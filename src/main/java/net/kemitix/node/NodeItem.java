@@ -110,10 +110,7 @@ public class NodeItem<T> implements Node<T> {
     @Override
     public Optional<Node<T>> walkTree(@NonNull final List<T> path) {
         if (path.size() > 0) {
-            Optional<Node<T>> found = children.stream()
-                    .filter((Node<T> child) -> path.get(0)
-                            .equals(child.getData()))
-                    .findFirst();
+            Optional<Node<T>> found = getChild(path.get(0));
             if (found.isPresent()) {
                 if (path.size() > 1) {
                     return found.get().walkTree(path.subList(1, path.size()));
