@@ -23,11 +23,12 @@ The library consits of an interface `Node` and an implementation `NodeItem`.
 
 ## Add a child node
 
-    root.createChild("child");
+    Node<String> child = root.createChild("child");
 
 Which is shorthand for:
 
-    root.addChild(new NodeItem<>("child"));
+    Node<String> child = new NodeItem<>("child");
+    root.addChild(child);
 
 The tree now looks like:
 
