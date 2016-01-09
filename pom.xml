@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>net.kemitix</groupId>
+    <artifactId>node</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>Node</name>
+    <description>A parent/children data structure</description>
+
+    <parent>
+        <groupId>net.kemitix</groupId>
+        <artifactId>kemitix-parent</artifactId>
+        <version>0.6.0</version>
+    </parent>
+
+    <issueManagement>
+        <url>https://github.com/kemitix/node/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
+
+    <scm>
+        <connection>scm:git:git@github.com:kemitix/node.git</connection>
+        <developerConnection>scm:git:git@github.com:kemitix/node.git</developerConnection>
+        <url>git@github.com:kemitix/node.git</url>
+    </scm>
+
+    <url>https://github.com/kemitix/node</url>
+
+    <inceptionYear>2016</inceptionYear>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>1.3</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
