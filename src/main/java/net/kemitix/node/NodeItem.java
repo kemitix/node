@@ -108,13 +108,8 @@ public class NodeItem<T> implements Node<T> {
      */
     @Override
     public boolean isChildOf(final Node<T> node) {
-        if (node.equals(parent)) {
-            return true;
-        }
-        if (parent != null) {
-            return parent.isChildOf(node);
-        }
-        return false;
+        return parent != null && (node.equals(parent) || parent.isChildOf(
+                node));
     }
 
     /**
