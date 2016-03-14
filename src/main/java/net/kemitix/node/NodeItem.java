@@ -148,9 +148,8 @@ public class NodeItem<T> implements Node<T> {
             throw new NullPointerException("descendants");
         }
         if (!descendants.isEmpty()) {
-            findOrCreateChild(descendants.get(0))
-                    .createDescendantLine(
-                            descendants.subList(1, descendants.size()));
+            findOrCreateChild(descendants.get(0)).createDescendantLine(
+                    descendants.subList(1, descendants.size()));
         }
     }
 
@@ -183,8 +182,8 @@ public class NodeItem<T> implements Node<T> {
             throw new NullPointerException("child");
         }
         return children.stream()
-                .filter((Node<T> t) -> t.getData().equals(child))
-                .findAny();
+                       .filter((Node<T> t) -> t.getData().equals(child))
+                       .findAny();
     }
 
     /**
