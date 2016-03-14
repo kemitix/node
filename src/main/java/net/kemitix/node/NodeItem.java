@@ -166,12 +166,7 @@ public class NodeItem<T> implements Node<T> {
         if (child == null) {
             throw new NullPointerException("child");
         }
-        Optional<Node<T>> found = getChild(child);
-        if (found.isPresent()) {
-            return found.get();
-        } else {
-            return createChild(child);
-        }
+        return getChild(child).orElseGet(() -> createChild(child));
     }
 
     /**
