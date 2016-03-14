@@ -18,7 +18,7 @@ public class NodeItem<T> implements Node<T> {
 
     private Node<T> parent;
 
-    private Set<Node<T>> children;
+    private final Set<Node<T>> children = new HashSet<>();
 
     /**
      * Creates a root node.
@@ -43,7 +43,6 @@ public class NodeItem<T> implements Node<T> {
         if (parent != null) {
             setParent(parent);
         }
-        this.children = new HashSet<>();
     }
 
     @Override
@@ -109,19 +108,15 @@ public class NodeItem<T> implements Node<T> {
      */
     @Override
     public boolean isChildOf(final Node<T> node) {
-        if (node.equals(parent)) {
-            return true;
-        }
-        if (parent != null) {
-            return parent.isChildOf(node);
-        }
-        return false;
+        return parent != null && (node.equals(parent) || parent.isChildOf(
+                node));
     }
 
     /**
      * Walks the node tree using the path to select each child.
      *
      * @param path the path to the desired child
+     *
      * @return the child or null
      */
     @Override
@@ -153,9 +148,8 @@ public class NodeItem<T> implements Node<T> {
             throw new NullPointerException("descendants");
         }
         if (!descendants.isEmpty()) {
-            findOrCreateChild(descendants.get(0))
-                    .createDescendantLine(
-                            descendants.subList(1, descendants.size()));
+            findOrCreateChild(descendants.get(0)).createDescendantLine(
+                    descendants.subList(1, descendants.size()));
         }
     }
 
@@ -172,12 +166,7 @@ public class NodeItem<T> implements Node<T> {
         if (child == null) {
             throw new NullPointerException("child");
         }
-        Optional<Node<T>> found = getChild(child);
-        if (found.isPresent()) {
-            return found.get();
-        } else {
-            return createChild(child);
-        }
+        return getChild(child).orElseGet(() -> createChild(child));
     }
 
     /**
@@ -193,8 +182,8 @@ public class NodeItem<T> implements Node<T> {
             throw new NullPointerException("child");
         }
         return children.stream()
-                .filter((Node<T> t) -> t.getData().equals(child))
-                .findAny();
+                       .filter((Node<T> t) -> t.getData().equals(child))
+                       .findAny();
     }
 
     /**
