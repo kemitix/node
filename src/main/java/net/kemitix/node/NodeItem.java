@@ -18,7 +18,7 @@ public class NodeItem<T> implements Node<T> {
 
     private Node<T> parent;
 
-    private Set<Node<T>> children;
+    private final Set<Node<T>> children = new HashSet<>();
 
     /**
      * Creates a root node.
@@ -43,7 +43,6 @@ public class NodeItem<T> implements Node<T> {
         if (parent != null) {
             setParent(parent);
         }
-        this.children = new HashSet<>();
     }
 
     @Override
