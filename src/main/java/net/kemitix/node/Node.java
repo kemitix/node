@@ -7,8 +7,9 @@ import java.util.Set;
 /**
  * An interface for tree node items.
  *
- * @author pcampbell
  * @param <T> the type of data held in each node
+ *
+ * @author pcampbell
  */
 public interface Node<T> {
 
@@ -21,7 +22,6 @@ public interface Node<T> {
 
     /**
      * Fetch the parent node.
-     *
      * <p>
      * If the node is a root node, i.e. has no parent, then this will return
      * null.

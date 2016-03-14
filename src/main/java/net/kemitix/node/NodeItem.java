@@ -116,6 +116,7 @@ public class NodeItem<T> implements Node<T> {
      * Walks the node tree using the path to select each child.
      *
      * @param path the path to the desired child
+     *
      * @return the child or null
      */
     @Override
