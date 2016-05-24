@@ -1,5 +1,6 @@
 package net.kemitix.node;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -323,6 +324,46 @@ public class NodeItem<T> implements Node<T> {
                 nameSupplier = n -> null;
             }
         }
+    }
+
+    @Override
+    public void placeNodeIn(final Node<T> nodeItem, final String... path) {
+        if (path.length == 0) {
+            if (nodeItem.isNamed()) {
+                final Optional<Node<T>> childNamed = findChildNamed(
+                        nodeItem.getName());
+                if (childNamed.isPresent()) {
+                    final Node<T> existing = childNamed.get();
+                    if (!existing.isEmpty()) {
+                        throw new NodeException(
+                                "A non-empty node with that name already "
+                                        + "exists here");
+                    } else {
+                        existing.getChildren().forEach(nodeItem::addChild);
+                        existing.removeParent();
+                        nodeItem.setParent(this);
+                        return;
+                    }
+                }
+            }
+            addChild(nodeItem);
+            return;
+        }
+        String item = path[0];
+        final Optional<Node<T>> childNamed = findChildNamed(item);
+        Node<T> child;
+        if (!childNamed.isPresent()) {
+            child = new NodeItem<>(null, item, this);
+        } else {
+            child = childNamed.get();
+            if (child.isEmpty()) {
+                if (path.length == 1) {
+                    getChildren().forEach(nodeItem::addChild);
+                    nodeItem.setParent(this);
+                }
+            }
+        }
+        child.placeNodeIn(nodeItem, Arrays.copyOfRange(path, 1, path.length));
     }
 
     @Override

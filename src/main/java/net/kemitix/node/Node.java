@@ -127,6 +127,14 @@ public interface Node<T> {
     Optional<Node<T>> walkTree(final List<T> path);
 
     /**
+     * Places the node in the tree under by the path. Intervening empty
+     * nodes are created as needed.
+     *
+     * @param node the node to place
+     * @param path the path to contain the new node
+     */
+    void placeNodeIn(Node<T> node, String... path);
+
     /**
      * Searches for a child with the name given.
      *
