@@ -306,6 +306,26 @@ public class NodeItem<T> implements Node<T> {
     }
 
     @Override
+    public void removeChild(final Node<T> node) {
+        if (children.remove(node)) {
+            node.removeParent();
+        }
+    }
+
+    @Override
+    public void removeParent() {
+        if (parent != null) {
+            parent.removeChild(this);
+            parent = null;
+            if (nameSupplier == null) {
+                // this is now a root node, so must provide a default name
+                // supplier
+                nameSupplier = n -> null;
+            }
+        }
+    }
+
+    @Override
     public String drawTree(final int depth) {
         final StringBuilder sb = new StringBuilder();
         final String unnamed = "(unnamed)";

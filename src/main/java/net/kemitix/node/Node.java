@@ -162,4 +162,15 @@ public interface Node<T> {
      */
     boolean isNamed();
 
+    /**
+     * Remove the node from the children.
+     *
+     * @param node the node to be removed
+     */
+    void removeChild(Node<T> node);
+
+    /**
+     * Removes the parent from the node. Makes the node into a new root node.
+     */
+    void removeParent();
 }
