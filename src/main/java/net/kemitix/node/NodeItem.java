@@ -51,6 +51,11 @@ public class NodeItem<T> implements Node<T> {
     }
 
     @Override
+    public boolean isEmpty() {
+        return data == null;
+    }
+
+    @Override
     public Node<T> getParent() {
         return parent;
     }

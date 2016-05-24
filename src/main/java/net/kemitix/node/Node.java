@@ -21,6 +21,13 @@ public interface Node<T> {
     T getData();
 
     /**
+     * Returns true if the node is empty (has no data).
+     *
+     * @return true is data is null
+     */
+    boolean isEmpty();
+
+    /**
      * Fetch the parent node.
      * <p>
      * If the node is a root node, i.e. has no parent, then this will return
