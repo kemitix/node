@@ -734,7 +734,9 @@ public class NodeItemTest {
         node.insertInPath(grandchild, "child");
         node.insertInPath(child);
         //then
-        assertThat(node.getChildByName("child")).as("child").isSameAs(child);
+        assertThat(node.getChildByName("child").getData()).as("data in tree")
+                                                          .isSameAs(
+                                                                  "child data");
         assertThat(
                 node.getChildByName("child").getChildByName("grandchild")).as(
                 "grandchild").isSameAs(grandchild);
@@ -798,14 +800,14 @@ public class NodeItemTest {
         child.addChild(target);
         final NodeItem<String> addMe = new NodeItem<>("I'm new", "target");
         assertThat(addMe.getParent()).isNull();
+        assertThat(child.getChildByName("target").isEmpty()).as(
+                "target starts empty").isTrue();
         //when
         // addMe should replace target as the sole descendant of child
         node.insertInPath(addMe, "child");
         //then
-        assertThat(child.getChildren()).as("child only contains new node")
-                                       .containsOnly(addMe);
-        assertThat(target.getParent()).as("old node is removed from tree")
-                                      .isNull();
+        assertThat(child.getChildByName("target").getData()).as(
+                "target now contains data").isEqualTo("I'm new");
     }
 
     @Test
