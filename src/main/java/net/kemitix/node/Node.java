@@ -89,6 +89,15 @@ public interface Node<T> {
     Node<T> createChild(T child);
 
     /**
+     * Creates a new named node and adds it as a child of the current node.
+     *
+     * @param child the child node's data
+     *
+     * @return the new child node
+     */
+    Node<T> createChild(T child, String name);
+
+    /**
      * Populates the tree with the path of nodes, each being a child of the
      * previous node in the path.
      *

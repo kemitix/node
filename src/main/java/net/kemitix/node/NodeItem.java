@@ -189,6 +189,13 @@ public class NodeItem<T> implements Node<T> {
         return new NodeItem<>(child, this);
     }
 
+    @Override
+    public Node<T> createChild(final T child, final String name) {
+        Node<T> node = createChild(child);
+        node.setName(name);
+        return node;
+    }
+
     /**
      * Populates the tree with the path of nodes, each being a child of the
      * previous node in the path.

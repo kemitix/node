@@ -888,4 +888,17 @@ public class NodeItemTest {
         //then
         assertThat(node.getData()).isEqualTo("updated");
     }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void canCreateNamedChild() {
+        //given
+        node = new NodeItem<>(null);
+        //when
+        Node<String> child = node.createChild("child data", "child name");
+        //then
+        assertThat(child.getName()).isEqualTo("child name");
+        assertThat(child.getParent()).isSameAs(node);
+        assertThat(node.getChildren()).containsExactly(child);
+    }
 }
