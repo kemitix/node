@@ -376,12 +376,14 @@ public class NodeItem<T> implements Node<T> {
     @Override
     public void removeParent() {
         if (parent != null) {
-            parent.removeChild(this);
+            Node<T> oldParent = parent;
+            Function<Node<T>, String> supplier = getNameSupplier();
             parent = null;
-            if (nameSupplier == null) {
+            oldParent.removeChild(this);
+            if (this.nameSupplier == null) {
                 // this is now a root node, so must provide a default name
                 // supplier
-                nameSupplier = n -> null;
+                this.nameSupplier = supplier;
             }
         }
     }

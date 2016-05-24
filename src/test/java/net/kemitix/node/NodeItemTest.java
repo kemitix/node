@@ -793,4 +793,67 @@ public class NodeItemTest {
         assertThat(target.getParent()).as("old node is removed from tree")
                                       .isNull();
     }
+
+    @Test
+    public void findChildNamedShouldThrowNPEWhenNameIsNull() {
+        //given
+        exception.expect(NullPointerException.class);
+        exception.expectMessage("name");
+        node = new NodeItem<>(null);
+        //when
+        node.findChildNamed(null);
+    }
+
+    @Test
+    public void isNamedNull() {
+        //given
+        node = new NodeItem<>(null);
+        //then
+        assertThat(node.isNamed()).isFalse();
+    }
+
+    @Test
+    public void isNamedEmpty() {
+        //given
+        node = new NodeItem<>(null, "");
+        //then
+        assertThat(node.isNamed()).isFalse();
+    }
+
+    @Test
+    public void isNamedNamed() {
+        //given
+        node = new NodeItem<>(null, "named");
+        //then
+        assertThat(node.isNamed()).isTrue();
+    }
+
+    @Test
+    public void removeParentNodeProvidesSameNameSupplier() {
+        // once a node has it's parent removed it should provide a default name
+        // provider
+        //given
+        node = new NodeItem<>("data", Node::getData); // name provider: getData
+        final NodeItem<String> child = new NodeItem<>("other", node);
+        assertThat(node.getName()).as("initial root name").isEqualTo("data");
+        assertThat(child.getName()).as("initial child name").isEqualTo("other");
+        //when
+        child.removeParent();
+        //then
+        assertThat(node.getName()).as("final root name").isEqualTo("data");
+        assertThat(child.getName()).as("final child name").isEqualTo("other");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void removeChildRemovesTheChild() {
+        //given
+        node = new NodeItem<>(null);
+        Node<String> child = node.createChild("child");
+        assertThat(node.getChildren()).containsExactly(child);
+        //then
+        node.removeChild(child);
+        //then
+        assertThat(node.getChildren()).isEmpty();
+    }
 }
