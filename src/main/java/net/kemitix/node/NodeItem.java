@@ -287,6 +287,10 @@ public class NodeItem<T> implements Node<T> {
     public Node<T> createChild(final T child) {
         if (child == null) {
             throw new NullPointerException("child");
+        }
+        return new NodeItem<>(child, this);
+    }
+
     @Override
     public Optional<Node<T>> findChildNamed(final String named) {
         if (named == null) {
@@ -384,10 +388,6 @@ public class NodeItem<T> implements Node<T> {
     @Override
     public boolean isNamed() {
         return name != null && name.length() > 0;
-    }
-
-        }
-        return new NodeItem<>(child, this);
     }
 
 }
