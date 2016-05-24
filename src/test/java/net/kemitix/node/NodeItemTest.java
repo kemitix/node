@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Test for {@link NodeItem}.
@@ -972,5 +973,30 @@ public class NodeItemTest {
         child.removeParent();
         //then
         assertThat(child.getName()).isEqualTo("local supplier");
+    }
+
+    @Test
+    public void getNameWithNameSupplierIsRecalculatedEachCall() {
+        val counter = new AtomicInteger(0);
+        node = new NodeItem<>(null,
+                n -> Integer.toString(counter.incrementAndGet()));
+        //then
+        assertThat(node.getName()).isNotEqualTo(node.getName());
+    }
+
+    @Test
+    public void isNamedWithNameSupplierIsRecalculatedEachCall() {
+        val counter = new AtomicInteger(0);
+        node = new NodeItem<>(null, n -> {
+            // alternate between even numbers and nulls: null, 2, null, 4, null
+            final int i = counter.incrementAndGet();
+            if (i % 2 == 0) {
+                return Integer.toString(i);
+            }
+            return null;
+        });
+        //then
+        assertThat(node.isNamed()).isFalse();
+        assertThat(node.isNamed()).isTrue();
     }
 }

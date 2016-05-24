@@ -14,7 +14,8 @@ import java.util.Set;
 public interface Node<T> {
 
     /**
-     * Fetch the name of the node.
+     * Fetch the name of the node. Where a node's name is determined via a name
+     * supplier, the name may be regenerated each time this method is called.
      *
      * @return the name of the node
      */
@@ -193,7 +194,8 @@ public interface Node<T> {
     String drawTree(int depth);
 
     /**
-     * Returns true if the Node has a name.
+     * Returns true if the Node has a name. Where a name supplier is used, the
+     * generated name is used.
      *
      * @return true if the node has a name
      */
