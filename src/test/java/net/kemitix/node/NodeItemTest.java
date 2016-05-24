@@ -976,6 +976,18 @@ public class NodeItemTest {
     }
 
     @Test
+    public void setNameToNullRevertsToParentNameSupplier() {
+        //given
+        node = new NodeItem<>(null, n -> "root supplier");
+        val child = new NodeItem<String>(null, "child name", node);
+        assertThat(child.getName()).isEqualTo("child name");
+        //when
+        child.setName(null);
+        //then
+        assertThat(child.getName()).isEqualTo("root supplier");
+    }
+
+    @Test
     public void getNameWithNameSupplierIsRecalculatedEachCall() {
         val counter = new AtomicInteger(0);
         node = new NodeItem<>(null,

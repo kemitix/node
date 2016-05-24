@@ -22,7 +22,8 @@ public interface Node<T> {
     String getName();
 
     /**
-     * Sets the explicit name for a node.
+     * Sets the explicit name for a node. Setting the name to null will clear
+     * the name and revert to the parent's name supplier.
      *
      * @param name the new name
      */
