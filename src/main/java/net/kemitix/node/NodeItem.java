@@ -57,7 +57,6 @@ public class NodeItem<T> implements Node<T> {
             final T data, final Function<Node<T>, String> nameSupplier) {
         this(data);
         this.nameSupplier = nameSupplier;
-        name = generateName();
     }
 
     /**
@@ -69,7 +68,6 @@ public class NodeItem<T> implements Node<T> {
     public NodeItem(final T data, final Node<T> parent) {
         this.data = data;
         setParent(parent);
-        this.name = generateName();
     }
 
     /**
@@ -114,6 +112,9 @@ public class NodeItem<T> implements Node<T> {
 
     @Override
     public String getName() {
+        if (name == null) {
+            return generateName();
+        }
         return name;
     }
 
@@ -386,7 +387,8 @@ public class NodeItem<T> implements Node<T> {
 
     @Override
     public boolean isNamed() {
-        return name != null && name.length() > 0;
+        String currentName = getName();
+        return currentName != null && currentName.length() > 0;
     }
 
     @Override
