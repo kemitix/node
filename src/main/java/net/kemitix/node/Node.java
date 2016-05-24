@@ -14,6 +14,20 @@ import java.util.Set;
 public interface Node<T> {
 
     /**
+     * Fetch the name of the node.
+     *
+     * @return the name of the node
+     */
+    String getName();
+
+    /**
+     * Sets the explicit name for a node.
+     *
+     * @param name the new name
+     */
+    void setName(String name);
+
+    /**
      * Fetch the data held within the node.
      *
      * @return the node's data
@@ -111,5 +125,12 @@ public interface Node<T> {
      * @return the child or null
      */
     Optional<Node<T>> walkTree(final List<T> path);
+
+    /**
+     * Returns true if the Node has a name.
+     *
+     * @return true if the node has a name
+     */
+    boolean isNamed();
 
 }

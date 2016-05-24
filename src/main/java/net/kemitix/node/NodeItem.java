@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Represents a tree of nodes.
@@ -16,33 +17,108 @@ public class NodeItem<T> implements Node<T> {
 
     private final T data;
 
-    private Node<T> parent;
-
     private final Set<Node<T>> children = new HashSet<>();
 
+    private Function<Node<T>, String> nameSupplier;
+
+    private Node<T> parent;
+
+    private String name;
+
     /**
-     * Creates a root node.
+     * Create unnamed root node.
      *
-     * @param data the value of the node
+     * @param data the data or null
      */
     public NodeItem(final T data) {
-        this(data, null);
+        this.data = data;
+        this.nameSupplier = (n) -> null;
+    }
+
+    /**
+     * Create named root node.
+     *
+     * @param data the data or null
+     * @param name the name
+     */
+    public NodeItem(final T data, final String name) {
+        this(data);
+        this.name = name;
+    }
+
+    /**
+     * Creates root node with a name supplier.
+     *
+     * @param data         the data or null
+     * @param nameSupplier the name supplier function
+     */
+    public NodeItem(
+            final T data, final Function<Node<T>, String> nameSupplier) {
+        this(data);
+        this.nameSupplier = nameSupplier;
+        name = generateName();
     }
 
     /**
      * Creates a node with a parent.
      *
-     * @param data   the value of the node
+     * @param data   the data or null
      * @param parent the parent node
      */
     public NodeItem(final T data, final Node<T> parent) {
-        if (data == null) {
-            throw new NullPointerException("data");
-        }
         this.data = data;
-        if (parent != null) {
-            setParent(parent);
+        setParent(parent);
+        this.name = generateName();
+    }
+
+    /**
+     * Creates a named node with a parent.
+     *
+     * @param data   the data or null
+     * @param name   the name
+     * @param parent the parent node
+     */
+    public NodeItem(final T data, final String name, final Node<T> parent) {
+        this.data = data;
+        this.name = name;
+        setParent(parent);
+    }
+
+    /**
+     * Creates a node with a name supplier and a parent.
+     *
+     * @param data         the data or null
+     * @param nameSupplier the name supplier function
+     * @param parent       the parent node
+     */
+    public NodeItem(
+            final T data, final Function<Node<T>, String> nameSupplier,
+            final Node<T> parent) {
+        this(data, nameSupplier);
+        setParent(parent);
+    }
+
+    private String generateName() {
+        return getNameSupplier().apply(this);
+    }
+
+    private Function<Node<T>, String> getNameSupplier() {
+        if (nameSupplier != null) {
+            return nameSupplier;
         }
+        // no test for parent as root nodes will always have a default name
+        // supplier
+        return ((NodeItem<T>) parent).getNameSupplier();
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(final String name) {
+        this.name = name;
     }
 
     @Override
@@ -97,6 +173,14 @@ public class NodeItem<T> implements Node<T> {
         }
         if (this.equals(child) || isChildOf(child)) {
             throw new NodeException("Child is an ancestor");
+        }
+        if (child.isNamed()) {
+            final Optional<Node<T>> existingChild = findChildNamed(
+                    child.getName());
+            if (existingChild.isPresent() && existingChild.get() != child) {
+                throw new NodeException(
+                        "Node with that name already exists here");
+            }
         }
         children.add(child);
         if (child.getParent() == null || !child.getParent().equals(this)) {
@@ -202,6 +286,11 @@ public class NodeItem<T> implements Node<T> {
     public Node<T> createChild(final T child) {
         if (child == null) {
             throw new NullPointerException("child");
+    @Override
+    public boolean isNamed() {
+        return name != null && name.length() > 0;
+    }
+
         }
         return new NodeItem<>(child, this);
     }
