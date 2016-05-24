@@ -152,11 +152,11 @@ public class NodeItem<T> implements Node<T> {
         if (child == null) {
             throw new NullPointerException("child");
         }
-        if (this.equals(child) || isChildOf(child)) {
+        if (this.equals(child) || isDescendantOf(child)) {
             throw new NodeException("Child is an ancestor");
         }
         if (child.isNamed()) {
-            final Optional<Node<T>> existingChild = findChildNamed(
+            final Optional<Node<T>> existingChild = findChildByName(
                     child.getName());
             if (existingChild.isPresent() && existingChild.get() != child) {
                 throw new NodeException(
@@ -214,7 +214,7 @@ public class NodeItem<T> implements Node<T> {
         if (child == null) {
             throw new NullPointerException("child");
         }
-        return getChild(child).orElseGet(() -> createChild(child));
+        return findChild(child).orElseGet(() -> createChild(child));
     }
 
     /**
@@ -225,7 +225,7 @@ public class NodeItem<T> implements Node<T> {
      * @return an {@link Optional} containing the child node if found
      */
     @Override
-    public Optional<Node<T>> getChild(final T child) {
+    public Optional<Node<T>> findChild(final T child) {
         if (child == null) {
             throw new NullPointerException("child");
         }
@@ -242,8 +242,8 @@ public class NodeItem<T> implements Node<T> {
      * @return true if the node is an ancestor
      */
     @Override
-    public boolean isChildOf(final Node<T> node) {
-        return parent != null && (node.equals(parent) || parent.isChildOf(
+    public boolean isDescendantOf(final Node<T> node) {
+        return parent != null && (node.equals(parent) || parent.isDescendantOf(
                 node));
     }
 
@@ -257,7 +257,7 @@ public class NodeItem<T> implements Node<T> {
         if (parent == null) {
             throw new NullPointerException("parent");
         }
-        if (this.equals(parent) || parent.isChildOf(this)) {
+        if (this.equals(parent) || parent.isDescendantOf(this)) {
             throw new NodeException("Parent is a descendant");
         }
         if (this.parent != null) {
@@ -275,15 +275,15 @@ public class NodeItem<T> implements Node<T> {
      * @return the child or null
      */
     @Override
-    public Optional<Node<T>> walkTree(final List<T> path) {
+    public Optional<Node<T>> findInPath(final List<T> path) {
         if (path == null) {
             throw new NullPointerException("path");
         }
         if (path.size() > 0) {
-            Optional<Node<T>> found = getChild(path.get(0));
+            Optional<Node<T>> found = findChild(path.get(0));
             if (found.isPresent()) {
                 if (path.size() > 1) {
-                    return found.get().walkTree(path.subList(1, path.size()));
+                    return found.get().findInPath(path.subList(1, path.size()));
                 }
                 return found;
             }
@@ -292,13 +292,13 @@ public class NodeItem<T> implements Node<T> {
     }
 
     @Override
-    public void placeNodeIn(final Node<T> nodeItem, final String... path) {
+    public void insertInPath(final Node<T> nodeItem, final String... path) {
         if (path.length == 0) {
             if (!nodeItem.isNamed()) { // nothing to conflict with
                 addChild(nodeItem);
                 return;
             }
-            final Optional<Node<T>> childNamed = findChildNamed(
+            final Optional<Node<T>> childNamed = findChildByName(
                     nodeItem.getName());
             if (!childNamed.isPresent()) { // nothing with the same name exists
                 addChild(nodeItem);
@@ -317,18 +317,18 @@ public class NodeItem<T> implements Node<T> {
             return;
         }
         String item = path[0];
-        final Optional<Node<T>> childNamed = findChildNamed(item);
+        final Optional<Node<T>> childNamed = findChildByName(item);
         Node<T> child;
         if (!childNamed.isPresent()) {
             child = new NodeItem<>(null, item, this);
         } else {
             child = childNamed.get();
         }
-        child.placeNodeIn(nodeItem, Arrays.copyOfRange(path, 1, path.length));
+        child.insertInPath(nodeItem, Arrays.copyOfRange(path, 1, path.length));
     }
 
     @Override
-    public Optional<Node<T>> findChildNamed(final String named) {
+    public Optional<Node<T>> findChildByName(final String named) {
         if (named == null) {
             throw new NullPointerException("name");
         }
@@ -338,8 +338,8 @@ public class NodeItem<T> implements Node<T> {
     }
 
     @Override
-    public Node<T> getChildNamed(final String named) {
-        final Optional<Node<T>> optional = findChildNamed(named);
+    public Node<T> getChildByName(final String named) {
+        final Optional<Node<T>> optional = findChildByName(named);
         if (optional.isPresent()) {
             return optional.get();
         }
