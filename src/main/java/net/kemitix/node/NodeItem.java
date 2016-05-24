@@ -333,9 +333,7 @@ public class NodeItem<T> implements Node<T> {
                 throw new NodeException(
                         "A non-empty node with that name already exists here");
             } else {
-                existing.getChildren().forEach(nodeItem::addChild);
-                existing.removeParent();
-                addChild(nodeItem);
+                existing.setData(nodeItem.getData());
             }
             return;
         }
