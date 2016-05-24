@@ -27,16 +27,6 @@ public class NodeItem<T> implements Node<T> {
     private String name;
 
     /**
-     * Create unnamed root node.
-     *
-     * @param data the data or null
-     */
-    public NodeItem(final T data) {
-        this.data = data;
-        this.nameSupplier = (n) -> null;
-    }
-
-    /**
      * Create named root node.
      *
      * @param data the data or null
@@ -45,6 +35,16 @@ public class NodeItem<T> implements Node<T> {
     public NodeItem(final T data, final String name) {
         this(data);
         this.name = name;
+    }
+
+    /**
+     * Create unnamed root node.
+     *
+     * @param data the data or null
+     */
+    public NodeItem(final T data) {
+        this.data = data;
+        this.nameSupplier = (n) -> null;
     }
 
     /**
@@ -143,26 +143,6 @@ public class NodeItem<T> implements Node<T> {
     }
 
     /**
-     * Make the current node a direct child of the parent.
-     *
-     * @param parent the new parent node
-     */
-    @Override
-    public final void setParent(final Node<T> parent) {
-        if (parent == null) {
-            throw new NullPointerException("parent");
-        }
-        if (this.equals(parent) || parent.isChildOf(this)) {
-            throw new NodeException("Parent is a descendant");
-        }
-        if (this.parent != null) {
-            this.parent.getChildren().remove(this);
-        }
-        this.parent = parent;
-        parent.addChild(this);
-    }
-
-    /**
      * Adds the child to the node.
      *
      * @param child the node to add
@@ -190,40 +170,18 @@ public class NodeItem<T> implements Node<T> {
     }
 
     /**
-     * Checks if the node is an ancestor.
+     * Creates a new node and adds it as a child of the current node.
      *
-     * @param node the potential ancestor
+     * @param child the child node's data
      *
-     * @return true if the node is an ancestor
+     * @return the new child node
      */
     @Override
-    public boolean isChildOf(final Node<T> node) {
-        return parent != null && (node.equals(parent) || parent.isChildOf(
-                node));
-    }
-
-    /**
-     * Walks the node tree using the path to select each child.
-     *
-     * @param path the path to the desired child
-     *
-     * @return the child or null
-     */
-    @Override
-    public Optional<Node<T>> walkTree(final List<T> path) {
-        if (path == null) {
-            throw new NullPointerException("path");
+    public Node<T> createChild(final T child) {
+        if (child == null) {
+            throw new NullPointerException("child");
         }
-        if (path.size() > 0) {
-            Optional<Node<T>> found = getChild(path.get(0));
-            if (found.isPresent()) {
-                if (path.size() > 1) {
-                    return found.get().walkTree(path.subList(1, path.size()));
-                }
-                return found;
-            }
-        }
-        return Optional.empty();
+        return new NodeItem<>(child, this);
     }
 
     /**
@@ -277,57 +235,60 @@ public class NodeItem<T> implements Node<T> {
     }
 
     /**
-     * Creates a new node and adds it as a child of the current node.
+     * Checks if the node is an ancestor.
      *
-     * @param child the child node's data
+     * @param node the potential ancestor
      *
-     * @return the new child node
+     * @return true if the node is an ancestor
      */
     @Override
-    public Node<T> createChild(final T child) {
-        if (child == null) {
-            throw new NullPointerException("child");
-        }
-        return new NodeItem<>(child, this);
+    public boolean isChildOf(final Node<T> node) {
+        return parent != null && (node.equals(parent) || parent.isChildOf(
+                node));
     }
 
+    /**
+     * Make the current node a direct child of the parent.
+     *
+     * @param parent the new parent node
+     */
     @Override
-    public Optional<Node<T>> findChildNamed(final String named) {
-        if (named == null) {
-            throw new NullPointerException("name");
+    public final void setParent(final Node<T> parent) {
+        if (parent == null) {
+            throw new NullPointerException("parent");
         }
-        return children.stream()
-                       .filter((Node<T> t) -> t.getName().equals(named))
-                       .findAny();
+        if (this.equals(parent) || parent.isChildOf(this)) {
+            throw new NodeException("Parent is a descendant");
+        }
+        if (this.parent != null) {
+            this.parent.getChildren().remove(this);
+        }
+        this.parent = parent;
+        parent.addChild(this);
     }
 
+    /**
+     * Walks the node tree using the path to select each child.
+     *
+     * @param path the path to the desired child
+     *
+     * @return the child or null
+     */
     @Override
-    public Node<T> getChildNamed(final String named) {
-        final Optional<Node<T>> optional = findChildNamed(named);
-        if (optional.isPresent()) {
-            return optional.get();
+    public Optional<Node<T>> walkTree(final List<T> path) {
+        if (path == null) {
+            throw new NullPointerException("path");
         }
-        throw new NodeException("Named child not found");
-    }
-
-    @Override
-    public void removeChild(final Node<T> node) {
-        if (children.remove(node)) {
-            node.removeParent();
-        }
-    }
-
-    @Override
-    public void removeParent() {
-        if (parent != null) {
-            parent.removeChild(this);
-            parent = null;
-            if (nameSupplier == null) {
-                // this is now a root node, so must provide a default name
-                // supplier
-                nameSupplier = n -> null;
+        if (path.size() > 0) {
+            Optional<Node<T>> found = getChild(path.get(0));
+            if (found.isPresent()) {
+                if (path.size() > 1) {
+                    return found.get().walkTree(path.subList(1, path.size()));
+                }
+                return found;
             }
         }
+        return Optional.empty();
     }
 
     @Override
@@ -371,6 +332,25 @@ public class NodeItem<T> implements Node<T> {
     }
 
     @Override
+    public Optional<Node<T>> findChildNamed(final String named) {
+        if (named == null) {
+            throw new NullPointerException("name");
+        }
+        return children.stream()
+                       .filter((Node<T> t) -> t.getName().equals(named))
+                       .findAny();
+    }
+
+    @Override
+    public Node<T> getChildNamed(final String named) {
+        final Optional<Node<T>> optional = findChildNamed(named);
+        if (optional.isPresent()) {
+            return optional.get();
+        }
+        throw new NodeException("Named child not found");
+    }
+
+    @Override
     public String drawTree(final int depth) {
         final StringBuilder sb = new StringBuilder();
         final String unnamed = "(unnamed)";
@@ -388,6 +368,26 @@ public class NodeItem<T> implements Node<T> {
     @Override
     public boolean isNamed() {
         return name != null && name.length() > 0;
+    }
+
+    @Override
+    public void removeChild(final Node<T> node) {
+        if (children.remove(node)) {
+            node.removeParent();
+        }
+    }
+
+    @Override
+    public void removeParent() {
+        if (parent != null) {
+            parent.removeChild(this);
+            parent = null;
+            if (nameSupplier == null) {
+                // this is now a root node, so must provide a default name
+                // supplier
+                nameSupplier = n -> null;
+            }
+        }
     }
 
 }

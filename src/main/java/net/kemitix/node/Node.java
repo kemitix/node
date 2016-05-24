@@ -52,6 +52,13 @@ public interface Node<T> {
     Node<T> getParent();
 
     /**
+     * Make the current node a direct child of the parent.
+     *
+     * @param parent the new parent node
+     */
+    void setParent(final Node<T> parent);
+
+    /**
      * Fetches the child nodes.
      *
      * @return the set of child nodes
@@ -109,13 +116,6 @@ public interface Node<T> {
      * @return true if the node is an ancestor
      */
     boolean isChildOf(final Node<T> node);
-
-    /**
-     * Make the current node a direct child of the parent.
-     *
-     * @param parent the new parent node
-     */
-    void setParent(final Node<T> parent);
 
     /**
      * Walks the node tree using the path to select each child.
