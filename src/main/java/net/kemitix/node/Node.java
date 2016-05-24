@@ -127,6 +127,25 @@ public interface Node<T> {
     Optional<Node<T>> walkTree(final List<T> path);
 
     /**
+    /**
+     * Searches for a child with the name given.
+     *
+     * @param name the name of the child
+     *
+     * @return an Optional containing the child found or empty
+     */
+    Optional<Node<T>> findChildNamed(String name);
+
+    /**
+     * Returns the child with the given name. If one can't be found a
+     * NodeException is thrown.
+     *
+     * @param name the name of the child
+     *
+     * @return the node
+     */
+    Node<T> getChildNamed(String name);
+
      * Returns true if the Node has a name.
      *
      * @return true if the node has a name

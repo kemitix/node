@@ -287,6 +287,25 @@ public class NodeItem<T> implements Node<T> {
         if (child == null) {
             throw new NullPointerException("child");
     @Override
+    public Optional<Node<T>> findChildNamed(final String named) {
+        if (named == null) {
+            throw new NullPointerException("name");
+        }
+        return children.stream()
+                       .filter((Node<T> t) -> t.getName().equals(named))
+                       .findAny();
+    }
+
+    @Override
+    public Node<T> getChildNamed(final String named) {
+        final Optional<Node<T>> optional = findChildNamed(named);
+        if (optional.isPresent()) {
+            return optional.get();
+        }
+        throw new NodeException("Named child not found");
+    }
+
+    @Override
     public boolean isNamed() {
         return name != null && name.length() > 0;
     }
