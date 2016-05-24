@@ -901,4 +901,25 @@ public class NodeItemTest {
         assertThat(child.getParent()).isSameAs(node);
         assertThat(node.getChildren()).containsExactly(child);
     }
+
+    @Test
+    public void canGetChildWhenFound() {
+        //given
+        node = new NodeItem<>("data");
+        Node<String> child = new NodeItem<>("child data", "child name", node);
+        //when
+        Node<String> found = node.getChild("child data");
+        //then
+        assertThat(found).isSameAs(child);
+    }
+
+    @Test
+    public void canGetChildWhenNotFound() {
+        //given
+        exception.expect(NodeException.class);
+        exception.expectMessage("Child not found");
+        node = new NodeItem<>("data");
+        //when
+        node.getChild("child data");
+    }
 }

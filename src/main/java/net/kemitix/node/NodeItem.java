@@ -246,6 +246,14 @@ public class NodeItem<T> implements Node<T> {
                        .findAny();
     }
 
+    @Override
+    public Node<T> getChild(final T child) {
+        Optional<Node<T>> optional = findChild(child);
+        if (optional.isPresent())
+            return optional.get();
+        throw new NodeException("Child not found");
+    }
+
     /**
      * Checks if the node is an ancestor.
      *
