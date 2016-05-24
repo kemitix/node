@@ -354,8 +354,9 @@ public class NodeItem<T> implements Node<T> {
             sb.append(String.format("[%1$" + (depth + name.length()) + "s]\n",
                     name));
         } else if (!children.isEmpty()) {
-            sb.append(String.format("[%1$" + (depth + unnamed) + "s]\n",
-                    unnamed));
+            sb.append(
+                    String.format("[%1$" + (depth + unnamed.length()) + "s]\n",
+                            unnamed));
         }
         getChildren().stream().forEach(c -> sb.append(c.drawTree(depth + 1)));
         return sb.toString();

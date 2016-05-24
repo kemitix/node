@@ -856,4 +856,26 @@ public class NodeItemTest {
         //then
         assertThat(node.getChildren()).isEmpty();
     }
+
+    @Test
+    public void drawTreeIsCorrect() {
+        //given
+        node = new NodeItem<>(null, "root");
+        val bob = new NodeItem<String>(null, "bob", node);
+        val alice = new NodeItem<String>(null, "alice", node);
+        new NodeItem<>(null, "dave", alice);
+        new NodeItem<>(null, bob); // has no name and no children so no included
+        val kim = new NodeItem<String>(null, node); // nameless mother
+        new NodeItem<>(null, "lucy", kim);
+        //when
+        val tree = node.drawTree(0);
+        //then
+        String[] lines = tree.split("\n");
+        assertThat(lines).contains("[root]", "[ alice]", "[  dave]",
+                "[ (unnamed)]", "[  lucy]", "[ bob]");
+        assertThat(lines).containsSubsequence("[root]", "[ alice]", "[  dave]");
+        assertThat(lines).containsSubsequence("[root]", "[ (unnamed)]",
+                "[  lucy]");
+        assertThat(lines).containsSubsequence("[root]", "[ bob]");
+    }
 }
