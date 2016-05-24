@@ -744,4 +744,53 @@ public class NodeItemTest {
         //when
         node.removeParent();
     }
+
+    @Test
+    public void placeNodeInTreeWhereNonEmptyNodeWithSameNameExists() {
+        //given
+        exception.expect(NodeException.class);
+        exception.expectMessage(
+                "A non-empty node with that name already exists here");
+        node = new NodeItem<>(null);
+        val child = new NodeItem<String>(null, "child", node);
+        new NodeItem<>("data", "grandchild", child);
+        // root -> child -> grandchild
+        // only grandchild has data
+        //when
+        // attempt to add another node called 'grandchild' to 'child'
+        node.placeNodeIn(new NodeItem<>("cuckoo", "grandchild"), "child");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void placeNodeInTreeWhenAddedNodeIsUnnamed() {
+        //given
+        node = new NodeItem<>(null);
+        final Node<String> newNode = new NodeItem<>(null);
+        //when
+        node.placeNodeIn(newNode);
+        //then
+        assertThat(node.getChildren()).containsOnly(newNode);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void placeNodeInTreeWhenEmptyChildWithTargetNameExists() {
+        //given
+        node = new NodeItem<>(null);
+        final NodeItem<String> child = new NodeItem<>(null, "child");
+        final NodeItem<String> target = new NodeItem<>(null, "target");
+        node.addChild(child);
+        child.addChild(target);
+        final NodeItem<String> addMe = new NodeItem<>("I'm new", "target");
+        assertThat(addMe.getParent()).isNull();
+        //when
+        // addMe should replace target as the sole descendant of child
+        node.placeNodeIn(addMe, "child");
+        //then
+        assertThat(child.getChildren()).as("child only contains new node")
+                                       .containsOnly(addMe);
+        assertThat(target.getParent()).as("old node is removed from tree")
+                                      .isNull();
+    }
 }

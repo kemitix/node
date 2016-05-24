@@ -294,24 +294,26 @@ public class NodeItem<T> implements Node<T> {
     @Override
     public void placeNodeIn(final Node<T> nodeItem, final String... path) {
         if (path.length == 0) {
-            if (nodeItem.isNamed()) {
-                final Optional<Node<T>> childNamed = findChildNamed(
-                        nodeItem.getName());
-                if (childNamed.isPresent()) {
-                    final Node<T> existing = childNamed.get();
-                    if (!existing.isEmpty()) {
-                        throw new NodeException(
-                                "A non-empty node with that name already "
-                                        + "exists here");
-                    } else {
-                        existing.getChildren().forEach(nodeItem::addChild);
-                        existing.removeParent();
-                        nodeItem.setParent(this);
-                        return;
-                    }
-                }
+            if (!nodeItem.isNamed()) { // nothing to conflict with
+                addChild(nodeItem);
+                return;
             }
-            addChild(nodeItem);
+            final Optional<Node<T>> childNamed = findChildNamed(
+                    nodeItem.getName());
+            if (!childNamed.isPresent()) { // nothing with the same name exists
+                addChild(nodeItem);
+                return;
+            }
+            // we have an existing node with the same name
+            final Node<T> existing = childNamed.get();
+            if (!existing.isEmpty()) {
+                throw new NodeException(
+                        "A non-empty node with that name already exists here");
+            } else {
+                existing.getChildren().forEach(nodeItem::addChild);
+                existing.removeParent();
+                addChild(nodeItem);
+            }
             return;
         }
         String item = path[0];
@@ -321,12 +323,6 @@ public class NodeItem<T> implements Node<T> {
             child = new NodeItem<>(null, item, this);
         } else {
             child = childNamed.get();
-            if (child.isEmpty()) {
-                if (path.length == 1) {
-                    getChildren().forEach(nodeItem::addChild);
-                    nodeItem.setParent(this);
-                }
-            }
         }
         child.placeNodeIn(nodeItem, Arrays.copyOfRange(path, 1, path.length));
     }
