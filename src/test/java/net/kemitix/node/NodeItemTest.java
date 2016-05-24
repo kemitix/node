@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 /**
  * Test for {@link NodeItem}.
@@ -1010,5 +1011,22 @@ public class NodeItemTest {
         //then
         assertThat(node.isNamed()).isFalse();
         assertThat(node.isNamed()).isTrue();
+    }
+
+    @Test
+    public void canUseNameSupplierToBuildFullPath() {
+        //given
+        final Function<Node<String>, String> pathNameSupplier = node -> {
+            Node<String> parent = node.getParent();
+            if (parent == null) {
+                return "";
+            }
+            return parent.getName() + "/" + node.getData();
+        };
+        node = new NodeItem<>(null, pathNameSupplier);
+        val child = new NodeItem<String>("child", node);
+        val grandchild = new NodeItem<String>("grandchild", child);
+        //then
+        assertThat(grandchild.getName()).isEqualTo("/child/grandchild");
     }
 }
