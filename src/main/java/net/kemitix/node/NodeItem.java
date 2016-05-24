@@ -16,7 +16,7 @@ import java.util.function.Function;
  */
 public class NodeItem<T> implements Node<T> {
 
-    private final T data;
+    private T data;
 
     private final Set<Node<T>> children = new HashSet<>();
 
@@ -125,6 +125,11 @@ public class NodeItem<T> implements Node<T> {
     @Override
     public T getData() {
         return data;
+    }
+
+    @Override
+    public void setData(final T data) {
+        this.data = data;
     }
 
     @Override

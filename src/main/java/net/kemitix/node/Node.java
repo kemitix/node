@@ -35,6 +35,13 @@ public interface Node<T> {
     T getData();
 
     /**
+     * Set the data held within the node.
+     *
+     * @param data the node's data
+     */
+    void setData(T data);
+
+    /**
      * Returns true if the node is empty (has no data).
      *
      * @return true is data is null

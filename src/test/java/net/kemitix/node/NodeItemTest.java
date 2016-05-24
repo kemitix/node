@@ -878,4 +878,14 @@ public class NodeItemTest {
                 "[  lucy]");
         assertThat(lines).containsSubsequence("[root]", "[ bob]");
     }
+
+    @Test
+    public void canChangeNodeData() {
+        //given
+        node = new NodeItem<>("initial");
+        //when
+        node.setData("updated");
+        //then
+        assertThat(node.getData()).isEqualTo("updated");
+    }
 }
