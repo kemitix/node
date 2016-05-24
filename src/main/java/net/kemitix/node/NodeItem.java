@@ -190,6 +190,7 @@ public class NodeItem<T> implements Node<T> {
     }
 
     @Override
+    @SuppressWarnings("hiddenfield")
     public Node<T> createChild(final T child, final String name) {
         Node<T> node = createChild(child);
         node.setName(name);
@@ -249,8 +250,9 @@ public class NodeItem<T> implements Node<T> {
     @Override
     public Node<T> getChild(final T child) {
         Optional<Node<T>> optional = findChild(child);
-        if (optional.isPresent())
+        if (optional.isPresent()) {
             return optional.get();
+        }
         throw new NodeException("Child not found");
     }
 

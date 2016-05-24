@@ -92,6 +92,7 @@ public interface Node<T> {
      * Creates a new named node and adds it as a child of the current node.
      *
      * @param child the child node's data
+     * @param name  the name
      *
      * @return the new child node
      */
