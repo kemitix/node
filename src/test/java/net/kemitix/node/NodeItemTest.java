@@ -717,7 +717,8 @@ public class NodeItemTest {
         node.insertInPath(grandchild, "child"); // as root/child/grandchild
         //then
         assertThat(node.getChildByName("child")).as("child").isSameAs(child);
-        assertThat(node.getChildByName("child").getChildByName("grandchild")).as(
+        assertThat(
+                node.getChildByName("child").getChildByName("grandchild")).as(
                 "grandchild").isSameAs(grandchild);
     }
 
@@ -733,7 +734,8 @@ public class NodeItemTest {
         node.insertInPath(child);
         //then
         assertThat(node.getChildByName("child")).as("child").isSameAs(child);
-        assertThat(node.getChildByName("child").getChildByName("grandchild")).as(
+        assertThat(
+                node.getChildByName("child").getChildByName("grandchild")).as(
                 "grandchild").isSameAs(grandchild);
     }
 
@@ -743,6 +745,17 @@ public class NodeItemTest {
         node = new NodeItem<>(null);
         //when
         node.removeParent();
+    }
+
+    @Test
+    public void removingParentFromNodeWithParentRemovesParent() {
+        //given
+        node = new NodeItem<>(null);
+        NodeItem<String> child = new NodeItem<>(null, node);
+        //when
+        child.removeParent();
+        //then
+        assertThat(child.getParent()).isNull();
     }
 
     @Test
@@ -921,5 +934,43 @@ public class NodeItemTest {
         node = new NodeItem<>("data");
         //when
         node.getChild("child data");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void constructorWithNameSupplierAndParentBeChildOfParent() {
+        //given
+        node = new NodeItem<>(null);
+        //when
+        NodeItem<String> child = new NodeItem<>(null, Node::getData, node);
+        //then
+        assertThat(child.getParent()).isSameAs(node);
+        assertThat(node.getChildren()).containsExactly(child);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void removeParentCopiesRootNameSupplier() {
+        //given
+        node = new NodeItem<>("root data", n -> "root supplier");
+        val child = new NodeItem<>("child data", node);
+        assertThat(child.getName()).isEqualTo("root supplier");
+        //when
+        child.removeParent();
+        //then
+        assertThat(child.getName()).isEqualTo("root supplier");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void removeParentDoesNotReplaceLocalNameSupplier() {
+        //given
+        node = new NodeItem<>("root data", n -> "root supplier");
+        val child = new NodeItem<>("child data", n -> "local supplier", node);
+        assertThat(child.getName()).isEqualTo("local supplier");
+        //when
+        child.removeParent();
+        //then
+        assertThat(child.getName()).isEqualTo("local supplier");
     }
 }
