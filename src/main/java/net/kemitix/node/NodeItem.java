@@ -306,6 +306,21 @@ public class NodeItem<T> implements Node<T> {
     }
 
     @Override
+    public String drawTree(final int depth) {
+        final StringBuilder sb = new StringBuilder();
+        final String unnamed = "(unnamed)";
+        if (isNamed()) {
+            sb.append(String.format("[%1$" + (depth + name.length()) + "s]\n",
+                    name));
+        } else if (!children.isEmpty()) {
+            sb.append(String.format("[%1$" + (depth + unnamed) + "s]\n",
+                    unnamed));
+        }
+        getChildren().stream().forEach(c -> sb.append(c.drawTree(depth + 1)));
+        return sb.toString();
+    }
+
+    @Override
     public boolean isNamed() {
         return name != null && name.length() > 0;
     }

@@ -146,6 +146,16 @@ public interface Node<T> {
      */
     Node<T> getChildNamed(String name);
 
+    /**
+     * Draw a representation of the tree.
+     *
+     * @param depth current depth for recursion
+     *
+     * @return a representation of the tree
+     */
+    String drawTree(int depth);
+
+    /**
      * Returns true if the Node has a name.
      *
      * @return true if the node has a name
