@@ -1,13 +1,15 @@
 package net.kemitix.node;
 
 import lombok.val;
-import org.junit.Assert;
+import org.assertj.core.api.SoftAssertions;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
@@ -19,32 +21,51 @@ import java.util.Optional;
  */
 public class NodeItemTest {
 
-    /**
-     * Class under test.
-     */
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
     private Node<String> node;
 
-    /**
-     * Test that node data is recoverable.
-     */
     @Test
-    public void shouldReturnNodeData() {
+    public void getDataReturnsData() {
         //given
         val data = "this node data";
         //when
         node = new NodeItem<>(data);
         //then
-        Assert.assertThat("can get the data from a node", node.getData(),
-                is(data));
+        assertThat(node.getData()).as("can get the data from a node").
+                isSameAs(data);
     }
 
-    /**
-     * Test that passing null as node data throws exception.
-     */
-    @Test(expected = NullPointerException.class)
-    public void shouldThrowNPEWhenDataIsNull() {
+    @Test
+    public void canCreateAnEmptyAndUnnamedNode() {
         //when
         node = new NodeItem<>(null);
+        //then
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(node.isEmpty()).as("node is empty").isTrue();
+        softly.assertThat(node.isNamed()).as("node is unnamed").isFalse();
+        softly.assertAll();
+    }
+
+    @Test
+    public void canCreateNodeWithParentAndCustomNameSupplier() {
+        //given
+        node = new NodeItem<>(null, n -> "root name supplier");
+        //when
+        val child = new NodeItem<>(null, n -> "overridden", node);
+        //then
+        assertThat(child.getName()).isEqualTo("overridden");
+    }
+
+    @Test
+    public void canSetName() {
+        //given
+        node = new NodeItem<>(null);
+        //when
+        node.setName("named");
+        //then
+        assertThat(node.getName()).isEqualTo("named");
     }
 
     /**
@@ -53,10 +74,10 @@ public class NodeItemTest {
     @Test
     public void shouldHaveNullForDefaultParent() {
         //given
-        node = new NodeItem<>("data");
+        node = new NodeItem<>("data", Node::getData);
         //then
-        Assert.assertThat("node created without a parent has null as parent",
-                node.getParent(), nullValue());
+        assertThat(node.getParent()).as(
+                "node created without a parent has null as parent").isNull();
     }
 
     /**
@@ -65,23 +86,26 @@ public class NodeItemTest {
     @Test
     public void shouldReturnNodeParent() {
         //given
-        val parent = new NodeItem<String>("parent");
+        val parent = new NodeItem<String>("parent", Node::getData);
         //when
         node = new NodeItem<>("subject", parent);
         //then
-        Assert.assertThat("node created with a parent can return the parent",
-                node.getParent(), is(parent));
+        assertThat(node.getParent()).as(
+                "node created with a parent can return the parent")
+                                    .isSameAs(parent);
     }
 
     /**
      * Test that setting the parent on a node where the proposed parent is a
      * child of the node throws an exception.
      */
-    @Test(expected = NodeException.class)
-    public void shouldThrowNEWhenSettingParentToAChild() {
+    @Test
+    public void setParentShouldThrowNodeExceptionWhenParentIsAChild() {
         //given
-        node = new NodeItem<>("subject");
+        node = new NodeItem<>("subject", Node::getData);
         val child = new NodeItem<String>("child", node);
+        exception.expect(NodeException.class);
+        exception.expectMessage("Parent is a descendant");
         //when
         node.setParent(child);
     }
@@ -91,16 +115,16 @@ public class NodeItemTest {
      * child of the parent.
      */
     @Test
+    @SuppressWarnings("unchecked")
     public void shouldAddNewNodeAsChildToParent() {
         //given
-        val parent = new NodeItem<String>("parent");
+        val parent = new NodeItem<String>("parent", Node::getData);
         //when
         node = new NodeItem<>("subject", parent);
         //then
-        Assert.assertThat(
+        assertThat(parent.getChildren()).as(
                 "when a node is created with a parent, the parent has the new"
-                        + " node among it's children", parent.getChildren(),
-                hasItem(node));
+                        + " node among it's children").contains(node);
     }
 
     /**
@@ -109,23 +133,25 @@ public class NodeItemTest {
     @Test
     public void shouldReturnSetParent() {
         //given
-        node = new NodeItem<>("subject");
-        val parent = new NodeItem<String>("parent");
+        node = new NodeItem<>("subject", Node::getData);
+        val parent = new NodeItem<String>("parent", Node::getData);
         //when
         node.setParent(parent);
         //then
-        Assert.assertThat(
+        assertThat(node.getParent()).as(
                 "when a node is assigned a new parent that parent can be "
-                        + "returned", node.getParent(), is(parent));
+                        + "returned").isSameAs(parent);
     }
 
     /**
      * Test that we throw an exception when passed null.
      */
-    @Test(expected = NullPointerException.class)
+    @Test
     public void shouldThrowNPEWhenSetParentNull() {
         //given
-        node = new NodeItem<>("subject");
+        node = new NodeItem<>("subject", Node::getData);
+        exception.expect(NullPointerException.class);
+        exception.expectMessage("parent");
         //when
         node.setParent(null);
     }
@@ -134,10 +160,12 @@ public class NodeItemTest {
      * Test that we throw an exceptions when attempting to node as its own
      * parent.
      */
-    @Test(expected = NodeException.class)
-    public void shouldThrowNEWhenSetParentSelf() {
+    @Test
+    public void setParentShouldThrowNodeExceptionWhenParentIsSelf() {
         //given
-        node = new NodeItem<>("subject");
+        node = new NodeItem<>("subject", Node::getData);
+        exception.expect(NodeException.class);
+        exception.expectMessage("Parent is a descendant");
         //when
         node.setParent(node);
     }
@@ -149,19 +177,18 @@ public class NodeItemTest {
     @Test
     public void shouldUpdateOldParentWhenNodeSetToNewParent() {
         //given
-        node = new NodeItem<>("subject");
+        node = new NodeItem<>("subject", Node::getData);
         val child = node.createChild("child");
-        val newParent = new NodeItem<String>("newParent");
+        val newParent = new NodeItem<String>("newParent", Node::getData);
         //when
         child.setParent(newParent);
         //then
-        Assert.assertThat(
+        assertThat(child.getParent()).as(
                 "when a node is assigned a new parent, the old parent is "
-                        + "replaced", child.getParent(), is(newParent));
-        Assert.assertThat(
+                        + "replaced").isSameAs(newParent);
+        assertThat(node.getChild("child").isPresent()).as(
                 "when a node is assigned a new parent, the old parent no "
-                        + "longer has the node among it's children",
-                node.getChild("child").isPresent(), is(false));
+                        + "longer has the node among it's children").isFalse();
     }
 
     /**
@@ -171,30 +198,31 @@ public class NodeItemTest {
     @Test
     public void shouldRemoveNodeFromOldParentWhenAddedAsChildToNewParent() {
         //given
-        node = new NodeItem<>("subject");
+        node = new NodeItem<>("subject", Node::getData);
         val child = node.createChild("child");
-        val newParent = new NodeItem<String>("newParent");
+        val newParent = new NodeItem<String>("newParent", Node::getData);
         //when
         newParent.addChild(child);
         //then
-        Assert.assertThat(
+        assertThat(child.getParent()).as(
                 "when a node with an existing parent is added as a child "
-                        + "to another node, then the old parent is replaced",
-                child.getParent(), is(newParent));
-        Assert.assertThat(
+                        + "to another node, then the old parent is replaced")
+                                     .isSameAs(newParent);
+        assertThat(node.getChild("child").isPresent()).as(
                 "when a node with an existing parent is added as a child to "
                         + "another node, then the old parent no longer has "
-                        + "the node among it's children",
-                node.getChild("child").isPresent(), is(false));
+                        + "the node among it's children").isFalse();
     }
 
     /**
      * Test that adding null as a child throws an exception.
      */
-    @Test(expected = NullPointerException.class)
+    @Test
     public void shouldThrowNPEWhenAddingNullAsChild() {
         //given
-        node = new NodeItem<>("subject");
+        node = new NodeItem<>("subject", Node::getData);
+        exception.expect(NullPointerException.class);
+        exception.expectMessage("child");
         //when
         node.addChild(null);
     }
@@ -203,25 +231,28 @@ public class NodeItemTest {
      * Test that adding a child is returned.
      */
     @Test
+    @SuppressWarnings("unchecked")
     public void shouldReturnAddedChild() {
         //given
-        node = new NodeItem<>("subject");
-        val child = new NodeItem<String>("child");
+        node = new NodeItem<>("subject", Node::getData);
+        val child = new NodeItem<String>("child", Node::getData);
         //when
         node.addChild(child);
         //then
-        Assert.assertThat(
+        assertThat(node.getChildren()).as(
                 "when a node is added as a child, the node is among the "
-                        + "children", node.getChildren(), hasItem(child));
+                        + "children").contains(child);
     }
 
     /**
      * Test that adding a node as it's own child throws an exception.
      */
-    @Test(expected = NodeException.class)
-    public void shouldThrowNEWhenAddingANodeAsOwnChild() {
+    @Test
+    public void addChildShouldThrowNodeExceptionWhenAddingANodeAsOwnChild() {
         //given
-        node = new NodeItem<>("subject");
+        node = new NodeItem<>("subject", Node::getData);
+        exception.expect(NodeException.class);
+        exception.expectMessage("Child is an ancestor");
         //then
         node.addChild(node);
     }
@@ -229,10 +260,12 @@ public class NodeItemTest {
     /**
      * Test that adding a node to itself as a child causes an exception.
      */
-    @Test(expected = NodeException.class)
-    public void shouldThrowWhenAddingSelfAsChild() {
+    @Test
+    public void addChildShouldThrowNodeExceptionWhenAddingSelfAsChild() {
         //given
-        node = new NodeItem<>("subject");
+        node = new NodeItem<>("subject", Node::getData);
+        exception.expect(NodeException.class);
+        exception.expectMessage("Child is an ancestor");
         //when
         node.addChild(node);
     }
@@ -241,11 +274,13 @@ public class NodeItemTest {
      * Test that adding the parent of a node to the node as a child causes an
      * exception.
      */
-    @Test(expected = NodeException.class)
-    public void shouldThrowWhenAddingParentAsChild() {
+    @Test
+    public void addChildShouldThrowNodeExceptionWhenChildIsParent() {
         //given
-        val parent = new NodeItem<String>("parent");
+        val parent = new NodeItem<String>("parent", Node::getData);
         node = new NodeItem<>("subject", parent);
+        exception.expect(NodeException.class);
+        exception.expectMessage("Child is an ancestor");
         //when
         node.addChild(parent);
     }
@@ -254,12 +289,14 @@ public class NodeItemTest {
      * Test that adding the grandparent to a node as a child causes an
      * exception.
      */
-    @Test(expected = NodeException.class)
-    public void shouldThrowWhenAddingGrandParentAsChild() {
+    @Test
+    public void addChildShouldThrowNodeExceptionWhenAddingGrandParentAsChild() {
         //given
-        val grandParent = new NodeItem<String>("grandparent");
+        val grandParent = new NodeItem<String>("grandparent", Node::getData);
         val parent = new NodeItem<String>("parent", grandParent);
         node = new NodeItem<>("subject", parent);
+        exception.expect(NodeException.class);
+        exception.expectMessage("Child is an ancestor");
         //when
         node.addChild(grandParent);
     }
@@ -270,14 +307,14 @@ public class NodeItemTest {
     @Test
     public void shouldSetParentOnChildWhenAddedAsChild() {
         //given
-        val child = new NodeItem<String>("child");
-        node = new NodeItem<>("subject");
+        val child = new NodeItem<String>("child", Node::getData);
+        node = new NodeItem<>("subject", Node::getData);
         //when
         node.addChild(child);
         //then
-        Assert.assertThat(
+        assertThat(child.getParent()).as(
                 "when a node is added as a child, the child has the node as "
-                        + "its parent", child.getParent(), is(node));
+                        + "its parent").isSameAs(node);
     }
 
     /**
@@ -287,7 +324,7 @@ public class NodeItemTest {
     public void shouldWalkTreeToNode() {
         //given
         val grandparent = "grandparent";
-        val grandParentNode = new NodeItem<String>(grandparent);
+        val grandParentNode = new NodeItem<String>(grandparent, Node::getData);
         val parent = "parent";
         val parentNode = new NodeItem<String>(parent, grandParentNode);
         val subject = "subject";
@@ -295,12 +332,12 @@ public class NodeItemTest {
         //when
         val result = grandParentNode.walkTree(Arrays.asList(parent, subject));
         //then
-        Assert.assertThat("when we walk the tree to a node it is found",
-                result.isPresent(), is(true));
+        assertThat(result.isPresent()).as(
+                "when we walk the tree to a node it is found").isTrue();
         if (result.isPresent()) {
-            Assert.assertThat(
-                    "when we walk the tree to a node the correct node is found",
-                    result.get(), is(node));
+            assertThat(result.get()).as(
+                    "when we walk the tree to a node the correct node is found")
+                                    .isSameAs(node);
         }
     }
 
@@ -312,24 +349,26 @@ public class NodeItemTest {
     public void shouldNotFindNonExistentChildNode() {
         //given
         val parent = "parent";
-        val parentNode = new NodeItem<String>(parent);
+        val parentNode = new NodeItem<String>(parent, Node::getData);
         val subject = "subject";
         node = new NodeItem<>(subject, parentNode);
         //when
         val result = parentNode.walkTree(Arrays.asList(subject, "no child"));
         //then
-        Assert.assertThat(
+        assertThat(result.isPresent()).as(
                 "when we walk the tree to a node that doesn't exists, nothing"
-                        + " is found", result.isPresent(), is(false));
+                        + " is found").isFalse();
     }
 
     /**
      * Test that when we pass null we get an exception.
      */
-    @Test(expected = NullPointerException.class)
+    @Test
     public void shouldThrowNEWhenWalkTreeNull() {
         //given
-        node = new NodeItem<>("subject");
+        node = new NodeItem<>("subject", Node::getData);
+        exception.expect(NullPointerException.class);
+        exception.expectMessage("path");
         //when
         node.walkTree(null);
     }
@@ -341,9 +380,11 @@ public class NodeItemTest {
     @Test
     public void shouldReturnEmptyForEmptyWalkTreePath() {
         //given
-        node = new NodeItem<>("subject");
+        node = new NodeItem<>("subject", Node::getData);
         //when
-        node.walkTree(Collections.emptyList());
+        val result = node.walkTree(Collections.emptyList());
+        //then
+        assertThat(result).isEmpty();
     }
 
     /**
@@ -352,7 +393,7 @@ public class NodeItemTest {
     @Test
     public void shouldCreateDescendantNodes() {
         //given
-        node = new NodeItem<>("subject");
+        node = new NodeItem<>("subject", Node::getData);
         val alphaData = "alpha";
         val betaData = "beta";
         val gammaData = "gamma";
@@ -361,36 +402,34 @@ public class NodeItemTest {
                 Arrays.asList(alphaData, betaData, gammaData));
         //then
         val alphaOptional = node.getChild(alphaData);
-        Assert.assertThat(
-                "when creating a descendant line, the first element is found",
-                alphaOptional.isPresent(), is(true));
+        assertThat(alphaOptional.isPresent()).as(
+                "when creating a descendant line, the first element is found")
+                                             .isTrue();
         if (alphaOptional.isPresent()) {
             val alpha = alphaOptional.get();
-            Assert.assertThat(
+            assertThat(alpha.getParent()).as(
                     "when creating a descendant line, the first element has "
-                            + "the current node as its parent",
-                    alpha.getParent(), is(node));
+                            + "the current node as its parent").isSameAs(node);
             val betaOptional = alpha.getChild(betaData);
-            Assert.assertThat(
+            assertThat(betaOptional.isPresent()).as(
                     "when creating a descendant line, the second element is "
-                            + "found", betaOptional.isPresent(), is(true));
+                            + "found").isTrue();
             if (betaOptional.isPresent()) {
                 val beta = betaOptional.get();
-                Assert.assertThat(
+                assertThat(beta.getParent()).as(
                         "when creating a descendant line, the second element "
-                                + "has the first as its parent",
-                        beta.getParent(), is(alpha));
+                                + "has the first as its parent")
+                                            .isSameAs(alpha);
                 val gammaOptional = beta.getChild(gammaData);
-                Assert.assertThat(
+                assertThat(gammaOptional.isPresent()).as(
                         "when creating a descendant line, the third element "
-                                + "is found", gammaOptional.isPresent(),
-                        is(true));
+                                + "is found").isTrue();
                 if (gammaOptional.isPresent()) {
                     val gamma = gammaOptional.get();
-                    Assert.assertThat(
+                    assertThat(gamma.getParent()).as(
                             "when creating a descendant line, the third "
-                                    + "element has the second as its parent",
-                            gamma.getParent(), is(beta));
+                                    + "element has the second as its parent")
+                                                 .isSameAs(beta);
                 }
             }
         }
@@ -400,10 +439,12 @@ public class NodeItemTest {
      * Test that if we pass null to create a chain of descendant nodes we get an
      * exception.
      */
-    @Test(expected = NullPointerException.class)
-    public void shouldThrowNPEWhenCreateDescendantNull() {
+    @Test
+    public void createDescendantLineShouldThrowNPEWhenDescendantsAreNull() {
         //given
-        node = new NodeItem<>("subject");
+        node = new NodeItem<>("subject", Node::getData);
+        exception.expect(NullPointerException.class);
+        exception.expectMessage("descendants");
         //when
         node.createDescendantLine(null);
     }
@@ -414,13 +455,13 @@ public class NodeItemTest {
     @Test
     public void shouldChangeNothingWhenCreateDescendantEmpty() {
         //given
-        node = new NodeItem<>("subject");
+        node = new NodeItem<>("subject", Node::getData);
         //when
         node.createDescendantLine(Collections.emptyList());
         //then
-        Assert.assertThat(
+        assertThat(node.getChildren()).as(
                 "when creating a descendant line from an empty list, nothing "
-                        + "is created", node.getChildren().size(), is(0));
+                        + "is created").isEmpty();
     }
 
     /**
@@ -429,15 +470,15 @@ public class NodeItemTest {
     @Test
     public void shouldFindExistingChildNode() {
         //given
-        node = new NodeItem<>("subject");
+        node = new NodeItem<>("subject", Node::getData);
         val childData = "child";
         val child = new NodeItem<String>(childData, node);
         //when
         val found = node.findOrCreateChild(childData);
         //then
-        Assert.assertThat(
+        assertThat(found).as(
                 "when searching for a child by data, the matching child is "
-                        + "found", found, is(child));
+                        + "found").isSameAs(child);
     }
 
     /**
@@ -446,23 +487,25 @@ public class NodeItemTest {
     @Test
     public void shouldFindCreateNewChildNode() {
         //given
-        node = new NodeItem<>("subject");
+        node = new NodeItem<>("subject", Node::getData);
         val childData = "child";
         //when
         val found = node.findOrCreateChild(childData);
         //then
-        Assert.assertThat(
-                "when searching for a child by data, a new node is created",
-                found.getData(), is(childData));
+        assertThat(found.getData()).as(
+                "when searching for a child by data, a new node is created")
+                                   .isSameAs(childData);
     }
 
     /**
      * Test that if we pass null we get an exception.
      */
-    @Test(expected = NullPointerException.class)
-    public void shouldThrowNPEFWhenFindOrCreateChildNull() {
+    @Test
+    public void findOrCreateChildShouldThrowNPEFWhenChildIsNull() {
         //given
-        node = new NodeItem<>("subject");
+        node = new NodeItem<>("subject", Node::getData);
+        exception.expect(NullPointerException.class);
+        exception.expectMessage("child");
         //when
         node.findOrCreateChild(null);
     }
@@ -473,29 +516,31 @@ public class NodeItemTest {
     @Test
     public void shouldGetChild() {
         //given
-        node = new NodeItem<>("subject");
+        node = new NodeItem<>("subject", Node::getData);
         val childData = "child";
-        val child = new NodeItem<String>(childData);
+        val child = new NodeItem<String>(childData, Node::getData);
         node.addChild(child);
         //when
         val found = node.getChild(childData);
         //then
-        Assert.assertThat("when retrieving a child by its data, it is found",
-                found.isPresent(), is(true));
+        assertThat(found.isPresent()).as(
+                "when retrieving a child by its data, it is found").isTrue();
         if (found.isPresent()) {
-            Assert.assertThat(
+            assertThat(found.get()).as(
                     "when retrieving a child by its data, it is the expected "
-                            + "node", found.get(), is(child));
+                            + "node").isSameAs(child);
         }
     }
 
     /**
      * Test that we throw an exception when passed null.
      */
-    @Test(expected = NullPointerException.class)
-    public void shouldThrowNPEWhenGetChildNull() {
+    @Test
+    public void getChildShouldThrowNPEWhenThereIsNoChild() {
         //given
-        node = new NodeItem<>("subject");
+        node = new NodeItem<>("data", Node::getData);
+        exception.expect(NullPointerException.class);
+        exception.expectMessage("child");
         //when
         node.getChild(null);
     }
@@ -507,34 +552,330 @@ public class NodeItemTest {
     @Test
     public void shouldCreateChild() {
         //given
-        node = new NodeItem<>("subject");
+        node = new NodeItem<>("subject", Node::getData);
         val childData = "child";
         //when
         val child = node.createChild(childData);
         //then
-        Assert.assertThat(
+        assertThat(child.getParent()).as(
                 "when creating a child node, the child has the current node "
-                        + "as its parent", child.getParent(), is(node));
+                        + "as its parent").isSameAs(node);
         val foundChild = node.getChild(childData);
-        Assert.assertThat(
+        assertThat(foundChild.isPresent()).as(
                 "when creating a child node, the child can be found by its "
-                        + "data", foundChild.isPresent(), is(true));
+                        + "data").isTrue();
         if (foundChild.isPresent()) {
-            Assert.assertThat(
+            assertThat(foundChild.get()).as(
                     "when creating a child node, the correct child can be "
-                            + "found by its data", foundChild.get(), is(child));
+                            + "found by its data").isSameAs(child);
         }
     }
 
     /**
      * Test that we throw an exception when passed null.
      */
-    @Test(expected = NullPointerException.class)
-    public void shouldThrowNPEWhenCreateChildNull() {
+    @Test
+    public void createChildShouldThrowNPEWhenChildIsNull() {
         //given
-        node = new NodeItem<>("subject");
+        node = new NodeItem<>("subject", Node::getData);
+        exception.expect(NullPointerException.class);
+        exception.expectMessage("child");
         //when
         node.createChild(null);
     }
 
+    @Test
+    public void getNameShouldBeCorrect() {
+        //given
+        node = new NodeItem<>("subject", Node::getData);
+        //then
+        assertThat(node.getName()).isEqualTo("subject");
+    }
+
+    @Test
+    public void getNameShouldUseParentNameSupplier() {
+        //given
+        val root = new NodeItem<String>("root", Node::getData);
+        node = new NodeItem<>("child", root);
+        //then
+        assertThat(node.getName()).isEqualTo("child");
+    }
+
+    @Test
+    public void getNameShouldReturnNameForNonStringData() {
+        val root = new NodeItem<LocalDate>(LocalDate.parse("2016-05-23"),
+                n -> n.getData().format(DateTimeFormatter.BASIC_ISO_DATE));
+        //then
+        assertThat(root.getName()).isEqualTo("20160523");
+    }
+
+    @Test
+    public void getNameShouldUseClosestNameSupplier() {
+        node = new NodeItem<>("root", Node::getData);
+        val child = new NodeItem<String>("child", Object::toString);
+        node.addChild(child);
+        val grandChild = new NodeItem<>("grandchild", child);
+        //then
+        assertThat(node.getName()).isEqualTo("root");
+        assertThat(child.getName()).isNotEqualTo("child");
+        assertThat(grandChild.getName()).isNotEqualTo("grandchild");
+    }
+
+    @Test
+    public void getNameShouldWorkWithoutNameSupplier() {
+        node = new NodeItem<>(null, "root");
+        val namedchild = new NodeItem<>("named", "Alice", node);
+        //then
+        assertThat(node.getName()).isEqualTo("root");
+        assertThat(namedchild.getName()).isEqualTo("Alice");
+    }
+
+    @Test
+    public void canCreateRootNodeWithoutData() {
+        node = new NodeItem<>(null, "empty");
+        assertThat(node.getData()).isNull();
+    }
+
+    @Test
+    public void canCreateRootNodeWithoutDataButWithNameSupplier() {
+        node = new NodeItem<>(null, Node::getData);
+        assertThat(node.getData()).isNull();
+    }
+
+    @Test
+    public void getChildNamedFindsChild() {
+        //given
+        node = new NodeItem<>(null, "root");
+        val alpha = new NodeItem<String>(null, "alpha");
+        val beta = new NodeItem<String>(null, "beta");
+        node.addChild(alpha);
+        node.addChild(beta);
+        //when
+        val result = node.getChildNamed("alpha");
+        //then
+        assertThat(result).isSameAs(alpha);
+    }
+
+    @Test
+    public void getChildNamedFindsNothing() {
+        //given
+        node = new NodeItem<>(null, "root");
+        val alpha = new NodeItem<String>(null, "alpha");
+        val beta = new NodeItem<String>(null, "beta");
+        node.addChild(alpha);
+        node.addChild(beta);
+        exception.expect(NodeException.class);
+        exception.expectMessage("Named child not found");
+        //when
+        node.getChildNamed("gamma");
+    }
+
+    @Test
+    public void nodeNamesAreUniqueWithinAParent() {
+        //given
+        node = new NodeItem<>(null, "root");
+        val alpha = new NodeItem<String>(null, "alpha");
+        node.addChild(alpha);
+        val beta = new NodeItem<String>(null, "alpha");
+        exception.expect(NodeException.class);
+        exception.expectMessage("Node with that name already exists here");
+        //when
+        node.addChild(beta);
+    }
+
+    @Test
+    public void canPlaceNodeInTreeByPathNames() {
+        //given
+        node = new NodeItem<>(null, "root"); // create a root
+        val four = new NodeItem<String>("data", "four");
+        //when
+        node.placeNodeIn(four, "one", "two", "three");
+        //then
+        val three = four.getParent();
+        assertThat(four.getParent()).as("add node to a tree").isNotNull();
+        assertThat(three.getName()).isEqualTo("three");
+        val two = three.getParent();
+        assertThat(two.getName()).isEqualTo("two");
+        val one = two.getParent();
+        assertThat(one.getName()).isEqualTo("one");
+        assertThat(one.getParent()).isSameAs(node);
+        assertThat(node.getChildNamed("one")
+                       .getChildNamed("two")
+                       .getChildNamed("three")
+                       .getChildNamed("four")).isSameAs(four);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void canPlaceInTreeUnderExistingNode() {
+        //given
+        node = new NodeItem<>(null, "root");
+        val child = new NodeItem<String>("child data", "child");
+        val grandchild = new NodeItem<String>("grandchild data", "grandchild");
+        //when
+        node.placeNodeIn(child); // as root/child
+        node.placeNodeIn(grandchild, "child"); // as root/child/grandchild
+        //then
+        assertThat(node.getChildNamed("child")).as("child").isSameAs(child);
+        assertThat(node.getChildNamed("child").getChildNamed("grandchild")).as(
+                "grandchild").isSameAs(grandchild);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void canPlaceInTreeAboveExistingNode() {
+        //given
+        node = new NodeItem<>(null, "root");
+        val child = new NodeItem<String>("child data", "child");
+        val grandchild = new NodeItem<String>("grandchild data", "grandchild");
+        //when
+        node.placeNodeIn(grandchild, "child");
+        node.placeNodeIn(child);
+        //then
+        assertThat(node.getChildNamed("child")).as("child").isSameAs(child);
+        assertThat(node.getChildNamed("child").getChildNamed("grandchild")).as(
+                "grandchild").isSameAs(grandchild);
+    }
+
+    @Test
+    public void removingParentFromNodeWithNoParentIsNoop() {
+        //given
+        node = new NodeItem<>(null);
+        //when
+        node.removeParent();
+    }
+
+    @Test
+    public void placeNodeInTreeWhereNonEmptyNodeWithSameNameExists() {
+        //given
+        exception.expect(NodeException.class);
+        exception.expectMessage(
+                "A non-empty node with that name already exists here");
+        node = new NodeItem<>(null);
+        val child = new NodeItem<String>(null, "child", node);
+        new NodeItem<>("data", "grandchild", child);
+        // root -> child -> grandchild
+        // only grandchild has data
+        //when
+        // attempt to add another node called 'grandchild' to 'child'
+        node.placeNodeIn(new NodeItem<>("cuckoo", "grandchild"), "child");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void placeNodeInTreeWhenAddedNodeIsUnnamed() {
+        //given
+        node = new NodeItem<>(null);
+        final Node<String> newNode = new NodeItem<>(null);
+        //when
+        node.placeNodeIn(newNode);
+        //then
+        assertThat(node.getChildren()).containsOnly(newNode);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void placeNodeInTreeWhenEmptyChildWithTargetNameExists() {
+        //given
+        node = new NodeItem<>(null);
+        final NodeItem<String> child = new NodeItem<>(null, "child");
+        final NodeItem<String> target = new NodeItem<>(null, "target");
+        node.addChild(child);
+        child.addChild(target);
+        final NodeItem<String> addMe = new NodeItem<>("I'm new", "target");
+        assertThat(addMe.getParent()).isNull();
+        //when
+        // addMe should replace target as the sole descendant of child
+        node.placeNodeIn(addMe, "child");
+        //then
+        assertThat(child.getChildren()).as("child only contains new node")
+                                       .containsOnly(addMe);
+        assertThat(target.getParent()).as("old node is removed from tree")
+                                      .isNull();
+    }
+
+    @Test
+    public void findChildNamedShouldThrowNPEWhenNameIsNull() {
+        //given
+        exception.expect(NullPointerException.class);
+        exception.expectMessage("name");
+        node = new NodeItem<>(null);
+        //when
+        node.findChildNamed(null);
+    }
+
+    @Test
+    public void isNamedNull() {
+        //given
+        node = new NodeItem<>(null);
+        //then
+        assertThat(node.isNamed()).isFalse();
+    }
+
+    @Test
+    public void isNamedEmpty() {
+        //given
+        node = new NodeItem<>(null, "");
+        //then
+        assertThat(node.isNamed()).isFalse();
+    }
+
+    @Test
+    public void isNamedNamed() {
+        //given
+        node = new NodeItem<>(null, "named");
+        //then
+        assertThat(node.isNamed()).isTrue();
+    }
+
+    @Test
+    public void removeParentNodeProvidesSameNameSupplier() {
+        // once a node has it's parent removed it should provide a default name
+        // provider
+        //given
+        node = new NodeItem<>("data", Node::getData); // name provider: getData
+        final NodeItem<String> child = new NodeItem<>("other", node);
+        assertThat(node.getName()).as("initial root name").isEqualTo("data");
+        assertThat(child.getName()).as("initial child name").isEqualTo("other");
+        //when
+        child.removeParent();
+        //then
+        assertThat(node.getName()).as("final root name").isEqualTo("data");
+        assertThat(child.getName()).as("final child name").isEqualTo("other");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void removeChildRemovesTheChild() {
+        //given
+        node = new NodeItem<>(null);
+        Node<String> child = node.createChild("child");
+        assertThat(node.getChildren()).containsExactly(child);
+        //then
+        node.removeChild(child);
+        //then
+        assertThat(node.getChildren()).isEmpty();
+    }
+
+    @Test
+    public void drawTreeIsCorrect() {
+        //given
+        node = new NodeItem<>(null, "root");
+        val bob = new NodeItem<String>(null, "bob", node);
+        val alice = new NodeItem<String>(null, "alice", node);
+        new NodeItem<>(null, "dave", alice);
+        new NodeItem<>(null, bob); // has no name and no children so no included
+        val kim = new NodeItem<String>(null, node); // nameless mother
+        new NodeItem<>(null, "lucy", kim);
+        //when
+        val tree = node.drawTree(0);
+        //then
+        String[] lines = tree.split("\n");
+        assertThat(lines).contains("[root]", "[ alice]", "[  dave]",
+                "[ (unnamed)]", "[  lucy]", "[ bob]");
+        assertThat(lines).containsSubsequence("[root]", "[ alice]", "[  dave]");
+        assertThat(lines).containsSubsequence("[root]", "[ (unnamed)]",
+                "[  lucy]");
+        assertThat(lines).containsSubsequence("[root]", "[ bob]");
+    }
 }

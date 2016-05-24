@@ -14,11 +14,32 @@ import java.util.Set;
 public interface Node<T> {
 
     /**
+     * Fetch the name of the node.
+     *
+     * @return the name of the node
+     */
+    String getName();
+
+    /**
+     * Sets the explicit name for a node.
+     *
+     * @param name the new name
+     */
+    void setName(String name);
+
+    /**
      * Fetch the data held within the node.
      *
      * @return the node's data
      */
     T getData();
+
+    /**
+     * Returns true if the node is empty (has no data).
+     *
+     * @return true is data is null
+     */
+    boolean isEmpty();
 
     /**
      * Fetch the parent node.
@@ -29,6 +50,13 @@ public interface Node<T> {
      * @return the parent node
      */
     Node<T> getParent();
+
+    /**
+     * Make the current node a direct child of the parent.
+     *
+     * @param parent the new parent node
+     */
+    void setParent(final Node<T> parent);
 
     /**
      * Fetches the child nodes.
@@ -90,13 +118,6 @@ public interface Node<T> {
     boolean isChildOf(final Node<T> node);
 
     /**
-     * Make the current node a direct child of the parent.
-     *
-     * @param parent the new parent node
-     */
-    void setParent(final Node<T> parent);
-
-    /**
      * Walks the node tree using the path to select each child.
      *
      * @param path the path to the desired child
@@ -105,4 +126,59 @@ public interface Node<T> {
      */
     Optional<Node<T>> walkTree(final List<T> path);
 
+    /**
+     * Places the node in the tree under by the path. Intervening empty
+     * nodes are created as needed.
+     *
+     * @param node the node to place
+     * @param path the path to contain the new node
+     */
+    void placeNodeIn(Node<T> node, String... path);
+
+    /**
+     * Searches for a child with the name given.
+     *
+     * @param name the name of the child
+     *
+     * @return an Optional containing the child found or empty
+     */
+    Optional<Node<T>> findChildNamed(String name);
+
+    /**
+     * Returns the child with the given name. If one can't be found a
+     * NodeException is thrown.
+     *
+     * @param name the name of the child
+     *
+     * @return the node
+     */
+    Node<T> getChildNamed(String name);
+
+    /**
+     * Draw a representation of the tree.
+     *
+     * @param depth current depth for recursion
+     *
+     * @return a representation of the tree
+     */
+    String drawTree(int depth);
+
+    /**
+     * Returns true if the Node has a name.
+     *
+     * @return true if the node has a name
+     */
+    boolean isNamed();
+
+    /**
+     * Remove the node from the children.
+     *
+     * @param node the node to be removed
+     */
+    void removeChild(Node<T> node);
+
+    /**
+     * Removes the parent from the node. Makes the node into a new root node.
+     */
+    void removeParent();
 }
