@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+0.2.0
+------
+
+* Demo of full-path node name
+* insertInPath() uses setData()
+* Dynamic node names
+* New tests following mutation testing
+* Tidy the Node interface
+* Named nodes
+* Update code style
+* Drop lombok in production (still using it in test)
+
 0.1.0
 ------
 
