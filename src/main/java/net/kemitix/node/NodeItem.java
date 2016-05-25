@@ -321,8 +321,8 @@ public class NodeItem<T> implements Node<T> {
                 addChild(nodeItem);
                 return;
             }
-            String name = nodeItem.getName();
-            final Optional<Node<T>> childNamed = findChildByName(name);
+            String nodeName = nodeItem.getName();
+            final Optional<Node<T>> childNamed = findChildByName(nodeName);
             if (!childNamed.isPresent()) { // nothing with the same name exists
                 addChild(nodeItem);
                 return;
@@ -330,7 +330,7 @@ public class NodeItem<T> implements Node<T> {
             // we have an existing node with the same name
             final Node<T> existing = childNamed.get();
             if (!existing.isEmpty()) {
-                throw new NodeException("A non-empty node named '" + name
+                throw new NodeException("A non-empty node named '" + nodeName
                         + "' already exists here");
             } else {
                 existing.setData(nodeItem.getData());
