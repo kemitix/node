@@ -767,7 +767,7 @@ public class NodeItemTest {
         //given
         exception.expect(NodeException.class);
         exception.expectMessage(
-                "A non-empty node with that name already exists here");
+                "A non-empty node named 'grandchild' already exists here");
         node = new NodeItem<>(null);
         val child = new NodeItem<String>(null, "child", node);
         new NodeItem<>("data", "grandchild", child);
