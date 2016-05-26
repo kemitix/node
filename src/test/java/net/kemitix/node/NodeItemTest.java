@@ -55,9 +55,10 @@ public class NodeItemTest {
         //given
         node = new NodeItem<>(null, n -> "root name supplier");
         //when
-        val child = new NodeItem<>(null, n -> "overridden", node);
+        val child = new NodeItem<String>(null, n -> "overridden", node);
         //then
         assertThat(child.getName()).isEqualTo("overridden");
+        assertThat(child.getParent()).contains(node);
     }
 
     @Test
