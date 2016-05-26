@@ -183,6 +183,8 @@ public interface Node<T> {
      * @param name the name of the child
      *
      * @return the node
+     *
+     * @throws NodeException if the node is not found
      */
     Node<T> getChildByName(String name);
 
