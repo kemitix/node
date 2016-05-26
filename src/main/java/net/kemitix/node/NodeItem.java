@@ -139,8 +139,8 @@ public class NodeItem<T> implements Node<T> {
     }
 
     @Override
-    public Node<T> getParent() {
-        return parent;
+    public Optional<Node<T>> getParent() {
+        return Optional.ofNullable(parent);
     }
 
     @Override
@@ -170,7 +170,12 @@ public class NodeItem<T> implements Node<T> {
             }
         }
         children.add(child);
-        if (child.getParent() == null || !child.getParent().equals(this)) {
+        // update the child's parent if they don't have one or it is not this
+        Optional<Node<T>> childParent = child.getParent();
+        boolean isOrphan = !childParent.isPresent();
+        boolean hasDifferentParent = !isOrphan && !childParent.get()
+                                                              .equals(this);
+        if (isOrphan || hasDifferentParent) {
             child.setParent(this);
         }
     }

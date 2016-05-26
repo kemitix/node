@@ -53,13 +53,10 @@ public interface Node<T> {
 
     /**
      * Fetch the parent node.
-     * <p>
-     * If the node is a root node, i.e. has no parent, then this will return
-     * null.
      *
-     * @return the parent node
+     * @return an Optional contain the parent node, or empty if a root node
      */
-    Node<T> getParent();
+    Optional<Node<T>> getParent();
 
     /**
      * Make the current node a direct child of the parent.

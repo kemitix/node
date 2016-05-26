@@ -79,7 +79,7 @@ public class NodeItemTest {
         node = new NodeItem<>("data");
         //then
         assertThat(node.getParent()).as(
-                "node created without a parent has null as parent").isNull();
+                "node created without a parent has no parent").isEmpty();
     }
 
     /**
@@ -94,7 +94,7 @@ public class NodeItemTest {
         //then
         assertThat(node.getParent()).as(
                 "node created with a parent can return the parent")
-                                    .isSameAs(parent);
+                                    .contains(parent);
     }
 
     /**
@@ -142,7 +142,7 @@ public class NodeItemTest {
         //then
         assertThat(node.getParent()).as(
                 "when a node is assigned a new parent that parent can be "
-                        + "returned").isSameAs(parent);
+                        + "returned").contains(parent);
     }
 
     /**
@@ -187,7 +187,7 @@ public class NodeItemTest {
         //then
         assertThat(child.getParent()).as(
                 "when a node is assigned a new parent, the old parent is "
-                        + "replaced").isSameAs(newParent);
+                        + "replaced").contains(newParent);
         assertThat(node.findChild("child").isPresent()).as(
                 "when a node is assigned a new parent, the old parent no "
                         + "longer has the node among it's children").isFalse();
@@ -209,7 +209,7 @@ public class NodeItemTest {
         assertThat(child.getParent()).as(
                 "when a node with an existing parent is added as a child "
                         + "to another node, then the old parent is replaced")
-                                     .isSameAs(newParent);
+                                     .contains(newParent);
         assertThat(node.findChild("child").isPresent()).as(
                 "when a node with an existing parent is added as a child to "
                         + "another node, then the old parent no longer has "
@@ -309,14 +309,14 @@ public class NodeItemTest {
     @Test
     public void shouldSetParentOnChildWhenAddedAsChild() {
         //given
-        val child = new NodeItem<String>("child");
         node = new NodeItem<>("subject");
+        val child = new NodeItem<String>("child");
         //when
         node.addChild(child);
         //then
         assertThat(child.getParent()).as(
                 "when a node is added as a child, the child has the node as "
-                        + "its parent").isSameAs(node);
+                        + "its parent").contains(node);
     }
 
     /**
@@ -411,7 +411,7 @@ public class NodeItemTest {
             val alpha = alphaOptional.get();
             assertThat(alpha.getParent()).as(
                     "when creating a descendant line, the first element has "
-                            + "the current node as its parent").isSameAs(node);
+                            + "the current node as its parent").contains(node);
             val betaOptional = alpha.findChild(betaData);
             assertThat(betaOptional.isPresent()).as(
                     "when creating a descendant line, the second element is "
@@ -421,7 +421,7 @@ public class NodeItemTest {
                 assertThat(beta.getParent()).as(
                         "when creating a descendant line, the second element "
                                 + "has the first as its parent")
-                                            .isSameAs(alpha);
+                                            .contains(alpha);
                 val gammaOptional = beta.findChild(gammaData);
                 assertThat(gammaOptional.isPresent()).as(
                         "when creating a descendant line, the third element "
@@ -431,7 +431,7 @@ public class NodeItemTest {
                     assertThat(gamma.getParent()).as(
                             "when creating a descendant line, the third "
                                     + "element has the second as its parent")
-                                                 .isSameAs(beta);
+                                                 .contains(beta);
                 }
             }
         }
@@ -561,7 +561,7 @@ public class NodeItemTest {
         //then
         assertThat(child.getParent()).as(
                 "when creating a child node, the child has the current node "
-                        + "as its parent").isSameAs(node);
+                        + "as its parent").contains(node);
         val foundChild = node.findChild(childData);
         assertThat(foundChild.isPresent()).as(
                 "when creating a child node, the child can be found by its "
@@ -698,14 +698,14 @@ public class NodeItemTest {
         //when
         node.insertInPath(four, "one", "two", "three");
         //then
-        val three = four.getParent();
+        val three = four.getParent().get();
         assertThat(four.getParent()).as("add node to a tree").isNotNull();
         assertThat(three.getName()).isEqualTo("three");
-        val two = three.getParent();
+        val two = three.getParent().get();
         assertThat(two.getName()).isEqualTo("two");
-        val one = two.getParent();
+        val one = two.getParent().get();
         assertThat(one.getName()).isEqualTo("one");
-        assertThat(one.getParent()).isSameAs(node);
+        assertThat(one.getParent().get()).isSameAs(node);
         assertThat(node.getChildByName("one")
                        .getChildByName("two")
                        .getChildByName("three")
@@ -764,7 +764,7 @@ public class NodeItemTest {
         //when
         child.removeParent();
         //then
-        assertThat(child.getParent()).isNull();
+        assertThat(child.getParent()).isEmpty();
     }
 
     @Test
@@ -805,7 +805,7 @@ public class NodeItemTest {
         node.addChild(child);
         child.addChild(target);
         final NodeItem<String> addMe = new NodeItem<>("I'm new", "target");
-        assertThat(addMe.getParent()).isNull();
+        assertThat(addMe.getParent()).isEmpty();
         assertThat(child.getChildByName("target").isEmpty()).as(
                 "target starts empty").isTrue();
         //when
@@ -920,7 +920,7 @@ public class NodeItemTest {
         Node<String> child = node.createChild("child data", "child name");
         //then
         assertThat(child.getName()).isEqualTo("child name");
-        assertThat(child.getParent()).isSameAs(node);
+        assertThat(child.getParent()).contains(node);
         assertThat(node.getChildren()).containsExactly(child);
     }
 
@@ -953,7 +953,7 @@ public class NodeItemTest {
         //when
         NodeItem<String> child = new NodeItem<>(null, node);
         //then
-        assertThat(child.getParent()).isSameAs(node);
+        assertThat(child.getParent()).contains(node);
         assertThat(node.getChildren()).containsExactly(child);
     }
 
@@ -1024,11 +1024,11 @@ public class NodeItemTest {
     public void canUseNameSupplierToBuildFullPath() {
         //given
         final Function<Node<String>, String> pathNameSupplier = node -> {
-            Node<String> parent = node.getParent();
-            if (parent == null) {
-                return "";
+            Optional<Node<String>> parent = node.getParent();
+            if (parent.isPresent()) {
+                return parent.get().getName() + "/" + node.getData().get();
             }
-            return parent.getName() + "/" + node.getData().get();
+            return "";
         };
         node = new NodeItem<>(null, pathNameSupplier);
         val child = new NodeItem<String>("child", node);
