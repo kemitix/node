@@ -878,6 +878,7 @@ public class NodeItemTest {
         node.removeChild(child);
         //then
         assertThat(node.getChildren()).isEmpty();
+        assertThat(child.getParent()).isEmpty();
     }
 
     @Test
