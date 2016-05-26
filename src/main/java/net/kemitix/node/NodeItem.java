@@ -124,8 +124,8 @@ public class NodeItem<T> implements Node<T> {
     }
 
     @Override
-    public T getData() {
-        return data;
+    public Optional<T> getData() {
+        return Optional.ofNullable(data);
     }
 
     @Override
@@ -244,7 +244,8 @@ public class NodeItem<T> implements Node<T> {
             throw new NullPointerException("child");
         }
         return children.stream()
-                       .filter((Node<T> t) -> t.getData().equals(child))
+                       .filter(n -> !n.isEmpty())
+                       .filter(n -> n.getData().get().equals(child))
                        .findAny();
     }
 
@@ -333,7 +334,7 @@ public class NodeItem<T> implements Node<T> {
                 throw new NodeException("A non-empty node named '" + nodeName
                         + "' already exists here");
             } else {
-                existing.setData(nodeItem.getData());
+                nodeItem.getData().ifPresent(existing::setData);
             }
             return;
         }

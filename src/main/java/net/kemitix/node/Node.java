@@ -32,9 +32,10 @@ public interface Node<T> {
     /**
      * Fetch the data held within the node.
      *
-     * @return the node's data
+     * @return an Optional containing the node's data, or empty if the node has
+     * none
      */
-    T getData();
+    Optional<T> getData();
 
     /**
      * Set the data held within the node.
