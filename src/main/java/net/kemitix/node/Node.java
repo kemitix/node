@@ -32,9 +32,10 @@ public interface Node<T> {
     /**
      * Fetch the data held within the node.
      *
-     * @return the node's data
+     * @return an Optional containing the node's data, or empty if the node has
+     * none
      */
-    T getData();
+    Optional<T> getData();
 
     /**
      * Set the data held within the node.
@@ -52,13 +53,10 @@ public interface Node<T> {
 
     /**
      * Fetch the parent node.
-     * <p>
-     * If the node is a root node, i.e. has no parent, then this will return
-     * null.
      *
-     * @return the parent node
+     * @return an Optional contain the parent node, or empty if a root node
      */
-    Node<T> getParent();
+    Optional<Node<T>> getParent();
 
     /**
      * Make the current node a direct child of the parent.
@@ -182,6 +180,8 @@ public interface Node<T> {
      * @param name the name of the child
      *
      * @return the node
+     *
+     * @throws NodeException if the node is not found
      */
     Node<T> getChildByName(String name);
 
