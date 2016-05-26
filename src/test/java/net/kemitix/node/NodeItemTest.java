@@ -761,11 +761,12 @@ public class NodeItemTest {
     public void removingParentFromNodeWithParentRemovesParent() {
         //given
         node = new NodeItem<>(null);
-        NodeItem<String> child = new NodeItem<>(null, node);
+        val child = new NodeItem<String>(null, node);
         //when
         child.removeParent();
         //then
         assertThat(child.getParent()).isEmpty();
+        assertThat(node.getChildren()).isEmpty();
     }
 
     @Test
