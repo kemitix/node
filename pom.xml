@@ -16,6 +16,7 @@
 
     <properties>
         <assertj.version>3.4.1</assertj.version>
+        <coveralls-maven-plugin.version>4.2.0</coveralls-maven-plugin.version>
     </properties>
 
     <issueManagement>
@@ -32,6 +33,16 @@
     <url>https://github.com/kemitix/node</url>
 
     <inceptionYear>2016</inceptionYear>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>${coveralls-maven-plugin.version}</version>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
         <dependency>

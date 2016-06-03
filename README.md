@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/kemitix/node.svg?branch=develop)](https://travis-ci.org/kemitix/node)
+[![Coverage Status](https://coveralls.io/repos/github/kemitix/node/badge.svg?branch=develop)](https://coveralls.io/github/kemitix/node?branch=develop)
+
 # node
 A parent/children data structure
 
