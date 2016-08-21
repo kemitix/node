@@ -52,7 +52,10 @@ public class NodeItem<T> implements Node<T> {
      *
      * @param data         the data or null
      * @param nameSupplier the name supplier function
+     *
+     * @deprecated dynamic names don't work on immutable objects
      */
+    @Deprecated
     public NodeItem(
             final T data, final Function<Node<T>, String> nameSupplier) {
         this(data);
@@ -89,7 +92,10 @@ public class NodeItem<T> implements Node<T> {
      * @param data         the data or null
      * @param nameSupplier the name supplier function
      * @param parent       the parent node
+     *
+     * @deprecated dynamic names don't work on immutable objects
      */
+    @Deprecated
     public NodeItem(
             final T data, final Function<Node<T>, String> nameSupplier,
             final Node<T> parent) {
