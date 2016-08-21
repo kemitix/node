@@ -48,21 +48,6 @@ public class NodeItem<T> implements Node<T> {
     }
 
     /**
-     * Creates root node with a name supplier.
-     *
-     * @param data         the data or null
-     * @param nameSupplier the name supplier function
-     *
-     * @deprecated dynamic names don't work on immutable objects
-     */
-    @Deprecated
-    public NodeItem(
-            final T data, final Function<Node<T>, String> nameSupplier) {
-        this(data);
-        this.nameSupplier = nameSupplier;
-    }
-
-    /**
      * Creates a node with a parent.
      *
      * @param data   the data or null
@@ -83,23 +68,6 @@ public class NodeItem<T> implements Node<T> {
     NodeItem(final T data, final String name, final Node<T> parent) {
         this.data = data;
         this.name = name;
-        setParent(parent);
-    }
-
-    /**
-     * Creates a node with a name supplier and a parent.
-     *
-     * @param data         the data or null
-     * @param nameSupplier the name supplier function
-     * @param parent       the parent node
-     *
-     * @deprecated dynamic names don't work on immutable objects
-     */
-    @Deprecated
-    public NodeItem(
-            final T data, final Function<Node<T>, String> nameSupplier,
-            final Node<T> parent) {
-        this(data, nameSupplier);
         setParent(parent);
     }
 

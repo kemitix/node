@@ -8,13 +8,9 @@ import org.junit.rules.ExpectedException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 
 /**
  * Test for {@link NodeItem}.
@@ -48,17 +44,6 @@ public class NodeItemTest {
         softly.assertThat(node.isEmpty()).as("node is empty").isTrue();
         softly.assertThat(node.isNamed()).as("node is unnamed").isFalse();
         softly.assertAll();
-    }
-
-    @Test
-    public void canCreateNodeWithParentAndCustomNameSupplier() {
-        //given
-        node = new NodeItem<>(null, n -> "root name supplier");
-        //when
-        val child = new NodeItem<String>(null, n -> "overridden", node);
-        //then
-        assertThat(child.getName()).isEqualTo("overridden");
-        assertThat(child.getParent()).contains(node);
     }
 
     @Test
@@ -588,65 +573,8 @@ public class NodeItemTest {
     }
 
     @Test
-    public void getNameShouldBeCorrect() {
-        //given
-        node = new NodeItem<>("subject", n -> n.getData().get());
-        //then
-        assertThat(node.getName()).isEqualTo("subject");
-    }
-
-    @Test
-    public void getNameShouldUseParentNameSupplier() {
-        //given
-        val root = new NodeItem<String>("root", n -> n.getData().get());
-        node = Nodes.unnamedChild("child", root);
-        //then
-        assertThat(node.getName()).isEqualTo("child");
-    }
-
-    @Test
-    public void getNameShouldReturnNameForNonStringData() {
-        val root = new NodeItem<LocalDate>(LocalDate.parse("2016-05-23"), n -> {
-            if (n.isEmpty()) {
-                return null;
-            }
-            return n.getData().get().format(DateTimeFormatter.BASIC_ISO_DATE);
-
-        });
-        //then
-        assertThat(root.getName()).isEqualTo("20160523");
-    }
-
-    @Test
-    public void getNameShouldUseClosestNameSupplier() {
-        node = new NodeItem<>("root", n -> n.getData().get());
-        val child = new NodeItem<String>("child", Object::toString);
-        node.addChild(child);
-        val grandChild = Nodes.unnamedChild("grandchild", child);
-        //then
-        assertThat(node.getName()).isEqualTo("root");
-        assertThat(child.getName()).isNotEqualTo("child");
-        assertThat(grandChild.getName()).isNotEqualTo("grandchild");
-    }
-
-    @Test
-    public void getNameShouldWorkWithoutNameSupplier() {
-        node = Nodes.namedRoot(null, "root");
-        val namedchild = Nodes.namedChild("named", "Alice", node);
-        //then
-        assertThat(node.getName()).isEqualTo("root");
-        assertThat(namedchild.getName()).isEqualTo("Alice");
-    }
-
-    @Test
     public void canCreateRootNodeWithoutData() {
         node = Nodes.namedRoot(null, "empty");
-        assertThat(node.getData()).isEmpty();
-    }
-
-    @Test
-    public void canCreateRootNodeWithoutDataButWithNameSupplier() {
-        node = Nodes.unnamedRoot(null);
         assertThat(node.getData()).isEmpty();
     }
 
@@ -853,22 +781,6 @@ public class NodeItemTest {
     }
 
     @Test
-    public void removeParentNodeProvidesSameNameSupplier() {
-        // once a node has it's parent removed it should provide a default name
-        // provider
-        //given
-        node = new NodeItem<>("data", n -> n.getData().get());
-        val child = Nodes.unnamedChild("other", node);
-        assertThat(node.getName()).as("initial root name").isEqualTo("data");
-        assertThat(child.getName()).as("initial child name").isEqualTo("other");
-        //when
-        child.removeParent();
-        //then
-        assertThat(node.getName()).as("final root name").isEqualTo("data");
-        assertThat(child.getName()).as("final child name").isEqualTo("other");
-    }
-
-    @Test
     @SuppressWarnings("unchecked")
     public void removeChildRemovesTheChild() {
         //given
@@ -959,86 +871,6 @@ public class NodeItemTest {
         //then
         assertThat(child.getParent()).contains(node);
         assertThat(node.getChildren()).containsExactly(child);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void removeParentCopiesRootNameSupplier() {
-        //given
-        node = new NodeItem<>("root data", n -> "root supplier");
-        val child = Nodes.unnamedChild("child data", node);
-        assertThat(child.getName()).isEqualTo("root supplier");
-        //when
-        child.removeParent();
-        //then
-        assertThat(child.getName()).isEqualTo("root supplier");
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void removeParentDoesNotReplaceLocalNameSupplier() {
-        //given
-        node = new NodeItem<>("root data", n -> "root supplier");
-        val child = new NodeItem<>("child data", n -> "local supplier", node);
-        assertThat(child.getName()).isEqualTo("local supplier");
-        //when
-        child.removeParent();
-        //then
-        assertThat(child.getName()).isEqualTo("local supplier");
-    }
-
-    @Test
-    public void setNameToNullRevertsToParentNameSupplier() {
-        //given
-        node = new NodeItem<>(null, n -> "root supplier");
-        val child = Nodes.namedChild("child data", "child name", node);
-        assertThat(child.getName()).isEqualTo("child name");
-        //when
-        child.setName(null);
-        //then
-        assertThat(child.getName()).isEqualTo("root supplier");
-    }
-
-    @Test
-    public void getNameWithNameSupplierIsRecalculatedEachCall() {
-        val counter = new AtomicInteger(0);
-        node = new NodeItem<>(null,
-                n -> Integer.toString(counter.incrementAndGet()));
-        //then
-        assertThat(node.getName()).isNotEqualTo(node.getName());
-    }
-
-    @Test
-    public void isNamedWithNameSupplierIsRecalculatedEachCall() {
-        val counter = new AtomicInteger(0);
-        node = new NodeItem<>(null, n -> {
-            // alternate between even numbers and nulls: null, 2, null, 4, null
-            final int i = counter.incrementAndGet();
-            if (i % 2 == 0) {
-                return Integer.toString(i);
-            }
-            return null;
-        });
-        //then
-        assertThat(node.isNamed()).isFalse();
-        assertThat(node.isNamed()).isTrue();
-    }
-
-    @Test
-    public void canUseNameSupplierToBuildFullPath() {
-        //given
-        final Function<Node<String>, String> pathNameSupplier = node -> {
-            Optional<Node<String>> parent = node.getParent();
-            if (parent.isPresent()) {
-                return parent.get().getName() + "/" + node.getData().get();
-            }
-            return "";
-        };
-        node = new NodeItem<>(null, pathNameSupplier);
-        val child = Nodes.unnamedChild("child", node);
-        val grandchild = Nodes.unnamedChild("grandchild", child);
-        //then
-        assertThat(grandchild.getName()).isEqualTo("/child/grandchild");
     }
 
     @Test
