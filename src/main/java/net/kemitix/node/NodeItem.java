@@ -14,7 +14,7 @@ import java.util.function.Function;
  *
  * @author pcampbell
  */
-public class NodeItem<T> implements Node<T> {
+class NodeItem<T> implements Node<T> {
 
     private T data;
 
