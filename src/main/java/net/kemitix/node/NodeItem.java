@@ -32,7 +32,7 @@ public class NodeItem<T> implements Node<T> {
      * @param data the data or null
      * @param name the name
      */
-    public NodeItem(final T data, final String name) {
+    NodeItem(final T data, final String name) {
         this(data);
         this.name = name;
     }
@@ -42,7 +42,7 @@ public class NodeItem<T> implements Node<T> {
      *
      * @param data the data or null
      */
-    public NodeItem(final T data) {
+    NodeItem(final T data) {
         this.data = data;
         this.nameSupplier = (n) -> null;
     }
@@ -68,7 +68,7 @@ public class NodeItem<T> implements Node<T> {
      * @param data   the data or null
      * @param parent the parent node
      */
-    public NodeItem(final T data, final Node<T> parent) {
+    NodeItem(final T data, final Node<T> parent) {
         this.data = data;
         setParent(parent);
     }
@@ -80,7 +80,7 @@ public class NodeItem<T> implements Node<T> {
      * @param name   the name
      * @param parent the parent node
      */
-    public NodeItem(final T data, final String name, final Node<T> parent) {
+    NodeItem(final T data, final String name, final Node<T> parent) {
         this.data = data;
         this.name = name;
         setParent(parent);
