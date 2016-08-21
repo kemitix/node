@@ -235,6 +235,7 @@ public class NodeItem<T> implements Node<T> {
      * @return the found or created child node
      */
     @Override
+    @Deprecated
     public Node<T> findOrCreateChild(final T child) {
         if (child == null) {
             throw new NullPointerException("child");
