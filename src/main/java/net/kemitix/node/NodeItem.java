@@ -255,10 +255,10 @@ public class NodeItem<T> implements Node<T> {
         if (child == null) {
             throw new NullPointerException("child");
         }
-        return children.stream()
-                       .filter(n -> !n.isEmpty())
-                       .filter(n -> n.getData().get().equals(child))
-                       .findAny();
+        return children.stream().filter(node -> {
+            final Optional<T> d = node.getData();
+            return d.isPresent() && d.get().equals(child);
+        }).findAny();
     }
 
     @Override
