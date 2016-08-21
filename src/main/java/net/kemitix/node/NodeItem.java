@@ -32,7 +32,7 @@ public class NodeItem<T> implements Node<T> {
      * @param data the data or null
      * @param name the name
      */
-    public NodeItem(final T data, final String name) {
+    NodeItem(final T data, final String name) {
         this(data);
         this.name = name;
     }
@@ -42,21 +42,9 @@ public class NodeItem<T> implements Node<T> {
      *
      * @param data the data or null
      */
-    public NodeItem(final T data) {
+    NodeItem(final T data) {
         this.data = data;
         this.nameSupplier = (n) -> null;
-    }
-
-    /**
-     * Creates root node with a name supplier.
-     *
-     * @param data         the data or null
-     * @param nameSupplier the name supplier function
-     */
-    public NodeItem(
-            final T data, final Function<Node<T>, String> nameSupplier) {
-        this(data);
-        this.nameSupplier = nameSupplier;
     }
 
     /**
@@ -65,7 +53,7 @@ public class NodeItem<T> implements Node<T> {
      * @param data   the data or null
      * @param parent the parent node
      */
-    public NodeItem(final T data, final Node<T> parent) {
+    NodeItem(final T data, final Node<T> parent) {
         this.data = data;
         setParent(parent);
     }
@@ -77,23 +65,9 @@ public class NodeItem<T> implements Node<T> {
      * @param name   the name
      * @param parent the parent node
      */
-    public NodeItem(final T data, final String name, final Node<T> parent) {
+    NodeItem(final T data, final String name, final Node<T> parent) {
         this.data = data;
         this.name = name;
-        setParent(parent);
-    }
-
-    /**
-     * Creates a node with a name supplier and a parent.
-     *
-     * @param data         the data or null
-     * @param nameSupplier the name supplier function
-     * @param parent       the parent node
-     */
-    public NodeItem(
-            final T data, final Function<Node<T>, String> nameSupplier,
-            final Node<T> parent) {
-        this(data, nameSupplier);
         setParent(parent);
     }
 
@@ -229,6 +203,7 @@ public class NodeItem<T> implements Node<T> {
      * @return the found or created child node
      */
     @Override
+    @Deprecated
     public Node<T> findOrCreateChild(final T child) {
         if (child == null) {
             throw new NullPointerException("child");
@@ -248,10 +223,10 @@ public class NodeItem<T> implements Node<T> {
         if (child == null) {
             throw new NullPointerException("child");
         }
-        return children.stream()
-                       .filter(n -> !n.isEmpty())
-                       .filter(n -> n.getData().get().equals(child))
-                       .findAny();
+        return children.stream().filter(node -> {
+            final Optional<T> d = node.getData();
+            return d.isPresent() && d.get().equals(child);
+        }).findAny();
     }
 
     @Override
