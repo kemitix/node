@@ -335,7 +335,7 @@ class NodeItem<T> implements Node<T> {
         } else if (!children.isEmpty()) {
             sb.append(formatByDepth(unnamed, depth));
         }
-        getChildren().stream().forEach(c -> sb.append(c.drawTree(depth + 1)));
+        getChildren().forEach(c -> sb.append(c.drawTree(depth + 1)));
         return sb.toString();
     }
 
