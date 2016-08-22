@@ -331,15 +331,16 @@ class NodeItem<T> implements Node<T> {
         final StringBuilder sb = new StringBuilder();
         final String unnamed = "(unnamed)";
         if (isNamed()) {
-            sb.append(String.format("[%1$" + (depth + name.length()) + "s]\n",
-                    name));
+            sb.append(formatByDepth(name, depth));
         } else if (!children.isEmpty()) {
-            sb.append(
-                    String.format("[%1$" + (depth + unnamed.length()) + "s]\n",
-                            unnamed));
+            sb.append(formatByDepth(unnamed, depth));
         }
         getChildren().stream().forEach(c -> sb.append(c.drawTree(depth + 1)));
         return sb.toString();
+    }
+
+    private String formatByDepth(final String value, final int depth) {
+        return String.format("[%1$" + (depth + value.length()) + "s]\n", value);
     }
 
     @Override
