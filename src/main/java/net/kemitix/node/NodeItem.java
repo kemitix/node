@@ -1,5 +1,7 @@
 package net.kemitix.node;
 
+import lombok.NonNull;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -128,10 +130,7 @@ class NodeItem<T> implements Node<T> {
      * @param child the node to add
      */
     @Override
-    public void addChild(final Node<T> child) {
-        if (child == null) {
-            throw new NullPointerException("child");
-        }
+    public void addChild(@NonNull final Node<T> child) {
         if (this.equals(child) || isDescendantOf(child)) {
             throw new NodeException("Child is an ancestor");
         }
@@ -162,10 +161,7 @@ class NodeItem<T> implements Node<T> {
      * @return the new child node
      */
     @Override
-    public Node<T> createChild(final T child) {
-        if (child == null) {
-            throw new NullPointerException("child");
-        }
+    public Node<T> createChild(@NonNull final T child) {
         return new NodeItem<>(child, this);
     }
 
@@ -184,10 +180,7 @@ class NodeItem<T> implements Node<T> {
      * @param descendants the line of descendants from the current node
      */
     @Override
-    public void createDescendantLine(final List<T> descendants) {
-        if (descendants == null) {
-            throw new NullPointerException("descendants");
-        }
+    public void createDescendantLine(@NonNull final List<T> descendants) {
         if (!descendants.isEmpty()) {
             findOrCreateChild(descendants.get(0)).createDescendantLine(
                     descendants.subList(1, descendants.size()));
@@ -204,10 +197,7 @@ class NodeItem<T> implements Node<T> {
      */
     @Override
     @Deprecated
-    public Node<T> findOrCreateChild(final T child) {
-        if (child == null) {
-            throw new NullPointerException("child");
-        }
+    public Node<T> findOrCreateChild(@NonNull final T child) {
         return findChild(child).orElseGet(() -> createChild(child));
     }
 
@@ -219,10 +209,7 @@ class NodeItem<T> implements Node<T> {
      * @return an {@link Optional} containing the child node if found
      */
     @Override
-    public Optional<Node<T>> findChild(final T child) {
-        if (child == null) {
-            throw new NullPointerException("child");
-        }
+    public Optional<Node<T>> findChild(@NonNull final T child) {
         return children.stream().filter(node -> {
             final Optional<T> d = node.getData();
             return d.isPresent() && d.get().equals(child);
@@ -257,10 +244,7 @@ class NodeItem<T> implements Node<T> {
      * @param parent the new parent node
      */
     @Override
-    public final void setParent(final Node<T> parent) {
-        if (parent == null) {
-            throw new NullPointerException("parent");
-        }
+    public final void setParent(@NonNull final Node<T> parent) {
         if (this.equals(parent) || parent.isDescendantOf(this)) {
             throw new NodeException("Parent is a descendant");
         }
@@ -279,10 +263,7 @@ class NodeItem<T> implements Node<T> {
      * @return the child or null
      */
     @Override
-    public Optional<Node<T>> findInPath(final List<T> path) {
-        if (path == null) {
-            throw new NullPointerException("path");
-        }
+    public Optional<Node<T>> findInPath(@NonNull final List<T> path) {
         if (path.size() > 0) {
             Optional<Node<T>> found = findChild(path.get(0));
             if (found.isPresent()) {
@@ -330,10 +311,7 @@ class NodeItem<T> implements Node<T> {
     }
 
     @Override
-    public Optional<Node<T>> findChildByName(final String named) {
-        if (named == null) {
-            throw new NullPointerException("name");
-        }
+    public Optional<Node<T>> findChildByName(@NonNull final String named) {
         return children.stream()
                        .filter((Node<T> t) -> t.getName().equals(named))
                        .findAny();
