@@ -1,5 +1,7 @@
 package net.kemitix.node;
 
+import lombok.NonNull;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -65,10 +67,7 @@ abstract class AbstractNodeItem<T> implements Node<T> {
      * @return an {@link Optional} containing the child node if found
      */
     @Override
-    public Optional<Node<T>> findChild(final T child) {
-        if (child == null) {
-            throw new NullPointerException("child");
-        }
+    public Optional<Node<T>> findChild(@NonNull final T child) {
         return children.stream().filter(node -> {
             final Optional<T> d = node.getData();
             return d.isPresent() && d.get().equals(child);
@@ -102,10 +101,7 @@ abstract class AbstractNodeItem<T> implements Node<T> {
      * @return the child or null
      */
     @Override
-    public Optional<Node<T>> findInPath(final List<T> path) {
-        if (path == null) {
-            throw new NullPointerException("path");
-        }
+    public Optional<Node<T>> findInPath(@NonNull final List<T> path) {
         if (path.size() > 0) {
             Optional<Node<T>> found = findChild(path.get(0));
             if (found.isPresent()) {
@@ -119,10 +115,7 @@ abstract class AbstractNodeItem<T> implements Node<T> {
     }
 
     @Override
-    public Optional<Node<T>> findChildByName(final String named) {
-        if (named == null) {
-            throw new NullPointerException("name");
-        }
+    public Optional<Node<T>> findChildByName(@NonNull final String named) {
         return children.stream()
                        .filter(n -> n.getName().equals(named))
                        .findAny();
