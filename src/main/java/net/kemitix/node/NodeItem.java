@@ -279,13 +279,15 @@ class NodeItem<T> implements Node<T> {
     @Override
     public void insertInPath(final Node<T> nodeItem, final String... path) {
         if (path.length == 0) {
-            if (!nodeItem.isNamed()) { // nothing to conflict with
+            if (!nodeItem.isNamed()) {
+                // nothing to conflict with
                 addChild(nodeItem);
                 return;
             }
             String nodeName = nodeItem.getName();
             final Optional<Node<T>> childNamed = findChildByName(nodeName);
-            if (!childNamed.isPresent()) { // nothing with the same name exists
+            if (!childNamed.isPresent()) {
+                // nothing with the same name exists
                 addChild(nodeItem);
                 return;
             }
