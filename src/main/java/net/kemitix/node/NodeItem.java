@@ -301,15 +301,10 @@ class NodeItem<T> implements Node<T> {
             }
             return;
         }
-        String item = path[0];
-        final Optional<Node<T>> childNamed = findChildByName(item);
-        Node<T> child;
-        if (!childNamed.isPresent()) {
-            child = new NodeItem<>(null, item, this);
-        } else {
-            child = childNamed.get();
-        }
-        child.insertInPath(nodeItem, Arrays.copyOfRange(path, 1, path.length));
+        val item = path[0];
+        findChildByName(item)
+                .orElseGet(() -> new NodeItem<>(null, item, this))
+                .insertInPath(nodeItem, Arrays.copyOfRange(path, 1, path.length));
     }
 
     @Override
