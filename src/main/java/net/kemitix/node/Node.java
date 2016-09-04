@@ -7,9 +7,9 @@ import java.util.Set;
 /**
  * An interface for tree node items.
  *
- * @param <T> the type of data held in each node
+ * @author Paul Campbell
  *
- * @author pcampbell
+ * @param <T> the type of data held in each node
  */
 public interface Node<T> {
 
