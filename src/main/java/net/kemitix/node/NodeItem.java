@@ -1,6 +1,7 @@
 package net.kemitix.node;
 
 import lombok.NonNull;
+import lombok.val;
 
 import java.util.*;
 import java.util.function.Function;
@@ -279,32 +280,40 @@ class NodeItem<T> implements Node<T> {
     @Override
     public void insertInPath(final Node<T> nodeItem, final String... path) {
         if (path.length == 0) {
-            if (!nodeItem.isNamed()) {
-                // nothing to conflict with
-                addChild(nodeItem);
-                return;
-            }
-            String nodeName = nodeItem.getName();
-            final Optional<Node<T>> childNamed = findChildByName(nodeName);
-            if (!childNamed.isPresent()) {
-                // nothing with the same name exists
-                addChild(nodeItem);
-                return;
-            }
-            // we have an existing node with the same name
-            final Node<T> existing = childNamed.get();
-            if (!existing.isEmpty()) {
-                throw new NodeException("A non-empty node named '" + nodeName
-                        + "' already exists here");
-            } else {
-                nodeItem.getData().ifPresent(existing::setData);
-            }
-            return;
+            insertChild(nodeItem);
+        } else {
+            val item = path[0];
+            findChildByName(item)
+                    .orElseGet(() -> new NodeItem<>(null, item, this))
+                    .insertInPath(nodeItem, Arrays.copyOfRange(path, 1, path.length));
         }
-        val item = path[0];
-        findChildByName(item)
-                .orElseGet(() -> new NodeItem<>(null, item, this))
-                .insertInPath(nodeItem, Arrays.copyOfRange(path, 1, path.length));
+    }
+
+    private void insertChild(final Node<T> nodeItem) {
+        if (nodeItem.isNamed()) {
+            insertNamedChild(nodeItem);
+        } else {
+            // nothing to conflict with
+            addChild(nodeItem);
+        }
+    }
+
+    private void insertNamedChild(final Node<T> nodeItem) {
+        val childByName = findChildByName(nodeItem.getName());
+        if (childByName.isPresent()) {
+            // we have an existing node with the same name
+            val existing = childByName.get();
+            if (existing.isEmpty()) {
+                // place any data in the new node into the existing empty node
+                nodeItem.getData().ifPresent(existing::setData);
+            } else {
+                throw new NodeException("A non-empty node named '" + nodeItem.getName()
+                        + "' already exists here");
+            }
+        } else {
+            // nothing with the same name exists
+            addChild(nodeItem);
+        }
     }
 
     @Override
