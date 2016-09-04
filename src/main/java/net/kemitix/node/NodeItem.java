@@ -263,14 +263,17 @@ class NodeItem<T> implements Node<T> {
         if (path.isEmpty()) {
             return Optional.empty();
         }
-        Optional<Node<T>> found = findChild(path.get(0));
-        if (found.isPresent()) {
-            if (path.size() > 1) {
-                return found.get().findInPath(path.subList(1, path.size()));
+        Node<T> current = this;
+        for (T item : path) {
+            final Optional<Node<T>> child = current.findChild(item);
+            if (child.isPresent()) {
+                current = child.get();
+            } else {
+                current = null;
+                break;
             }
-            return found;
         }
-        return Optional.empty();
+        return Optional.ofNullable(current);
     }
 
     @Override
