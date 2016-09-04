@@ -13,9 +13,9 @@ import java.util.function.Function;
 /**
  * Represents a tree of nodes.
  *
- * @param <T> the type of data stored in each node
- *
  * @author Paul Campbell
+ *
+ * @param <T> the type of data stored in each node
  */
 class NodeItem<T> implements Node<T> {
 
