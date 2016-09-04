@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * Represents a tree of nodes.
@@ -22,8 +21,6 @@ class NodeItem<T> implements Node<T> {
     private T data;
 
     private final Set<Node<T>> children = new HashSet<>();
-
-    private Function<Node<T>, String> nameSupplier;
 
     private Node<T> parent;
 
@@ -47,7 +44,6 @@ class NodeItem<T> implements Node<T> {
      */
     NodeItem(final T data) {
         this.data = data;
-        this.nameSupplier = (n) -> null;
     }
 
     /**
@@ -74,24 +70,8 @@ class NodeItem<T> implements Node<T> {
         setParent(parent);
     }
 
-    private String generateName() {
-        return getNameSupplier().apply(this);
-    }
-
-    private Function<Node<T>, String> getNameSupplier() {
-        if (nameSupplier != null) {
-            return nameSupplier;
-        }
-        // no test for parent as root nodes will always have a default name
-        // supplier
-        return ((NodeItem<T>) parent).getNameSupplier();
-    }
-
     @Override
     public String getName() {
-        if (name == null) {
-            return generateName();
-        }
         return name;
     }
 
@@ -380,14 +360,8 @@ class NodeItem<T> implements Node<T> {
     public void removeParent() {
         if (parent != null) {
             Node<T> oldParent = parent;
-            Function<Node<T>, String> supplier = getNameSupplier();
             parent = null;
             oldParent.removeChild(this);
-            if (this.nameSupplier == null) {
-                // this is now a root node, so must provide a default name
-                // supplier
-                this.nameSupplier = supplier;
-            }
         }
     }
 
