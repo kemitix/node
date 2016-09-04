@@ -292,7 +292,8 @@ class NodeItem<T> implements Node<T> {
             val item = path[0];
             findChildByName(item)
                     .orElseGet(() -> new NodeItem<>(null, item, this))
-                    .insertInPath(nodeItem, Arrays.copyOfRange(path, 1, path.length));
+                    .insertInPath(nodeItem,
+                            Arrays.copyOfRange(path, 1, path.length));
         }
     }
 
@@ -314,8 +315,8 @@ class NodeItem<T> implements Node<T> {
                 // place any data in the new node into the existing empty node
                 nodeItem.getData().ifPresent(existing::setData);
             } else {
-                throw new NodeException("A non-empty node named '" + nodeItem.getName()
-                        + "' already exists here");
+                throw new NodeException("A non-empty node named '"
+                        + nodeItem.getName() + "' already exists here");
             }
         } else {
             // nothing with the same name exists
