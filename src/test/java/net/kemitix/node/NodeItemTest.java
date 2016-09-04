@@ -4,13 +4,14 @@ import lombok.val;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Test for {@link NodeItem}.
@@ -309,6 +310,7 @@ public class NodeItemTest {
      * Test that we can walk a tree to the target node.
      */
     @Test
+    @Category(NodeFindInPathTestsCategory.class)
     public void shouldWalkTreeToNode() {
         //given
         val grandparent = "grandparent";
@@ -334,6 +336,7 @@ public class NodeItemTest {
      * doesn't exist.
      */
     @Test
+    @Category(NodeFindInPathTestsCategory.class)
     public void shouldNotFindNonExistentChildNode() {
         //given
         val parent = "parent";
@@ -352,6 +355,7 @@ public class NodeItemTest {
      * Test that when we pass null we get an exception.
      */
     @Test
+    @Category(NodeFindInPathTestsCategory.class)
     public void shouldThrowNEWhenWalkTreeNull() {
         //given
         node = Nodes.unnamedRoot("subject");
@@ -366,6 +370,7 @@ public class NodeItemTest {
      * a result.
      */
     @Test
+    @Category(NodeFindInPathTestsCategory.class)
     public void shouldReturnEmptyForEmptyWalkTreePath() {
         //given
         node = Nodes.unnamedRoot("subject");

@@ -4,13 +4,14 @@ import lombok.val;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Test for {@link ImmutableNodeItem}.
@@ -141,6 +142,7 @@ public class ImmutableNodeItemTest {
      * Test that we can walk a tree to the target node.
      */
     @Test
+    @Category(NodeFindInPathTestsCategory.class)
     public void shouldWalkTreeToNode() {
         //given
         val root = Nodes.unnamedRoot("root");
@@ -160,6 +162,7 @@ public class ImmutableNodeItemTest {
      * doesn't exist.
      */
     @Test
+    @Category(NodeFindInPathTestsCategory.class)
     public void shouldNotFindNonExistentChildNode() {
         //given
         val root = Nodes.unnamedRoot("root");
@@ -176,6 +179,7 @@ public class ImmutableNodeItemTest {
      * Test that when we pass null we get an exception.
      */
     @Test
+    @Category(NodeFindInPathTestsCategory.class)
     public void shouldThrowNEWhenWalkTreeNull() {
         //given
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot("subject"));
@@ -190,6 +194,7 @@ public class ImmutableNodeItemTest {
      * a result.
      */
     @Test
+    @Category(NodeFindInPathTestsCategory.class)
     public void shouldReturnEmptyForEmptyWalkTreePath() {
         //given
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot("subject"));
