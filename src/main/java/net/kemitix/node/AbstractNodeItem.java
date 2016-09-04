@@ -102,14 +102,15 @@ abstract class AbstractNodeItem<T> implements Node<T> {
      */
     @Override
     public Optional<Node<T>> findInPath(@NonNull final List<T> path) {
-        if (path.size() > 0) {
-            Optional<Node<T>> found = findChild(path.get(0));
-            if (found.isPresent()) {
-                if (path.size() > 1) {
-                    return found.get().findInPath(path.subList(1, path.size()));
-                }
-                return found;
+        if (path.isEmpty()) {
+            return Optional.empty();
+        }
+        Optional<Node<T>> found = findChild(path.get(0));
+        if (found.isPresent()) {
+            if (path.size() > 1) {
+                return found.get().findInPath(path.subList(1, path.size()));
             }
+            return found;
         }
         return Optional.empty();
     }

@@ -2,19 +2,15 @@ package net.kemitix.node;
 
 import lombok.NonNull;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 /**
  * Represents a tree of nodes.
  *
- * @author Paul Campbell
- *
  * @param <T> the type of data stored in each node
+ *
+ * @author Paul Campbell
  */
 class NodeItem<T> implements Node<T> {
 
@@ -147,7 +143,7 @@ class NodeItem<T> implements Node<T> {
         Optional<Node<T>> childParent = child.getParent();
         boolean isOrphan = !childParent.isPresent();
         boolean hasDifferentParent = !isOrphan && !childParent.get()
-                                                              .equals(this);
+                .equals(this);
         if (isOrphan || hasDifferentParent) {
             child.setParent(this);
         }
@@ -264,14 +260,15 @@ class NodeItem<T> implements Node<T> {
      */
     @Override
     public Optional<Node<T>> findInPath(@NonNull final List<T> path) {
-        if (path.size() > 0) {
-            Optional<Node<T>> found = findChild(path.get(0));
-            if (found.isPresent()) {
-                if (path.size() > 1) {
-                    return found.get().findInPath(path.subList(1, path.size()));
-                }
-                return found;
+        if (path.isEmpty()) {
+            return Optional.empty();
+        }
+        Optional<Node<T>> found = findChild(path.get(0));
+        if (found.isPresent()) {
+            if (path.size() > 1) {
+                return found.get().findInPath(path.subList(1, path.size()));
             }
+            return found;
         }
         return Optional.empty();
     }
@@ -315,8 +312,8 @@ class NodeItem<T> implements Node<T> {
     @Override
     public Optional<Node<T>> findChildByName(@NonNull final String named) {
         return children.stream()
-                       .filter((Node<T> t) -> t.getName().equals(named))
-                       .findAny();
+                .filter((Node<T> t) -> t.getName().equals(named))
+                .findAny();
     }
 
     @Override
