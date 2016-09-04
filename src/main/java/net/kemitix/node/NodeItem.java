@@ -132,25 +132,31 @@ class NodeItem<T> implements Node<T> {
      */
     @Override
     public void addChild(@NonNull final Node<T> child) {
-        if (this.equals(child) || isDescendantOf(child)) {
-            throw new NodeException("Child is an ancestor");
-        }
-        if (child.isNamed()) {
-            final Optional<Node<T>> existingChild = findChildByName(
-                    child.getName());
-            if (existingChild.isPresent() && existingChild.get() != child) {
-                throw new NodeException(
-                        "Node with that name already exists here");
-            }
-        }
+        verifyChildIsNotAnAncestor(child);
+        verifyChildWithSameNameDoesNotAlreadyExist(child);
         children.add(child);
         // update the child's parent if they don't have one or it is not this
-        Optional<Node<T>> childParent = child.getParent();
-        boolean isOrphan = !childParent.isPresent();
-        boolean hasDifferentParent = !isOrphan && !childParent.get()
-                .equals(this);
-        if (isOrphan || hasDifferentParent) {
+        val childParent = child.getParent();
+        if (!childParent.isPresent() || !childParent.get().equals(this)) {
             child.setParent(this);
+        }
+    }
+
+    private void verifyChildWithSameNameDoesNotAlreadyExist(
+            final @NonNull Node<T> child) {
+        if (child.isNamed()) {
+            findChildByName(child.getName())
+                    .filter(existingChild -> existingChild != child)
+                    .ifPresent(existingChild -> {
+                        throw new NodeException(
+                                "Node with that name already exists here");
+                    });
+        }
+    }
+
+    private void verifyChildIsNotAnAncestor(final @NonNull Node<T> child) {
+        if (this.equals(child) || isDescendantOf(child)) {
+            throw new NodeException("Child is an ancestor");
         }
     }
 
