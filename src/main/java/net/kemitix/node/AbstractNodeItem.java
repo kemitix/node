@@ -1,5 +1,7 @@
 package net.kemitix.node;
 
+import lombok.NonNull;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -9,9 +11,9 @@ import java.util.Set;
  * An abstract node item, providing default implementations for most read-only
  * operations.
  *
- * @param <T> the type of data stored in each node
+ * @author Paul Campbell
  *
- * @author pcampbell
+ * @param <T> the type of data stored in each node
  */
 abstract class AbstractNodeItem<T> implements Node<T> {
 
@@ -65,10 +67,7 @@ abstract class AbstractNodeItem<T> implements Node<T> {
      * @return an {@link Optional} containing the child node if found
      */
     @Override
-    public Optional<Node<T>> findChild(final T child) {
-        if (child == null) {
-            throw new NullPointerException("child");
-        }
+    public Optional<Node<T>> findChild(@NonNull final T child) {
         return children.stream().filter(node -> {
             final Optional<T> d = node.getData();
             return d.isPresent() && d.get().equals(child);
@@ -102,27 +101,25 @@ abstract class AbstractNodeItem<T> implements Node<T> {
      * @return the child or null
      */
     @Override
-    public Optional<Node<T>> findInPath(final List<T> path) {
-        if (path == null) {
-            throw new NullPointerException("path");
+    public Optional<Node<T>> findInPath(@NonNull final List<T> path) {
+        if (path.isEmpty()) {
+            return Optional.empty();
         }
-        if (path.size() > 0) {
-            Optional<Node<T>> found = findChild(path.get(0));
-            if (found.isPresent()) {
-                if (path.size() > 1) {
-                    return found.get().findInPath(path.subList(1, path.size()));
-                }
-                return found;
+        Node<T> current = this;
+        for (T item : path) {
+            final Optional<Node<T>> child = current.findChild(item);
+            if (child.isPresent()) {
+                current = child.get();
+            } else {
+                current = null;
+                break;
             }
         }
-        return Optional.empty();
+        return Optional.ofNullable(current);
     }
 
     @Override
-    public Optional<Node<T>> findChildByName(final String named) {
-        if (named == null) {
-            throw new NullPointerException("name");
-        }
+    public Optional<Node<T>> findChildByName(@NonNull final String named) {
         return children.stream()
                        .filter(n -> n.getName().equals(named))
                        .findAny();
@@ -139,15 +136,16 @@ abstract class AbstractNodeItem<T> implements Node<T> {
         final StringBuilder sb = new StringBuilder();
         final String unnamed = "(unnamed)";
         if (isNamed()) {
-            sb.append(String.format("[%1$" + (depth + name.length()) + "s]\n",
-                    name));
+            sb.append(formatByDepth(name, depth));
         } else if (!children.isEmpty()) {
-            sb.append(
-                    String.format("[%1$" + (depth + unnamed.length()) + "s]\n",
-                            unnamed));
+            sb.append(formatByDepth(unnamed, depth));
         }
         getChildren().forEach(c -> sb.append(c.drawTree(depth + 1)));
         return sb.toString();
+    }
+
+    private String formatByDepth(final String value, final int depth) {
+        return String.format("[%1$" + (depth + value.length()) + "s]\n", value);
     }
 
     @Override

@@ -1,26 +1,26 @@
 package net.kemitix.node;
 
+import lombok.NonNull;
+import lombok.val;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * Represents a tree of nodes.
  *
- * @param <T> the type of data stored in each node
+ * @author Paul Campbell
  *
- * @author pcampbell
+ * @param <T> the type of data stored in each node
  */
 class NodeItem<T> implements Node<T> {
 
     private T data;
 
     private final Set<Node<T>> children = new HashSet<>();
-
-    private Function<Node<T>, String> nameSupplier;
 
     private Node<T> parent;
 
@@ -44,7 +44,6 @@ class NodeItem<T> implements Node<T> {
      */
     NodeItem(final T data) {
         this.data = data;
-        this.nameSupplier = (n) -> null;
     }
 
     /**
@@ -71,24 +70,8 @@ class NodeItem<T> implements Node<T> {
         setParent(parent);
     }
 
-    private String generateName() {
-        return getNameSupplier().apply(this);
-    }
-
-    private Function<Node<T>, String> getNameSupplier() {
-        if (nameSupplier != null) {
-            return nameSupplier;
-        }
-        // no test for parent as root nodes will always have a default name
-        // supplier
-        return ((NodeItem<T>) parent).getNameSupplier();
-    }
-
     @Override
     public String getName() {
-        if (name == null) {
-            return generateName();
-        }
         return name;
     }
 
@@ -128,29 +111,32 @@ class NodeItem<T> implements Node<T> {
      * @param child the node to add
      */
     @Override
-    public void addChild(final Node<T> child) {
-        if (child == null) {
-            throw new NullPointerException("child");
-        }
-        if (this.equals(child) || isDescendantOf(child)) {
-            throw new NodeException("Child is an ancestor");
-        }
-        if (child.isNamed()) {
-            final Optional<Node<T>> existingChild = findChildByName(
-                    child.getName());
-            if (existingChild.isPresent() && existingChild.get() != child) {
-                throw new NodeException(
-                        "Node with that name already exists here");
-            }
-        }
+    public void addChild(@NonNull final Node<T> child) {
+        verifyChildIsNotAnAncestor(child);
+        verifyChildWithSameNameDoesNotAlreadyExist(child);
         children.add(child);
         // update the child's parent if they don't have one or it is not this
-        Optional<Node<T>> childParent = child.getParent();
-        boolean isOrphan = !childParent.isPresent();
-        boolean hasDifferentParent = !isOrphan && !childParent.get()
-                                                              .equals(this);
-        if (isOrphan || hasDifferentParent) {
+        val childParent = child.getParent();
+        if (!childParent.isPresent() || !childParent.get().equals(this)) {
             child.setParent(this);
+        }
+    }
+
+    private void verifyChildWithSameNameDoesNotAlreadyExist(
+            final @NonNull Node<T> child) {
+        if (child.isNamed()) {
+            findChildByName(child.getName())
+                    .filter(existingChild -> existingChild != child)
+                    .ifPresent(existingChild -> {
+                        throw new NodeException(
+                                "Node with that name already exists here");
+                    });
+        }
+    }
+
+    private void verifyChildIsNotAnAncestor(final @NonNull Node<T> child) {
+        if (this.equals(child) || isDescendantOf(child)) {
+            throw new NodeException("Child is an ancestor");
         }
     }
 
@@ -162,10 +148,7 @@ class NodeItem<T> implements Node<T> {
      * @return the new child node
      */
     @Override
-    public Node<T> createChild(final T child) {
-        if (child == null) {
-            throw new NullPointerException("child");
-        }
+    public Node<T> createChild(@NonNull final T child) {
         return new NodeItem<>(child, this);
     }
 
@@ -184,10 +167,7 @@ class NodeItem<T> implements Node<T> {
      * @param descendants the line of descendants from the current node
      */
     @Override
-    public void createDescendantLine(final List<T> descendants) {
-        if (descendants == null) {
-            throw new NullPointerException("descendants");
-        }
+    public void createDescendantLine(@NonNull final List<T> descendants) {
         if (!descendants.isEmpty()) {
             findOrCreateChild(descendants.get(0)).createDescendantLine(
                     descendants.subList(1, descendants.size()));
@@ -201,13 +181,13 @@ class NodeItem<T> implements Node<T> {
      * @param child the child's data to search or create with
      *
      * @return the found or created child node
+     *
+     * @deprecated use node.findChild(child).orElseGet(() -> node.createChild
+     * (child));
      */
     @Override
     @Deprecated
-    public Node<T> findOrCreateChild(final T child) {
-        if (child == null) {
-            throw new NullPointerException("child");
-        }
+    public Node<T> findOrCreateChild(@NonNull final T child) {
         return findChild(child).orElseGet(() -> createChild(child));
     }
 
@@ -219,10 +199,7 @@ class NodeItem<T> implements Node<T> {
      * @return an {@link Optional} containing the child node if found
      */
     @Override
-    public Optional<Node<T>> findChild(final T child) {
-        if (child == null) {
-            throw new NullPointerException("child");
-        }
+    public Optional<Node<T>> findChild(@NonNull final T child) {
         return children.stream().filter(node -> {
             final Optional<T> d = node.getData();
             return d.isPresent() && d.get().equals(child);
@@ -257,10 +234,7 @@ class NodeItem<T> implements Node<T> {
      * @param parent the new parent node
      */
     @Override
-    public final void setParent(final Node<T> parent) {
-        if (parent == null) {
-            throw new NullPointerException("parent");
-        }
+    public final void setParent(@NonNull final Node<T> parent) {
         if (this.equals(parent) || parent.isDescendantOf(this)) {
             throw new NodeException("Parent is a descendant");
         }
@@ -279,64 +253,68 @@ class NodeItem<T> implements Node<T> {
      * @return the child or null
      */
     @Override
-    public Optional<Node<T>> findInPath(final List<T> path) {
-        if (path == null) {
-            throw new NullPointerException("path");
+    public Optional<Node<T>> findInPath(@NonNull final List<T> path) {
+        if (path.isEmpty()) {
+            return Optional.empty();
         }
-        if (path.size() > 0) {
-            Optional<Node<T>> found = findChild(path.get(0));
-            if (found.isPresent()) {
-                if (path.size() > 1) {
-                    return found.get().findInPath(path.subList(1, path.size()));
-                }
-                return found;
+        Node<T> current = this;
+        for (T item : path) {
+            final Optional<Node<T>> child = current.findChild(item);
+            if (child.isPresent()) {
+                current = child.get();
+            } else {
+                current = null;
+                break;
             }
         }
-        return Optional.empty();
+        return Optional.ofNullable(current);
     }
 
     @Override
     public void insertInPath(final Node<T> nodeItem, final String... path) {
         if (path.length == 0) {
-            if (!nodeItem.isNamed()) { // nothing to conflict with
-                addChild(nodeItem);
-                return;
-            }
-            String nodeName = nodeItem.getName();
-            final Optional<Node<T>> childNamed = findChildByName(nodeName);
-            if (!childNamed.isPresent()) { // nothing with the same name exists
-                addChild(nodeItem);
-                return;
-            }
-            // we have an existing node with the same name
-            final Node<T> existing = childNamed.get();
-            if (!existing.isEmpty()) {
-                throw new NodeException("A non-empty node named '" + nodeName
-                        + "' already exists here");
-            } else {
-                nodeItem.getData().ifPresent(existing::setData);
-            }
-            return;
-        }
-        String item = path[0];
-        final Optional<Node<T>> childNamed = findChildByName(item);
-        Node<T> child;
-        if (!childNamed.isPresent()) {
-            child = new NodeItem<>(null, item, this);
+            insertChild(nodeItem);
         } else {
-            child = childNamed.get();
+            val item = path[0];
+            findChildByName(item)
+                    .orElseGet(() -> new NodeItem<>(null, item, this))
+                    .insertInPath(nodeItem,
+                            Arrays.copyOfRange(path, 1, path.length));
         }
-        child.insertInPath(nodeItem, Arrays.copyOfRange(path, 1, path.length));
+    }
+
+    private void insertChild(final Node<T> nodeItem) {
+        if (nodeItem.isNamed()) {
+            insertNamedChild(nodeItem);
+        } else {
+            // nothing to conflict with
+            addChild(nodeItem);
+        }
+    }
+
+    private void insertNamedChild(final Node<T> nodeItem) {
+        val childByName = findChildByName(nodeItem.getName());
+        if (childByName.isPresent()) {
+            // we have an existing node with the same name
+            val existing = childByName.get();
+            if (existing.isEmpty()) {
+                // place any data in the new node into the existing empty node
+                nodeItem.getData().ifPresent(existing::setData);
+            } else {
+                throw new NodeException("A non-empty node named '"
+                        + nodeItem.getName() + "' already exists here");
+            }
+        } else {
+            // nothing with the same name exists
+            addChild(nodeItem);
+        }
     }
 
     @Override
-    public Optional<Node<T>> findChildByName(final String named) {
-        if (named == null) {
-            throw new NullPointerException("name");
-        }
+    public Optional<Node<T>> findChildByName(@NonNull final String named) {
         return children.stream()
-                       .filter((Node<T> t) -> t.getName().equals(named))
-                       .findAny();
+                .filter((Node<T> t) -> t.getName().equals(named))
+                .findAny();
     }
 
     @Override
@@ -353,15 +331,16 @@ class NodeItem<T> implements Node<T> {
         final StringBuilder sb = new StringBuilder();
         final String unnamed = "(unnamed)";
         if (isNamed()) {
-            sb.append(String.format("[%1$" + (depth + name.length()) + "s]\n",
-                    name));
+            sb.append(formatByDepth(name, depth));
         } else if (!children.isEmpty()) {
-            sb.append(
-                    String.format("[%1$" + (depth + unnamed.length()) + "s]\n",
-                            unnamed));
+            sb.append(formatByDepth(unnamed, depth));
         }
-        getChildren().stream().forEach(c -> sb.append(c.drawTree(depth + 1)));
+        getChildren().forEach(c -> sb.append(c.drawTree(depth + 1)));
         return sb.toString();
+    }
+
+    private String formatByDepth(final String value, final int depth) {
+        return String.format("[%1$" + (depth + value.length()) + "s]\n", value);
     }
 
     @Override
@@ -381,14 +360,8 @@ class NodeItem<T> implements Node<T> {
     public void removeParent() {
         if (parent != null) {
             Node<T> oldParent = parent;
-            Function<Node<T>, String> supplier = getNameSupplier();
             parent = null;
             oldParent.removeChild(this);
-            if (this.nameSupplier == null) {
-                // this is now a root node, so must provide a default name
-                // supplier
-                this.nameSupplier = supplier;
-            }
         }
     }
 

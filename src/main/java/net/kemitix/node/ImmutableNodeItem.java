@@ -11,9 +11,9 @@ import java.util.Set;
  * getData()} they could then modify the original data within the node. This
  * wouldn't affect the integrity of the node tree structure, however.</p>
  *
- * @param <T> the type of data stored in each node
+ * @author Paul Campbell
  *
- * @author pcampbell
+ * @param <T> the type of data stored in each node
  */
 final class ImmutableNodeItem<T> extends AbstractNodeItem<T> {
 

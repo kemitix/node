@@ -7,9 +7,9 @@ import java.util.Set;
 /**
  * An interface for tree node items.
  *
- * @param <T> the type of data held in each node
+ * @author Paul Campbell
  *
- * @author pcampbell
+ * @param <T> the type of data held in each node
  */
 public interface Node<T> {
 
@@ -113,6 +113,9 @@ public interface Node<T> {
      * @param child the child's data to search or create with
      *
      * @return the found or created child node
+     *
+     * @deprecated use node.findChild(child).orElseGet(() ->
+     * node.createChild(child));
      */
     @Deprecated
     Node<T> findOrCreateChild(T child);
