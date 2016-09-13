@@ -157,8 +157,6 @@ public interface Node<T> {
      * @param child the child's data to search for
      *
      * @return the child node if found
-     *
-     * @throws NodeException if the node is not found
      */
     Node<T> getChild(T child);
 
@@ -205,8 +203,6 @@ public interface Node<T> {
      * @param name the name of the child
      *
      * @return the node
-     *
-     * @throws NodeException if the node is not found
      */
     Node<T> getChildByName(String name);
 
