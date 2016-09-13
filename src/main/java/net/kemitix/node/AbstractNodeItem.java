@@ -1,3 +1,27 @@
+/*
+The MIT License (MIT)
+
+Copyright (c) 2016 Paul Campbell
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package net.kemitix.node;
 
 import lombok.NonNull;
@@ -11,11 +35,13 @@ import java.util.Set;
  * An abstract node item, providing default implementations for most read-only
  * operations.
  *
- * @author Paul Campbell
- *
  * @param <T> the type of data stored in each node
+ *
+ * @author Paul Campbell (pcampbell@kemitix.net)
  */
 abstract class AbstractNodeItem<T> implements Node<T> {
+
+    private final Set<Node<T>> children;
 
     private T data;
 
@@ -23,11 +49,17 @@ abstract class AbstractNodeItem<T> implements Node<T> {
 
     private Node<T> parent;
 
-    private final Set<Node<T>> children;
-
+    /**
+     * Constructor.
+     *
+     * @param data     the data of the node
+     * @param name     the name of the node
+     * @param parent   the parent of the node, or null for a root node
+     * @param children the children of the node - must not be null
+     */
     protected AbstractNodeItem(
-            final T data, final String name, final Node<T> parent,
-            final Set<Node<T>> children) {
+            final T data, final String name, final Node<T> parent, @NonNull final Set<Node<T>> children
+                              ) {
         this.data = data;
         this.name = name;
         this.parent = parent;
@@ -68,16 +100,18 @@ abstract class AbstractNodeItem<T> implements Node<T> {
      */
     @Override
     public Optional<Node<T>> findChild(@NonNull final T child) {
-        return children.stream().filter(node -> {
-            final Optional<T> d = node.getData();
-            return d.isPresent() && d.get().equals(child);
-        }).findAny();
+        return children.stream()
+                       .filter(node -> {
+                           final Optional<T> d = node.getData();
+                           return d.isPresent() && d.get()
+                                                    .equals(child);
+                       })
+                       .findAny();
     }
 
     @Override
     public Node<T> getChild(final T child) {
-        return findChild(child).orElseThrow(
-                () -> new NodeException("Child not found"));
+        return findChild(child).orElseThrow(() -> new NodeException("Child not found"));
     }
 
     /**
@@ -89,8 +123,7 @@ abstract class AbstractNodeItem<T> implements Node<T> {
      */
     @Override
     public boolean isDescendantOf(final Node<T> node) {
-        return parent != null && (node.equals(parent) || parent.isDescendantOf(
-                node));
+        return parent != null && (node.equals(parent) || parent.isDescendantOf(node));
     }
 
     /**
@@ -106,14 +139,9 @@ abstract class AbstractNodeItem<T> implements Node<T> {
             return Optional.empty();
         }
         Node<T> current = this;
-        for (T item : path) {
-            final Optional<Node<T>> child = current.findChild(item);
-            if (child.isPresent()) {
-                current = child.get();
-            } else {
-                current = null;
-                break;
-            }
+        for (int i = 0, pathSize = path.size(); i < pathSize && current != null; i++) {
+            current = current.findChild(path.get(i))
+                             .orElse(null);
         }
         return Optional.ofNullable(current);
     }
@@ -121,14 +149,14 @@ abstract class AbstractNodeItem<T> implements Node<T> {
     @Override
     public Optional<Node<T>> findChildByName(@NonNull final String named) {
         return children.stream()
-                       .filter(n -> n.getName().equals(named))
+                       .filter(n -> n.getName()
+                                     .equals(named))
                        .findAny();
     }
 
     @Override
     public Node<T> getChildByName(final String named) {
-        return findChildByName(named).orElseThrow(
-                () -> new NodeException("Named child not found"));
+        return findChildByName(named).orElseThrow(() -> new NodeException("Named child not found"));
     }
 
     @Override
