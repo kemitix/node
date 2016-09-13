@@ -49,6 +49,14 @@ abstract class AbstractNodeItem<T> implements Node<T> {
 
     private Node<T> parent;
 
+    /**
+     * Constructor.
+     *
+     * @param data     the data of the node
+     * @param name     the name of the node
+     * @param parent   the parent of the node, or null for a root node
+     * @param children the children of the node - must not be null
+     */
     protected AbstractNodeItem(
             final T data, final String name, final Node<T> parent, @NonNull final Set<Node<T>> children
                               ) {
