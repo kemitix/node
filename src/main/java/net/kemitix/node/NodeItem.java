@@ -36,9 +36,9 @@ import java.util.Set;
 /**
  * Represents a tree of nodes.
  *
- * @author Paul Campbell
- *
  * @param <T> the type of data stored in each node
+ *
+ * @author Paul Campbell (pcampbell@kemitix.net)
  */
 class NodeItem<T> implements Node<T> {
 

@@ -27,7 +27,7 @@ package net.kemitix.node;
 /**
  * Represents an error within the tree node.
  *
- * @author pcampbell
+ * @author Paul Campbell (pcampbell@kemitix.net)
  */
 @SuppressWarnings("serial")
 public class NodeException extends RuntimeException {

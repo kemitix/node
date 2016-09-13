@@ -31,9 +31,9 @@ import java.util.Set;
 /**
  * An interface for tree node items.
  *
- * @author Paul Campbell
- *
  * @param <T> the type of data held in each node
+ *
+ * @author Paul Campbell (pcampbell@kemitix.net)
  */
 public interface Node<T> {
 

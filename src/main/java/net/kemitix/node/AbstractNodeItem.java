@@ -35,9 +35,9 @@ import java.util.Set;
  * An abstract node item, providing default implementations for most read-only
  * operations.
  *
- * @author Paul Campbell
- *
  * @param <T> the type of data stored in each node
+ *
+ * @author Paul Campbell (pcampbell@kemitix.net)
  */
 abstract class AbstractNodeItem<T> implements Node<T> {
 

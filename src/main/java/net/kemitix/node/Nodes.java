@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 /**
  * Utility class for {@link Node} items.
  *
- * @author pcampbell
+ * @author Paul Campbell (pcampbell@kemitix.net)
  */
 public final class Nodes {
 
