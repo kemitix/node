@@ -15,7 +15,7 @@
     </parent>
 
     <properties>
-        <assertj.version>3.4.1</assertj.version>
+        <assertj.version>3.5.2</assertj.version>
         <coveralls-maven-plugin.version>4.2.0</coveralls-maven-plugin.version>
         <trajano-commons-testing.version>2.1.0</trajano-commons-testing.version>
     </properties>
