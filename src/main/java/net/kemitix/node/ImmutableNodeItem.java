@@ -49,12 +49,33 @@ final class ImmutableNodeItem<T> extends AbstractNodeItem<T> {
         super(data, name, parent, children);
     }
 
+    /**
+     * Creates a new immutable root node.
+     *
+     * @param data     the data of the node
+     * @param name     the name of the node
+     * @param children the children of the node
+     * @param <T>      the type of the data in the node
+     *
+     * @return the new node tree's root node
+     */
     static <T> ImmutableNodeItem<T> newRoot(
             final T data, final String name, final Set<Node<T>> children
                                            ) {
         return new ImmutableNodeItem<>(data, name, null, children);
     }
 
+    /**
+     * Creates a new immutable subtree from this child.
+     *
+     * @param data     the data of the node
+     * @param name     the name of the node
+     * @param parent   the mutable parent of the node
+     * @param children the children of the node
+     * @param <T>      the type of the data in the node
+     *
+     * @return the new immutable node
+     */
     static <T> ImmutableNodeItem<T> newChild(
             final T data, final String name, final Node<T> parent, final Set<Node<T>> children
                                             ) {
