@@ -56,8 +56,7 @@ public interface Node<T> {
     /**
      * Fetch the data held within the node.
      *
-     * @return an Optional containing the node's data, or empty if the node has
-     * none
+     * @return an Optional containing the node's data, or empty if the node has none
      */
     Optional<T> getData();
 
@@ -138,8 +137,7 @@ public interface Node<T> {
      *
      * @return the found or created child node
      *
-     * @deprecated use {@code node.findChild(child).orElseGet(() ->
-     * node.createChild(child))};
+     * @deprecated use {@code node.findChild(child).orElseGet(() -> node.createChild(child))};
      */
     @Deprecated
     Node<T> findOrCreateChild(T child);

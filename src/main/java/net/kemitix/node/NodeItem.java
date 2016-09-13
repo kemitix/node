@@ -206,8 +206,7 @@ class NodeItem<T> implements Node<T> {
      *
      * @return the found or created child node
      *
-     * @deprecated use node.findChild(child).orElseGet(() -> node.createChild
-     * (child));
+     * @deprecated use node.findChild(child).orElseGet(() -> node.createChild (child));
      */
     @Override
     @Deprecated
