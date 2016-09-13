@@ -41,17 +41,17 @@ import java.util.Set;
  */
 abstract class AbstractNodeItem<T> implements Node<T> {
 
+    private final Set<Node<T>> children;
+
     private T data;
 
     private String name;
 
     private Node<T> parent;
 
-    private final Set<Node<T>> children;
-
     protected AbstractNodeItem(
-            final T data, final String name, final Node<T> parent,
-            final Set<Node<T>> children) {
+            final T data, final String name, final Node<T> parent, final Set<Node<T>> children
+                              ) {
         this.data = data;
         this.name = name;
         this.parent = parent;
@@ -92,16 +92,18 @@ abstract class AbstractNodeItem<T> implements Node<T> {
      */
     @Override
     public Optional<Node<T>> findChild(@NonNull final T child) {
-        return children.stream().filter(node -> {
-            final Optional<T> d = node.getData();
-            return d.isPresent() && d.get().equals(child);
-        }).findAny();
+        return children.stream()
+                       .filter(node -> {
+                           final Optional<T> d = node.getData();
+                           return d.isPresent() && d.get()
+                                                    .equals(child);
+                       })
+                       .findAny();
     }
 
     @Override
     public Node<T> getChild(final T child) {
-        return findChild(child).orElseThrow(
-                () -> new NodeException("Child not found"));
+        return findChild(child).orElseThrow(() -> new NodeException("Child not found"));
     }
 
     /**
@@ -113,8 +115,7 @@ abstract class AbstractNodeItem<T> implements Node<T> {
      */
     @Override
     public boolean isDescendantOf(final Node<T> node) {
-        return parent != null && (node.equals(parent) || parent.isDescendantOf(
-                node));
+        return parent != null && (node.equals(parent) || parent.isDescendantOf(node));
     }
 
     /**
@@ -145,14 +146,14 @@ abstract class AbstractNodeItem<T> implements Node<T> {
     @Override
     public Optional<Node<T>> findChildByName(@NonNull final String named) {
         return children.stream()
-                       .filter(n -> n.getName().equals(named))
+                       .filter(n -> n.getName()
+                                     .equals(named))
                        .findAny();
     }
 
     @Override
     public Node<T> getChildByName(final String named) {
-        return findChildByName(named).orElseThrow(
-                () -> new NodeException("Named child not found"));
+        return findChildByName(named).orElseThrow(() -> new NodeException("Named child not found"));
     }
 
     @Override

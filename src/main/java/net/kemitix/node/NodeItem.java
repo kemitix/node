@@ -42,9 +42,9 @@ import java.util.Set;
  */
 class NodeItem<T> implements Node<T> {
 
-    private T data;
-
     private final Set<Node<T>> children = new HashSet<>();
+
+    private T data;
 
     private Node<T> parent;
 
@@ -124,6 +124,24 @@ class NodeItem<T> implements Node<T> {
         return Optional.ofNullable(parent);
     }
 
+    /**
+     * Make the current node a direct child of the parent.
+     *
+     * @param parent the new parent node
+     */
+    @Override
+    public final void setParent(@NonNull final Node<T> parent) {
+        if (this.equals(parent) || parent.isDescendantOf(this)) {
+            throw new NodeException("Parent is a descendant");
+        }
+        if (this.parent != null) {
+            this.parent.getChildren()
+                       .remove(this);
+        }
+        this.parent = parent;
+        parent.addChild(this);
+    }
+
     @Override
     public Set<Node<T>> getChildren() {
         return children;
@@ -141,20 +159,20 @@ class NodeItem<T> implements Node<T> {
         children.add(child);
         // update the child's parent if they don't have one or it is not this
         val childParent = child.getParent();
-        if (!childParent.isPresent() || !childParent.get().equals(this)) {
+        if (!childParent.isPresent() || !childParent.get()
+                                                    .equals(this)) {
             child.setParent(this);
         }
     }
 
     private void verifyChildWithSameNameDoesNotAlreadyExist(
-            final @NonNull Node<T> child) {
+            final @NonNull Node<T> child
+                                                           ) {
         if (child.isNamed()) {
-            findChildByName(child.getName())
-                    .filter(existingChild -> existingChild != child)
-                    .ifPresent(existingChild -> {
-                        throw new NodeException(
-                                "Node with that name already exists here");
-                    });
+            findChildByName(child.getName()).filter(existingChild -> existingChild != child)
+                                            .ifPresent(existingChild -> {
+                                                throw new NodeException("Node with that name already exists here");
+                                            });
         }
     }
 
@@ -193,8 +211,7 @@ class NodeItem<T> implements Node<T> {
     @Override
     public void createDescendantLine(@NonNull final List<T> descendants) {
         if (!descendants.isEmpty()) {
-            findOrCreateChild(descendants.get(0)).createDescendantLine(
-                    descendants.subList(1, descendants.size()));
+            findOrCreateChild(descendants.get(0)).createDescendantLine(descendants.subList(1, descendants.size()));
         }
     }
 
@@ -223,10 +240,13 @@ class NodeItem<T> implements Node<T> {
      */
     @Override
     public Optional<Node<T>> findChild(@NonNull final T child) {
-        return children.stream().filter(node -> {
-            final Optional<T> d = node.getData();
-            return d.isPresent() && d.get().equals(child);
-        }).findAny();
+        return children.stream()
+                       .filter(node -> {
+                           final Optional<T> d = node.getData();
+                           return d.isPresent() && d.get()
+                                                    .equals(child);
+                       })
+                       .findAny();
     }
 
     @Override
@@ -247,25 +267,7 @@ class NodeItem<T> implements Node<T> {
      */
     @Override
     public boolean isDescendantOf(final Node<T> node) {
-        return parent != null && (node.equals(parent) || parent.isDescendantOf(
-                node));
-    }
-
-    /**
-     * Make the current node a direct child of the parent.
-     *
-     * @param parent the new parent node
-     */
-    @Override
-    public final void setParent(@NonNull final Node<T> parent) {
-        if (this.equals(parent) || parent.isDescendantOf(this)) {
-            throw new NodeException("Parent is a descendant");
-        }
-        if (this.parent != null) {
-            this.parent.getChildren().remove(this);
-        }
-        this.parent = parent;
-        parent.addChild(this);
+        return parent != null && (node.equals(parent) || parent.isDescendantOf(node));
     }
 
     /**
@@ -299,10 +301,8 @@ class NodeItem<T> implements Node<T> {
             insertChild(nodeItem);
         } else {
             val item = path[0];
-            findChildByName(item)
-                    .orElseGet(() -> new NodeItem<>(null, item, this))
-                    .insertInPath(nodeItem,
-                            Arrays.copyOfRange(path, 1, path.length));
+            findChildByName(item).orElseGet(() -> new NodeItem<>(null, item, this))
+                                 .insertInPath(nodeItem, Arrays.copyOfRange(path, 1, path.length));
         }
     }
 
@@ -322,10 +322,10 @@ class NodeItem<T> implements Node<T> {
             val existing = childByName.get();
             if (existing.isEmpty()) {
                 // place any data in the new node into the existing empty node
-                nodeItem.getData().ifPresent(existing::setData);
+                nodeItem.getData()
+                        .ifPresent(existing::setData);
             } else {
-                throw new NodeException("A non-empty node named '"
-                        + nodeItem.getName() + "' already exists here");
+                throw new NodeException("A non-empty node named '" + nodeItem.getName() + "' already exists here");
             }
         } else {
             // nothing with the same name exists
@@ -336,8 +336,9 @@ class NodeItem<T> implements Node<T> {
     @Override
     public Optional<Node<T>> findChildByName(@NonNull final String named) {
         return children.stream()
-                .filter((Node<T> t) -> t.getName().equals(named))
-                .findAny();
+                       .filter((Node<T> t) -> t.getName()
+                                               .equals(named))
+                       .findAny();
     }
 
     @Override

@@ -44,19 +44,20 @@ final class ImmutableNodeItem<T> extends AbstractNodeItem<T> {
     private static final String IMMUTABLE_OBJECT = "Immutable object";
 
     private ImmutableNodeItem(
-            final T data, final String name, final Node<T> parent,
-            final Set<Node<T>> children) {
+            final T data, final String name, final Node<T> parent, final Set<Node<T>> children
+                             ) {
         super(data, name, parent, children);
     }
 
     static <T> ImmutableNodeItem<T> newRoot(
-            final T data, final String name, final Set<Node<T>> children) {
+            final T data, final String name, final Set<Node<T>> children
+                                           ) {
         return new ImmutableNodeItem<>(data, name, null, children);
     }
 
     static <T> ImmutableNodeItem<T> newChild(
-            final T data, final String name, final Node<T> parent,
-            final Set<Node<T>> children) {
+            final T data, final String name, final Node<T> parent, final Set<Node<T>> children
+                                            ) {
         return new ImmutableNodeItem<>(data, name, parent, children);
     }
 
@@ -97,8 +98,7 @@ final class ImmutableNodeItem<T> extends AbstractNodeItem<T> {
 
     @Override
     public Node<T> findOrCreateChild(final T child) {
-        return findChild(child).orElseThrow(
-                () -> new UnsupportedOperationException(IMMUTABLE_OBJECT));
+        return findChild(child).orElseThrow(() -> new UnsupportedOperationException(IMMUTABLE_OBJECT));
     }
 
     @Override

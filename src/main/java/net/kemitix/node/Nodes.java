@@ -87,7 +87,8 @@ public final class Nodes {
      * @return the new node
      */
     public static <T> Node<T> namedChild(
-            final T data, final String name, final Node<T> parent) {
+            final T data, final String name, final Node<T> parent
+                                        ) {
         return new NodeItem<>(data, name, parent);
     }
 
@@ -100,12 +101,13 @@ public final class Nodes {
      * @return the immutable copy of the tree
      */
     public static <T> Node<T> asImmutable(final Node<T> root) {
-        if (root.getParent().isPresent()) {
+        if (root.getParent()
+                .isPresent()) {
             throw new IllegalArgumentException("source must be the root node");
         }
         final Set<Node<T>> children = getImmutableChildren(root);
-        return ImmutableNodeItem.newRoot(root.getData().orElse(null),
-                root.getName(), children);
+        return ImmutableNodeItem.newRoot(root.getData()
+                                             .orElse(null), root.getName(), children);
     }
 
     private static <T> Set<Node<T>> getImmutableChildren(final Node<T> source) {
@@ -116,15 +118,16 @@ public final class Nodes {
     }
 
     private static <T> Node<T> asImmutableChild(
-            final Node<T> source) {
+            final Node<T> source
+                                               ) {
         final Optional<Node<T>> sourceParent = source.getParent();
         if (sourceParent.isPresent()) {
-            return ImmutableNodeItem.newChild(source.getData().orElse(null),
-                    source.getName(), sourceParent.get(),
-                    getImmutableChildren(source));
+            return ImmutableNodeItem.newChild(source.getData()
+                                                    .orElse(null), source.getName(), sourceParent.get(),
+                                              getImmutableChildren(source)
+                                             );
         } else {
-            throw new IllegalArgumentException(
-                    "source must not be the root node");
+            throw new IllegalArgumentException("source must not be the root node");
         }
     }
 
