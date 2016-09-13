@@ -283,14 +283,9 @@ class NodeItem<T> implements Node<T> {
             return Optional.empty();
         }
         Node<T> current = this;
-        for (T item : path) {
-            final Optional<Node<T>> child = current.findChild(item);
-            if (child.isPresent()) {
-                current = child.get();
-            } else {
-                current = null;
-                break;
-            }
+        for (int i = 0, pathSize = path.size(); i < pathSize && current != null; i++) {
+            current = current.findChild(path.get(i))
+                             .orElse(null);
         }
         return Optional.ofNullable(current);
     }
