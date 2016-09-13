@@ -50,7 +50,7 @@ abstract class AbstractNodeItem<T> implements Node<T> {
     private Node<T> parent;
 
     protected AbstractNodeItem(
-            final T data, final String name, final Node<T> parent, final Set<Node<T>> children
+            final T data, final String name, final Node<T> parent, @NonNull final Set<Node<T>> children
                               ) {
         this.data = data;
         this.name = name;
