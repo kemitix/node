@@ -114,8 +114,8 @@ public interface Node<T> {
      *
      * @return the found or created child node
      *
-     * @deprecated use node.findChild(child).orElseGet(() ->
-     * node.createChild(child));
+     * @deprecated use {@code node.findChild(child).orElseGet(() ->
+     * node.createChild(child))};
      */
     @Deprecated
     Node<T> findOrCreateChild(T child);
