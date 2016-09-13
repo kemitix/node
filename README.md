@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/kemitix/node.svg?branch=develop)](https://travis-ci.org/kemitix/node)
+[![Coverage Status](https://coveralls.io/repos/github/kemitix/node/badge.svg?branch=develop)](https://coveralls.io/github/kemitix/node?branch=develop)
+
 # node
 
 [![Join the chat at https://gitter.im/kemitix/node](https://badges.gitter.im/kemitix/node.svg)](https://gitter.im/kemitix/node?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)

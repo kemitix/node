@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+0.4.0
+------
+
+* Upgrade kemitix-parent to 2.0.0
+* Add ImmutableTree implementation
+* Switch to static factory constructors
+
 0.3.0
 ------
 
