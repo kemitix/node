@@ -264,9 +264,9 @@ class NodeItem<T> implements Node<T> {
         if (path.length == 0) {
             insertChild(nodeItem);
         } else {
-            val item = path[0];
-            findChildByName(item).orElseGet(() -> new NodeItem<>(null, item, this))
-                                 .insertInPath(nodeItem, Arrays.copyOfRange(path, 1, path.length));
+            val nextInPath = path[0];
+            findChildByName(nextInPath).orElseGet(() -> new NodeItem<>(null, nextInPath, this, new HashSet<>()))
+                                       .insertInPath(nodeItem, Arrays.copyOfRange(path, 1, path.length));
         }
     }
 
