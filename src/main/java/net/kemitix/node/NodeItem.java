@@ -51,6 +51,23 @@ class NodeItem<T> implements Node<T> {
     private String name;
 
     /**
+     * Constructor.
+     *
+     * @param data     the data of the node
+     * @param name     the name of the node
+     * @param parent   the parent of the node, or null for a root node
+     * @param children the children of the node - must not be null
+     */
+    NodeItem(
+            final T data, final String name, final Node<T> parent, @NonNull final Set<Node<T>> children
+            ) {
+        this.data = data;
+        this.name = name;
+        this.parent = parent;
+        this.children.addAll(children);
+    }
+
+    /**
      * Create named root node.
      *
      * @param data the data or null
