@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.5.0
+------
+
+* Make ImmutableNodeItem extend NodeItem
+* Upgrade kemitix-parent to 2.1.0
+* Upgrade lombok to 1.16.10
+* Upgrade assertj to 3.5.2
+* 
+
 0.4.0
 ------
 

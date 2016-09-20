@@ -126,7 +126,7 @@ public class ImmutableNodeItemTest {
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot("subject"));
         expectImmutableException();
         //when
-        immutableNode.setParent(null);
+        immutableNode.setParent(Nodes.unnamedRoot("child"));
     }
 
     @Test
@@ -220,19 +220,6 @@ public class ImmutableNodeItemTest {
         if (result.isPresent()) {
             assertThat(result.get().getData()).contains("child");
         }
-    }
-
-    /**
-     * Test that if we pass null we get an exception.
-     */
-    @Test
-    public void findOrCreateChildShouldThrowNPEFWhenChildIsNull() {
-        //given
-        immutableNode = Nodes.asImmutable(Nodes.unnamedRoot("subject"));
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("child");
-        //when
-        immutableNode.findOrCreateChild(null);
     }
 
     /**
@@ -433,22 +420,11 @@ public class ImmutableNodeItemTest {
     }
 
     @Test
-    public void findOrCreateChildShouldReturnChildWhenChildIsFound() {
+    public void AsImmutableShouldThrowIAEWhenNotRoot() {
         //given
-        val root = Nodes.unnamedRoot("");
-        Nodes.namedChild("child", "child", root);
-        immutableNode = Nodes.asImmutable(root);
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("source must be the root node");
         //when
-        val found = immutableNode.findOrCreateChild("child");
-        assertThat(found).extracting(Node::getName).contains("child");
-    }
-
-    @Test
-    public void findOrCreateChildShouldThrowExceptionWhenChildNotFound() {
-        //given
-        immutableNode = Nodes.asImmutable(Nodes.unnamedRoot(""));
-        expectImmutableException();
-        //when
-        immutableNode.findOrCreateChild("child");
+        Nodes.asImmutable(Nodes.unnamedChild("child", Nodes.unnamedRoot("root")));
     }
 }

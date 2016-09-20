@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>node</artifactId>
-    <version>0.4.2</version>
+    <version>0.5.0</version>
     <packaging>jar</packaging>
 
     <name>Node</name>
@@ -11,11 +11,12 @@
     <parent>
         <groupId>net.kemitix</groupId>
         <artifactId>kemitix-parent</artifactId>
-        <version>2.0.0</version>
+        <version>2.1.0</version>
     </parent>
 
     <properties>
-        <assertj.version>3.4.1</assertj.version>
+        <lombok.version>1.16.10</lombok.version>
+        <assertj.version>3.5.2</assertj.version>
         <coveralls-maven-plugin.version>4.2.0</coveralls-maven-plugin.version>
         <trajano-commons-testing.version>2.1.0</trajano-commons-testing.version>
     </properties>
@@ -49,7 +50,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.16.8</version>
+            <version>${lombok.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

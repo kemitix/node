@@ -1,3 +1,27 @@
+/*
+The MIT License (MIT)
+
+Copyright (c) 2016 Paul Campbell
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package net.kemitix.node;
 
 import lombok.NonNull;
@@ -12,62 +36,46 @@ import java.util.Set;
 /**
  * Represents a tree of nodes.
  *
- * @author Paul Campbell
- *
  * @param <T> the type of data stored in each node
+ *
+ * @author Paul Campbell (pcampbell@kemitix.net)
  */
 class NodeItem<T> implements Node<T> {
 
-    private T data;
-
     private final Set<Node<T>> children = new HashSet<>();
+
+    private T data;
 
     private Node<T> parent;
 
     private String name;
 
     /**
-     * Create named root node.
+     * Constructor.
      *
-     * @param data the data or null
-     * @param name the name
+     * @param data     the data of the node
+     * @param name     the name of the node
+     * @param parent   the parent of the node, or null for a root node
+     * @param children the children of the node - must not be null
      */
-    NodeItem(final T data, final String name) {
-        this(data);
-        this.name = name;
-    }
-
-    /**
-     * Create unnamed root node.
-     *
-     * @param data the data or null
-     */
-    NodeItem(final T data) {
-        this.data = data;
-    }
-
-    /**
-     * Creates a node with a parent.
-     *
-     * @param data   the data or null
-     * @param parent the parent node
-     */
-    NodeItem(final T data, final Node<T> parent) {
-        this.data = data;
-        setParent(parent);
-    }
-
-    /**
-     * Creates a named node with a parent.
-     *
-     * @param data   the data or null
-     * @param name   the name
-     * @param parent the parent node
-     */
-    NodeItem(final T data, final String name, final Node<T> parent) {
+    NodeItem(
+            final T data, final String name, final Node<T> parent, @NonNull final Set<Node<T>> children
+            ) {
         this.data = data;
         this.name = name;
-        setParent(parent);
+        if (parent != null) {
+            doSetParent(parent);
+        }
+        this.children.addAll(children);
+    }
+
+    /**
+     * Sets the parent of a node without updating the parent in the process as {@link #setParent(Node)} does.
+     *
+     * @param newParent The new parent node
+     */
+    protected void forceParent(final Node<T> newParent) {
+        this.parent = newParent;
     }
 
     @Override
@@ -100,6 +108,28 @@ class NodeItem<T> implements Node<T> {
         return Optional.ofNullable(parent);
     }
 
+    /**
+     * Make the current node a direct child of the parent.
+     *
+     * @param parent the new parent node
+     */
+    @Override
+    public void setParent(@NonNull final Node<T> parent) {
+        doSetParent(parent);
+    }
+
+    private void doSetParent(@NonNull final Node<T> newParent) {
+        if (this.equals(newParent) || newParent.isDescendantOf(this)) {
+            throw new NodeException("Parent is a descendant");
+        }
+        if (this.parent != null) {
+            this.parent.getChildren()
+                       .remove(this);
+        }
+        this.parent = newParent;
+        newParent.addChild(this);
+    }
+
     @Override
     public Set<Node<T>> getChildren() {
         return children;
@@ -117,20 +147,20 @@ class NodeItem<T> implements Node<T> {
         children.add(child);
         // update the child's parent if they don't have one or it is not this
         val childParent = child.getParent();
-        if (!childParent.isPresent() || !childParent.get().equals(this)) {
+        if (!childParent.isPresent() || !childParent.get()
+                                                    .equals(this)) {
             child.setParent(this);
         }
     }
 
     private void verifyChildWithSameNameDoesNotAlreadyExist(
-            final @NonNull Node<T> child) {
+            final @NonNull Node<T> child
+                                                           ) {
         if (child.isNamed()) {
-            findChildByName(child.getName())
-                    .filter(existingChild -> existingChild != child)
-                    .ifPresent(existingChild -> {
-                        throw new NodeException(
-                                "Node with that name already exists here");
-                    });
+            findChildByName(child.getName()).filter(existingChild -> existingChild != child)
+                                            .ifPresent(existingChild -> {
+                                                throw new NodeException("Node with that name already exists here");
+                                            });
         }
     }
 
@@ -149,7 +179,7 @@ class NodeItem<T> implements Node<T> {
      */
     @Override
     public Node<T> createChild(@NonNull final T child) {
-        return new NodeItem<>(child, this);
+        return new NodeItem<>(child, "", this, new HashSet<>());
     }
 
     @Override
@@ -169,26 +199,11 @@ class NodeItem<T> implements Node<T> {
     @Override
     public void createDescendantLine(@NonNull final List<T> descendants) {
         if (!descendants.isEmpty()) {
-            findOrCreateChild(descendants.get(0)).createDescendantLine(
-                    descendants.subList(1, descendants.size()));
+            val child = descendants.get(0);
+            val remainingLine = descendants.subList(1, descendants.size());
+            findChild(child).orElseGet(() -> createChild(child))
+                            .createDescendantLine(remainingLine);
         }
-    }
-
-    /**
-     * Looks for a child node and returns it, creating a new child node if one
-     * isn't found.
-     *
-     * @param child the child's data to search or create with
-     *
-     * @return the found or created child node
-     *
-     * @deprecated use node.findChild(child).orElseGet(() -> node.createChild
-     * (child));
-     */
-    @Override
-    @Deprecated
-    public Node<T> findOrCreateChild(@NonNull final T child) {
-        return findChild(child).orElseGet(() -> createChild(child));
     }
 
     /**
@@ -200,19 +215,15 @@ class NodeItem<T> implements Node<T> {
      */
     @Override
     public Optional<Node<T>> findChild(@NonNull final T child) {
-        return children.stream().filter(node -> {
-            final Optional<T> d = node.getData();
-            return d.isPresent() && d.get().equals(child);
-        }).findAny();
+        return children.stream()
+                       .filter(node -> child.equals(node.getData()
+                                                        .orElseGet(() -> null)))
+                       .findFirst();
     }
 
     @Override
     public Node<T> getChild(final T child) {
-        Optional<Node<T>> optional = findChild(child);
-        if (optional.isPresent()) {
-            return optional.get();
-        }
-        throw new NodeException("Child not found");
+        return findChild(child).orElseThrow(() -> new NodeException("Child not found"));
     }
 
     /**
@@ -224,25 +235,7 @@ class NodeItem<T> implements Node<T> {
      */
     @Override
     public boolean isDescendantOf(final Node<T> node) {
-        return parent != null && (node.equals(parent) || parent.isDescendantOf(
-                node));
-    }
-
-    /**
-     * Make the current node a direct child of the parent.
-     *
-     * @param parent the new parent node
-     */
-    @Override
-    public final void setParent(@NonNull final Node<T> parent) {
-        if (this.equals(parent) || parent.isDescendantOf(this)) {
-            throw new NodeException("Parent is a descendant");
-        }
-        if (this.parent != null) {
-            this.parent.getChildren().remove(this);
-        }
-        this.parent = parent;
-        parent.addChild(this);
+        return parent != null && (node.equals(parent) || parent.isDescendantOf(node));
     }
 
     /**
@@ -258,14 +251,9 @@ class NodeItem<T> implements Node<T> {
             return Optional.empty();
         }
         Node<T> current = this;
-        for (T item : path) {
-            final Optional<Node<T>> child = current.findChild(item);
-            if (child.isPresent()) {
-                current = child.get();
-            } else {
-                current = null;
-                break;
-            }
+        for (int i = 0, pathSize = path.size(); i < pathSize && current != null; i++) {
+            current = current.findChild(path.get(i))
+                             .orElse(null);
         }
         return Optional.ofNullable(current);
     }
@@ -275,11 +263,9 @@ class NodeItem<T> implements Node<T> {
         if (path.length == 0) {
             insertChild(nodeItem);
         } else {
-            val item = path[0];
-            findChildByName(item)
-                    .orElseGet(() -> new NodeItem<>(null, item, this))
-                    .insertInPath(nodeItem,
-                            Arrays.copyOfRange(path, 1, path.length));
+            val nextInPath = path[0];
+            findChildByName(nextInPath).orElseGet(() -> new NodeItem<>(null, nextInPath, this, new HashSet<>()))
+                                       .insertInPath(nodeItem, Arrays.copyOfRange(path, 1, path.length));
         }
     }
 
@@ -299,10 +285,10 @@ class NodeItem<T> implements Node<T> {
             val existing = childByName.get();
             if (existing.isEmpty()) {
                 // place any data in the new node into the existing empty node
-                nodeItem.getData().ifPresent(existing::setData);
+                nodeItem.getData()
+                        .ifPresent(existing::setData);
             } else {
-                throw new NodeException("A non-empty node named '"
-                        + nodeItem.getName() + "' already exists here");
+                throw new NodeException("A non-empty node named '" + nodeItem.getName() + "' already exists here");
             }
         } else {
             // nothing with the same name exists
@@ -313,8 +299,9 @@ class NodeItem<T> implements Node<T> {
     @Override
     public Optional<Node<T>> findChildByName(@NonNull final String named) {
         return children.stream()
-                .filter((Node<T> t) -> t.getName().equals(named))
-                .findAny();
+                       .filter((Node<T> t) -> t.getName()
+                                               .equals(named))
+                       .findAny();
     }
 
     @Override
