@@ -418,4 +418,13 @@ public class ImmutableNodeItemTest {
         //when
         immutableNode.insertInPath(null, "");
     }
+
+    @Test
+    public void AsImmutableShouldThrowIAEWhenNotRoot() {
+        //given
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("source must be the root node");
+        //when
+        Nodes.asImmutable(Nodes.unnamedChild("child", Nodes.unnamedRoot("root")));
+    }
 }
