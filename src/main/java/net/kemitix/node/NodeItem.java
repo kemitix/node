@@ -224,11 +224,7 @@ class NodeItem<T> implements Node<T> {
 
     @Override
     public Node<T> getChild(final T child) {
-        Optional<Node<T>> optional = findChild(child);
-        if (optional.isPresent()) {
-            return optional.get();
-        }
-        throw new NodeException("Child not found");
+        return findChild(child).orElseThrow(() -> new NodeException("Child not found"));
     }
 
     /**
