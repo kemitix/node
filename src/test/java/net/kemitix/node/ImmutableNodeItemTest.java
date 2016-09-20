@@ -126,7 +126,7 @@ public class ImmutableNodeItemTest {
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot("subject"));
         expectImmutableException();
         //when
-        immutableNode.setParent(null);
+        immutableNode.setParent(Nodes.unnamedRoot("child"));
     }
 
     @Test
