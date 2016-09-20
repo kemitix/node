@@ -39,14 +39,15 @@ import java.util.Set;
  *
  * @author Paul Campbell (pcampbell@kemitix.net)
  */
-final class ImmutableNodeItem<T> extends AbstractNodeItem<T> {
+final class ImmutableNodeItem<T> extends NodeItem<T> {
 
     private static final String IMMUTABLE_OBJECT = "Immutable object";
 
     private ImmutableNodeItem(
             final T data, final String name, final Node<T> parent, final Set<Node<T>> children
                              ) {
-        super(data, name, parent, children);
+        super(data, name, null, children);
+        forceParent(parent);
     }
 
     /**
@@ -136,5 +137,4 @@ final class ImmutableNodeItem<T> extends AbstractNodeItem<T> {
     public void removeParent() {
         throw new UnsupportedOperationException(IMMUTABLE_OBJECT);
     }
-
 }

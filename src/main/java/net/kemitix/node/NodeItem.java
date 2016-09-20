@@ -69,6 +69,10 @@ class NodeItem<T> implements Node<T> {
         this.children.addAll(children);
     }
 
+    protected void forceParent(final Node<T> parent) {
+        this.parent = parent;
+    }
+
     @Override
     public String getName() {
         return name;
@@ -105,7 +109,7 @@ class NodeItem<T> implements Node<T> {
      * @param parent the new parent node
      */
     @Override
-    public final void setParent(@NonNull final Node<T> parent) {
+    public void setParent(@NonNull final Node<T> parent) {
         if (this.equals(parent) || parent.isDescendantOf(this)) {
             throw new NodeException("Parent is a descendant");
         }
