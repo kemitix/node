@@ -25,7 +25,6 @@ SOFTWARE.
 package net.kemitix.node;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -121,15 +120,11 @@ public final class Nodes {
     private static <T> Node<T> asImmutableChild(
             final Node<T> source
                                                ) {
-        final Optional<Node<T>> sourceParent = source.getParent();
-        if (sourceParent.isPresent()) {
-            return ImmutableNodeItem.newChild(source.getData()
-                                                    .orElse(null), source.getName(), sourceParent.get(),
-                                              getImmutableChildren(source)
-                                             );
-        } else {
-            throw new IllegalArgumentException("source must not be the root node");
-        }
+        return ImmutableNodeItem.newChild(source.getData()
+                                                .orElse(null), source.getName(), source.getParent()
+                                                                                       .orElse(null),
+                                          getImmutableChildren(source)
+                                         );
     }
 
 }
