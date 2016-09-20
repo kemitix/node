@@ -214,12 +214,9 @@ class NodeItem<T> implements Node<T> {
     @Override
     public Optional<Node<T>> findChild(@NonNull final T child) {
         return children.stream()
-                       .filter(node -> {
-                           final Optional<T> d = node.getData();
-                           return d.isPresent() && d.get()
-                                                    .equals(child);
-                       })
-                       .findAny();
+                       .filter(node -> child.equals(node.getData()
+                                                        .orElseGet(() -> null)))
+                       .findFirst();
     }
 
     @Override
