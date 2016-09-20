@@ -223,19 +223,6 @@ public class ImmutableNodeItemTest {
     }
 
     /**
-     * Test that if we pass null we get an exception.
-     */
-    @Test
-    public void findOrCreateChildShouldThrowNPEFWhenChildIsNull() {
-        //given
-        immutableNode = Nodes.asImmutable(Nodes.unnamedRoot("subject"));
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("child");
-        //when
-        immutableNode.findOrCreateChild(null);
-    }
-
-    /**
      * Test that we throw an exception when passed null.
      */
     @Test
@@ -430,25 +417,5 @@ public class ImmutableNodeItemTest {
         expectImmutableException();
         //when
         immutableNode.insertInPath(null, "");
-    }
-
-    @Test
-    public void findOrCreateChildShouldReturnChildWhenChildIsFound() {
-        //given
-        val root = Nodes.unnamedRoot("");
-        Nodes.namedChild("child", "child", root);
-        immutableNode = Nodes.asImmutable(root);
-        //when
-        val found = immutableNode.findOrCreateChild("child");
-        assertThat(found).extracting(Node::getName).contains("child");
-    }
-
-    @Test
-    public void findOrCreateChildShouldThrowExceptionWhenChildNotFound() {
-        //given
-        immutableNode = Nodes.asImmutable(Nodes.unnamedRoot(""));
-        expectImmutableException();
-        //when
-        immutableNode.findOrCreateChild("child");
     }
 }

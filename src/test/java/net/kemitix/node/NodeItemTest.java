@@ -470,52 +470,6 @@ public class NodeItemTest {
     }
 
     /**
-     * Test that we can find a child of a node.
-     */
-    @Test
-    public void shouldFindExistingChildNode() {
-        //given
-        node = Nodes.unnamedRoot("subject");
-        val childData = "child";
-        val child = Nodes.unnamedChild(childData, node);
-        //when
-        val found = node.findOrCreateChild(childData);
-        //then
-        assertThat(found).as(
-                "when searching for a child by data, the matching child is "
-                        + "found").isSameAs(child);
-    }
-
-    /**
-     * Test that we create a missing child of a node.
-     */
-    @Test
-    public void shouldFindCreateNewChildNode() {
-        //given
-        node = Nodes.unnamedRoot("subject");
-        val childData = "child";
-        //when
-        val found = node.findOrCreateChild(childData);
-        //then
-        assertThat(found.getData()).as(
-                "when searching for a non-existent child by data, a new node "
-                        + "is created").contains(childData);
-    }
-
-    /**
-     * Test that if we pass null we get an exception.
-     */
-    @Test
-    public void findOrCreateChildShouldThrowNPEFWhenChildIsNull() {
-        //given
-        node = Nodes.unnamedRoot("subject");
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("child");
-        //when
-        node.findOrCreateChild(null);
-    }
-
-    /**
      * Test that we can get the node for a child.
      */
     @Test

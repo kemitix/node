@@ -119,11 +119,6 @@ final class ImmutableNodeItem<T> extends NodeItem<T> {
     }
 
     @Override
-    public Node<T> findOrCreateChild(final T child) {
-        return findChild(child).orElseThrow(() -> new UnsupportedOperationException(IMMUTABLE_OBJECT));
-    }
-
-    @Override
     public void insertInPath(final Node<T> node, final String... path) {
         throw new UnsupportedOperationException(IMMUTABLE_OBJECT);
     }

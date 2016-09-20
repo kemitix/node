@@ -199,24 +199,11 @@ class NodeItem<T> implements Node<T> {
     @Override
     public void createDescendantLine(@NonNull final List<T> descendants) {
         if (!descendants.isEmpty()) {
-            findOrCreateChild(descendants.get(0)).createDescendantLine(descendants.subList(1, descendants.size()));
+            val child = descendants.get(0);
+            val remainingLine = descendants.subList(1, descendants.size());
+            findChild(child).orElseGet(() -> createChild(child))
+                            .createDescendantLine(remainingLine);
         }
-    }
-
-    /**
-     * Looks for a child node and returns it, creating a new child node if one
-     * isn't found.
-     *
-     * @param child the child's data to search or create with
-     *
-     * @return the found or created child node
-     *
-     * @deprecated use node.findChild(child).orElseGet(() -> node.createChild (child));
-     */
-    @Override
-    @Deprecated
-    public Node<T> findOrCreateChild(@NonNull final T child) {
-        return findChild(child).orElseGet(() -> createChild(child));
     }
 
     /**

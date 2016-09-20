@@ -130,19 +130,6 @@ public interface Node<T> {
     void createDescendantLine(List<T> descendants);
 
     /**
-     * Looks for a child node and returns it, creating a new child node if one
-     * isn't found.
-     *
-     * @param child the child's data to search or create with
-     *
-     * @return the found or created child node
-     *
-     * @deprecated use {@code node.findChild(child).orElseGet(() -> node.createChild(child))};
-     */
-    @Deprecated
-    Node<T> findOrCreateChild(T child);
-
-    /**
      * Fetches the node for the child if present.
      *
      * @param child the child's data to search for
