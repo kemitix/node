@@ -10,6 +10,7 @@ import org.junit.rules.ExpectedException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -82,6 +83,17 @@ public class NodeItemTest {
         assertThat(node.getParent()).as(
                 "node created with a parent can return the parent")
                                     .contains(parent);
+    }
+
+    @Test
+    public void shouldAddAsChildWhenCreatedWithParent() {
+        //given
+        final Node<String> root = Nodes.namedRoot("root data", "root name");
+        //when
+        final Node<String> child = Nodes.namedChild("child data", "child name", root);
+        //then
+        final Set<Node<String>> children = root.getChildren();
+        assertThat(children).containsExactly(child);
     }
 
     /**
