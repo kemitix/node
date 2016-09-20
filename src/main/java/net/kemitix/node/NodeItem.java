@@ -67,50 +67,6 @@ class NodeItem<T> implements Node<T> {
         this.children.addAll(children);
     }
 
-    /**
-     * Create named root node.
-     *
-     * @param data the data or null
-     * @param name the name
-     */
-    NodeItem(final T data, final String name) {
-        this(data);
-        this.name = name;
-    }
-
-    /**
-     * Create unnamed root node.
-     *
-     * @param data the data or null
-     */
-    NodeItem(final T data) {
-        this.data = data;
-    }
-
-    /**
-     * Creates a node with a parent.
-     *
-     * @param data   the data or null
-     * @param parent the parent node
-     */
-    NodeItem(final T data, final Node<T> parent) {
-        this.data = data;
-        setParent(parent);
-    }
-
-    /**
-     * Creates a named node with a parent.
-     *
-     * @param data   the data or null
-     * @param name   the name
-     * @param parent the parent node
-     */
-    NodeItem(final T data, final String name, final Node<T> parent) {
-        this.data = data;
-        this.name = name;
-        setParent(parent);
-    }
-
     @Override
     public String getName() {
         return name;
