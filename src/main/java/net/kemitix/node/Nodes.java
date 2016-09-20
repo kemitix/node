@@ -24,6 +24,7 @@ SOFTWARE.
 
 package net.kemitix.node;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -47,7 +48,7 @@ public final class Nodes {
      * @return the new node
      */
     public static <T> Node<T> unnamedRoot(final T data) {
-        return new NodeItem<>(data);
+        return new NodeItem<>(data, "", null, new HashSet<>());
     }
 
     /**
@@ -60,7 +61,7 @@ public final class Nodes {
      * @return the new node
      */
     public static <T> Node<T> namedRoot(final T data, final String name) {
-        return new NodeItem<>(data, name);
+        return new NodeItem<>(data, name, null, new HashSet<>());
     }
 
     /**
@@ -73,7 +74,7 @@ public final class Nodes {
      * @return the new node
      */
     public static <T> Node<T> unnamedChild(final T data, final Node<T> parent) {
-        return new NodeItem<>(data, parent);
+        return new NodeItem<>(data, "", parent, new HashSet<>());
     }
 
     /**
@@ -89,7 +90,7 @@ public final class Nodes {
     public static <T> Node<T> namedChild(
             final T data, final String name, final Node<T> parent
                                         ) {
-        return new NodeItem<>(data, name, parent);
+        return new NodeItem<>(data, name, parent, new HashSet<>());
     }
 
     /**

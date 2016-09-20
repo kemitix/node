@@ -208,7 +208,7 @@ class NodeItem<T> implements Node<T> {
      */
     @Override
     public Node<T> createChild(@NonNull final T child) {
-        return new NodeItem<>(child, this);
+        return new NodeItem<>(child, "", this, new HashSet<>());
     }
 
     @Override
