@@ -10,6 +10,7 @@ import org.junit.rules.ExpectedException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -82,6 +83,17 @@ public class NodeItemTest {
         assertThat(node.getParent()).as(
                 "node created with a parent can return the parent")
                                     .contains(parent);
+    }
+
+    @Test
+    public void shouldAddAsChildWhenCreatedWithParent() {
+        //given
+        final Node<String> root = Nodes.namedRoot("root data", "root name");
+        //when
+        final Node<String> child = Nodes.namedChild("child data", "child name", root);
+        //then
+        final Set<Node<String>> children = root.getChildren();
+        assertThat(children).containsExactly(child);
     }
 
     /**
@@ -455,52 +467,6 @@ public class NodeItemTest {
         assertThat(node.getChildren()).as(
                 "when creating a descendant line from an empty list, nothing "
                         + "is created").isEmpty();
-    }
-
-    /**
-     * Test that we can find a child of a node.
-     */
-    @Test
-    public void shouldFindExistingChildNode() {
-        //given
-        node = Nodes.unnamedRoot("subject");
-        val childData = "child";
-        val child = Nodes.unnamedChild(childData, node);
-        //when
-        val found = node.findOrCreateChild(childData);
-        //then
-        assertThat(found).as(
-                "when searching for a child by data, the matching child is "
-                        + "found").isSameAs(child);
-    }
-
-    /**
-     * Test that we create a missing child of a node.
-     */
-    @Test
-    public void shouldFindCreateNewChildNode() {
-        //given
-        node = Nodes.unnamedRoot("subject");
-        val childData = "child";
-        //when
-        val found = node.findOrCreateChild(childData);
-        //then
-        assertThat(found.getData()).as(
-                "when searching for a non-existent child by data, a new node "
-                        + "is created").contains(childData);
-    }
-
-    /**
-     * Test that if we pass null we get an exception.
-     */
-    @Test
-    public void findOrCreateChildShouldThrowNPEFWhenChildIsNull() {
-        //given
-        node = Nodes.unnamedRoot("subject");
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("child");
-        //when
-        node.findOrCreateChild(null);
     }
 
     /**

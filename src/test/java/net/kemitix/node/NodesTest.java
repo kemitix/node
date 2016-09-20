@@ -24,7 +24,7 @@ public class NodesTest {
         val node = Nodes.unnamedRoot("data");
         SoftAssertions softly = new SoftAssertions();
         softly.assertThat(node.getData()).contains("data");
-        softly.assertThat(node.getName()).isNull();
+        softly.assertThat(node.getName()).isEmpty();
         softly.assertAll();
     }
 
@@ -43,7 +43,7 @@ public class NodesTest {
         val node = Nodes.unnamedChild("data", parent);
         SoftAssertions softly = new SoftAssertions();
         softly.assertThat(node.getData()).contains("data");
-        softly.assertThat(node.getName()).isNull();
+        softly.assertThat(node.getName()).isEmpty();
         softly.assertThat(node.getParent()).contains(parent);
         softly.assertAll();
     }
