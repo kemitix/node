@@ -64,13 +64,18 @@ class NodeItem<T> implements Node<T> {
         this.data = data;
         this.name = name;
         if (parent != null) {
-            setParent(parent);
+            doSetParent(parent);
         }
         this.children.addAll(children);
     }
 
-    protected void forceParent(final Node<T> parent) {
-        this.parent = parent;
+    /**
+     * Sets the parent of a node without updating the parent in the process as {@link #setParent(Node)} does.
+     *
+     * @param newParent The new parent node
+     */
+    protected void forceParent(final Node<T> newParent) {
+        this.parent = newParent;
     }
 
     @Override
@@ -110,15 +115,19 @@ class NodeItem<T> implements Node<T> {
      */
     @Override
     public void setParent(@NonNull final Node<T> parent) {
-        if (this.equals(parent) || parent.isDescendantOf(this)) {
+        doSetParent(parent);
+    }
+
+    private void doSetParent(@NonNull final Node<T> newParent) {
+        if (this.equals(newParent) || newParent.isDescendantOf(this)) {
             throw new NodeException("Parent is a descendant");
         }
         if (this.parent != null) {
             this.parent.getChildren()
                        .remove(this);
         }
-        this.parent = parent;
-        parent.addChild(this);
+        this.parent = newParent;
+        newParent.addChild(this);
     }
 
     @Override
