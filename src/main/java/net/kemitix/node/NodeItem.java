@@ -63,7 +63,9 @@ class NodeItem<T> implements Node<T> {
             ) {
         this.data = data;
         this.name = name;
-        this.parent = parent;
+        if (parent != null) {
+            setParent(parent);
+        }
         this.children.addAll(children);
     }
 
