@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,8 +34,9 @@ public class NodeItemTest {
         //when
         node = Nodes.unnamedRoot(data);
         //then
-        assertThat(node.getData()).as("can get the data from a node").
-                contains(data);
+        assertThat(node.getData()).as("can get the data from a node")
+                                  .
+                                          contains(data);
     }
 
     @Test
@@ -43,8 +45,12 @@ public class NodeItemTest {
         node = Nodes.unnamedRoot(null);
         //then
         SoftAssertions softly = new SoftAssertions();
-        softly.assertThat(node.isEmpty()).as("node is empty").isTrue();
-        softly.assertThat(node.isNamed()).as("node is unnamed").isFalse();
+        softly.assertThat(node.isEmpty())
+              .as("node is empty")
+              .isTrue();
+        softly.assertThat(node.isNamed())
+              .as("node is unnamed")
+              .isFalse();
         softly.assertAll();
     }
 
@@ -66,8 +72,8 @@ public class NodeItemTest {
         //given
         node = Nodes.unnamedRoot("data");
         //then
-        assertThat(node.getParent()).as(
-                "node created without a parent has no parent").isEmpty();
+        assertThat(node.getParent()).as("node created without a parent has no parent")
+                                    .isEmpty();
     }
 
     /**
@@ -80,8 +86,7 @@ public class NodeItemTest {
         //when
         node = Nodes.unnamedChild("subject", parent);
         //then
-        assertThat(node.getParent()).as(
-                "node created with a parent can return the parent")
+        assertThat(node.getParent()).as("node created with a parent can return the parent")
                                     .contains(parent);
     }
 
@@ -124,8 +129,8 @@ public class NodeItemTest {
         node = Nodes.unnamedChild("subject", parent);
         //then
         assertThat(parent.getChildren()).as(
-                "when a node is created with a parent, the parent has the new"
-                        + " node among it's children").contains(node);
+                "when a node is created with a parent, the parent has the new" + " node among it's children")
+                                        .contains(node);
     }
 
     /**
@@ -139,9 +144,8 @@ public class NodeItemTest {
         //when
         node.setParent(parent);
         //then
-        assertThat(node.getParent()).as(
-                "when a node is assigned a new parent that parent can be "
-                        + "returned").contains(parent);
+        assertThat(node.getParent()).as("when a node is assigned a new parent that parent can be " + "returned")
+                                    .contains(parent);
     }
 
     /**
@@ -184,12 +188,12 @@ public class NodeItemTest {
         //when
         child.setParent(newParent);
         //then
-        assertThat(child.getParent()).as(
-                "when a node is assigned a new parent, the old parent is "
-                        + "replaced").contains(newParent);
-        assertThat(node.findChild("child").isPresent()).as(
-                "when a node is assigned a new parent, the old parent no "
-                        + "longer has the node among it's children").isFalse();
+        assertThat(child.getParent()).as("when a node is assigned a new parent, the old parent is " + "replaced")
+                                     .contains(newParent);
+        assertThat(node.findChild("child")
+                       .isPresent()).as(
+                "when a node is assigned a new parent, the old parent no " + "longer has the node among it's children")
+                                    .isFalse();
     }
 
     /**
@@ -205,14 +209,14 @@ public class NodeItemTest {
         //when
         newParent.addChild(child);
         //then
-        assertThat(child.getParent()).as(
-                "when a node with an existing parent is added as a child "
-                        + "to another node, then the old parent is replaced")
+        assertThat(child.getParent()).as("when a node with an existing parent is added as a child " +
+                                         "to another node, then the old parent is replaced")
                                      .contains(newParent);
-        assertThat(node.findChild("child").isPresent()).as(
-                "when a node with an existing parent is added as a child to "
-                        + "another node, then the old parent no longer has "
-                        + "the node among it's children").isFalse();
+        assertThat(node.findChild("child")
+                       .isPresent()).as("when a node with an existing parent is added as a child to " +
+                                        "another node, then the old parent no longer has " +
+                                        "the node among it's children")
+                                    .isFalse();
     }
 
     /**
@@ -240,9 +244,8 @@ public class NodeItemTest {
         //when
         node.addChild(child);
         //then
-        assertThat(node.getChildren()).as(
-                "when a node is added as a child, the node is among the "
-                        + "children").contains(child);
+        assertThat(node.getChildren()).as("when a node is added as a child, the node is among the " + "children")
+                                      .contains(child);
     }
 
     /**
@@ -313,9 +316,8 @@ public class NodeItemTest {
         //when
         node.addChild(child);
         //then
-        assertThat(child.getParent()).as(
-                "when a node is added as a child, the child has the node as "
-                        + "its parent").contains(node);
+        assertThat(child.getParent()).as("when a node is added as a child, the child has the node as " + "its parent")
+                                     .contains(node);
     }
 
     /**
@@ -334,11 +336,10 @@ public class NodeItemTest {
         //when
         val result = grandParentNode.findInPath(Arrays.asList(parent, subject));
         //then
-        assertThat(result.isPresent()).as(
-                "when we walk the tree to a node it is found").isTrue();
+        assertThat(result.isPresent()).as("when we walk the tree to a node it is found")
+                                      .isTrue();
         if (result.isPresent()) {
-            assertThat(result.get()).as(
-                    "when we walk the tree to a node the correct node is found")
+            assertThat(result.get()).as("when we walk the tree to a node the correct node is found")
                                     .isSameAs(node);
         }
     }
@@ -358,9 +359,8 @@ public class NodeItemTest {
         //when
         val result = parentNode.findInPath(Arrays.asList(subject, "no child"));
         //then
-        assertThat(result.isPresent()).as(
-                "when we walk the tree to a node that doesn't exists, nothing"
-                        + " is found").isFalse();
+        assertThat(result.isPresent()).as("when we walk the tree to a node that doesn't exists, nothing" + " is found")
+                                      .isFalse();
     }
 
     /**
@@ -403,37 +403,32 @@ public class NodeItemTest {
         val betaData = "beta";
         val gammaData = "gamma";
         //when
-        node.createDescendantLine(
-                Arrays.asList(alphaData, betaData, gammaData));
+        node.createDescendantLine(Arrays.asList(alphaData, betaData, gammaData));
         //then
         val alphaOptional = node.findChild(alphaData);
-        assertThat(alphaOptional.isPresent()).as(
-                "when creating a descendant line, the first element is found")
+        assertThat(alphaOptional.isPresent()).as("when creating a descendant line, the first element is found")
                                              .isTrue();
         if (alphaOptional.isPresent()) {
             val alpha = alphaOptional.get();
             assertThat(alpha.getParent()).as(
-                    "when creating a descendant line, the first element has "
-                            + "the current node as its parent").contains(node);
+                    "when creating a descendant line, the first element has " + "the current node as its parent")
+                                         .contains(node);
             val betaOptional = alpha.findChild(betaData);
-            assertThat(betaOptional.isPresent()).as(
-                    "when creating a descendant line, the second element is "
-                            + "found").isTrue();
+            assertThat(betaOptional.isPresent()).as("when creating a descendant line, the second element is " + "found")
+                                                .isTrue();
             if (betaOptional.isPresent()) {
                 val beta = betaOptional.get();
                 assertThat(beta.getParent()).as(
-                        "when creating a descendant line, the second element "
-                                + "has the first as its parent")
+                        "when creating a descendant line, the second element " + "has the first as its parent")
                                             .contains(alpha);
                 val gammaOptional = beta.findChild(gammaData);
                 assertThat(gammaOptional.isPresent()).as(
-                        "when creating a descendant line, the third element "
-                                + "is found").isTrue();
+                        "when creating a descendant line, the third element " + "is found")
+                                                     .isTrue();
                 if (gammaOptional.isPresent()) {
                     val gamma = gammaOptional.get();
                     assertThat(gamma.getParent()).as(
-                            "when creating a descendant line, the third "
-                                    + "element has the second as its parent")
+                            "when creating a descendant line, the third " + "element has the second as its parent")
                                                  .contains(beta);
                 }
             }
@@ -464,9 +459,8 @@ public class NodeItemTest {
         //when
         node.createDescendantLine(Collections.emptyList());
         //then
-        assertThat(node.getChildren()).as(
-                "when creating a descendant line from an empty list, nothing "
-                        + "is created").isEmpty();
+        assertThat(node.getChildren()).as("when creating a descendant line from an empty list, nothing " + "is created")
+                                      .isEmpty();
     }
 
     /**
@@ -482,12 +476,11 @@ public class NodeItemTest {
         //when
         val found = node.findChild(childData);
         //then
-        assertThat(found.isPresent()).as(
-                "when retrieving a child by its data, it is found").isTrue();
+        assertThat(found.isPresent()).as("when retrieving a child by its data, it is found")
+                                     .isTrue();
         if (found.isPresent()) {
-            assertThat(found.get()).as(
-                    "when retrieving a child by its data, it is the expected "
-                            + "node").isSameAs(child);
+            assertThat(found.get()).as("when retrieving a child by its data, it is the expected " + "node")
+                                   .isSameAs(child);
         }
     }
 
@@ -517,16 +510,15 @@ public class NodeItemTest {
         val child = node.createChild(childData);
         //then
         assertThat(child.getParent()).as(
-                "when creating a child node, the child has the current node "
-                        + "as its parent").contains(node);
+                "when creating a child node, the child has the current node " + "as its parent")
+                                     .contains(node);
         val foundChild = node.findChild(childData);
-        assertThat(foundChild.isPresent()).as(
-                "when creating a child node, the child can be found by its "
-                        + "data").isTrue();
+        assertThat(foundChild.isPresent()).as("when creating a child node, the child can be found by its " + "data")
+                                          .isTrue();
         if (foundChild.isPresent()) {
             assertThat(foundChild.get()).as(
-                    "when creating a child node, the correct child can be "
-                            + "found by its data").isSameAs(child);
+                    "when creating a child node, the correct child can be " + "found by its data")
+                                        .isSameAs(child);
         }
     }
 
@@ -598,14 +590,19 @@ public class NodeItemTest {
         //when
         node.insertInPath(four, "one", "two", "three");
         //then
-        val three = four.getParent().get();
-        assertThat(four.getParent()).as("add node to a tree").isNotNull();
+        val three = four.getParent()
+                        .get();
+        assertThat(four.getParent()).as("add node to a tree")
+                                    .isNotNull();
         assertThat(three.getName()).isEqualTo("three");
-        val two = three.getParent().get();
+        val two = three.getParent()
+                       .get();
         assertThat(two.getName()).isEqualTo("two");
-        val one = two.getParent().get();
+        val one = two.getParent()
+                     .get();
         assertThat(one.getName()).isEqualTo("one");
-        assertThat(one.getParent().get()).isSameAs(node);
+        assertThat(one.getParent()
+                      .get()).isSameAs(node);
         assertThat(node.getChildByName("one")
                        .getChildByName("two")
                        .getChildByName("three")
@@ -623,10 +620,11 @@ public class NodeItemTest {
         node.insertInPath(child); // as root/child
         node.insertInPath(grandchild, "child"); // as root/child/grandchild
         //then
-        assertThat(node.getChildByName("child")).as("child").isSameAs(child);
-        assertThat(
-                node.getChildByName("child").getChildByName("grandchild")).as(
-                "grandchild").isSameAs(grandchild);
+        assertThat(node.getChildByName("child")).as("child")
+                                                .isSameAs(child);
+        assertThat(node.getChildByName("child")
+                       .getChildByName("grandchild")).as("grandchild")
+                                                     .isSameAs(grandchild);
     }
 
     @Test
@@ -640,12 +638,12 @@ public class NodeItemTest {
         node.insertInPath(grandchild, "child");
         node.insertInPath(child);
         //then
-        assertThat(node.getChildByName("child").getData()).as("data in tree")
-                                                          .contains(
-                                                                  "child data");
-        assertThat(
-                node.getChildByName("child").getChildByName("grandchild")).as(
-                "grandchild").isSameAs(grandchild);
+        assertThat(node.getChildByName("child")
+                       .getData()).as("data in tree")
+                                  .contains("child data");
+        assertThat(node.getChildByName("child")
+                       .getChildByName("grandchild")).as("grandchild")
+                                                     .isSameAs(grandchild);
     }
 
     @Test
@@ -672,8 +670,7 @@ public class NodeItemTest {
     public void placeNodeInTreeWhereNonEmptyNodeWithSameNameExists() {
         //given
         exception.expect(NodeException.class);
-        exception.expectMessage(
-                "A non-empty node named 'grandchild' already exists here");
+        exception.expectMessage("A non-empty node named 'grandchild' already exists here");
         node = Nodes.unnamedRoot(null);
         val child = Nodes.namedChild("child data", "child", node);
         Nodes.namedChild("data", "grandchild", child);
@@ -707,14 +704,16 @@ public class NodeItemTest {
         child.addChild(target);
         val addMe = Nodes.namedRoot("I'm new", "target");
         assertThat(addMe.getParent()).isEmpty();
-        assertThat(child.getChildByName("target").isEmpty()).as(
-                "target starts empty").isTrue();
+        assertThat(child.getChildByName("target")
+                        .isEmpty()).as("target starts empty")
+                                   .isTrue();
         //when
         // addMe should replace target as the sole descendant of child
         node.insertInPath(addMe, "child");
         //then
-        assertThat(child.getChildByName("target").getData()).as(
-                "target now contains data").contains("I'm new");
+        assertThat(child.getChildByName("target")
+                        .getData()).as("target now contains data")
+                                   .contains("I'm new");
     }
 
     @Test
@@ -772,19 +771,16 @@ public class NodeItemTest {
         val bob = Nodes.namedChild("bob data", "bob", node);
         val alice = Nodes.namedChild("alice data", "alice", node);
         Nodes.namedChild("dave data", "dave", alice);
-        Nodes.unnamedChild("bob's child's data",
-                bob); // has no name and no children so no included
+        Nodes.unnamedChild("bob's child's data", bob); // has no name and no children so no included
         val kim = Nodes.unnamedChild("kim data", node); // nameless mother
         Nodes.namedChild("lucy data", "lucy", kim);
         //when
         val tree = node.drawTree(0);
         //then
         String[] lines = tree.split("\n");
-        assertThat(lines).contains("[root]", "[ alice]", "[  dave]",
-                "[ (unnamed)]", "[  lucy]", "[ bob]");
+        assertThat(lines).contains("[root]", "[ alice]", "[  dave]", "[ (unnamed)]", "[  lucy]", "[ bob]");
         assertThat(lines).containsSubsequence("[root]", "[ alice]", "[  dave]");
-        assertThat(lines).containsSubsequence("[root]", "[ (unnamed)]",
-                "[  lucy]");
+        assertThat(lines).containsSubsequence("[root]", "[ (unnamed)]", "[  lucy]");
         assertThat(lines).containsSubsequence("[root]", "[ bob]");
     }
 
@@ -851,5 +847,29 @@ public class NodeItemTest {
         Nodes.unnamedChild(null, node);
         //when
         node.findChild("data");
+    }
+
+    @Test
+    public void canStreamAll() throws Exception {
+        //given
+        node = Nodes.namedRoot("root", "root");
+        val n1 = Nodes.namedChild("one", "one", node);
+        val n2 = Nodes.namedChild("two", "two", node);
+        val n3 = Nodes.namedChild("three", "three", n1);
+        val n4 = Nodes.namedChild("four", "four", n2);
+        val n5 = Nodes.namedChild("five", "five", n1);
+        val n6 = Nodes.namedChild("six", "six", n2);
+        val n7 = Nodes.namedChild("seven", "seven", n5);
+        val n8 = Nodes.namedChild("eight", "eight", n6);
+        //when
+        val result = node.streamAll()
+                         .collect(Collectors.toList());
+        //then
+        assertThat(result).as("full tree")
+                          .contains(node, n1, n2, n3, n4, n5, n6, n7, n8);
+        // and
+        assertThat(n1.streamAll()
+                     .collect(Collectors.toList())).as("sub-tree")
+                                                   .containsExactlyInAnyOrder(n1, n3, n5, n7);
     }
 }
