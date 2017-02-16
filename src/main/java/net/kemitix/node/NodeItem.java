@@ -25,6 +25,7 @@ SOFTWARE.
 package net.kemitix.node;
 
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.val;
 
 import java.util.Arrays;
@@ -32,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Represents a tree of nodes.
@@ -40,6 +42,7 @@ import java.util.Set;
  *
  * @author Paul Campbell (pcampbell@kemitix.net)
  */
+@ToString(exclude = "children")
 class NodeItem<T> implements Node<T> {
 
     private final Set<Node<T>> children = new HashSet<>();
@@ -143,24 +146,19 @@ class NodeItem<T> implements Node<T> {
     @Override
     public void addChild(@NonNull final Node<T> child) {
         verifyChildIsNotAnAncestor(child);
-        verifyChildWithSameNameDoesNotAlreadyExist(child);
+        //verifyChildWithSameNameDoesNotAlreadyExist
+        if (child.isNamed()) {
+            findChildByName(child.getName()).filter(existingChild -> existingChild != child)
+                                            .ifPresent(existingChild -> {
+                                                throw new NodeException("Node with that name already exists here");
+                                            });
+        }
         children.add(child);
         // update the child's parent if they don't have one or it is not this
         val childParent = child.getParent();
         if (!childParent.isPresent() || !childParent.get()
                                                     .equals(this)) {
             child.setParent(this);
-        }
-    }
-
-    private void verifyChildWithSameNameDoesNotAlreadyExist(
-            final @NonNull Node<T> child
-                                                           ) {
-        if (child.isNamed()) {
-            findChildByName(child.getName()).filter(existingChild -> existingChild != child)
-                                            .ifPresent(existingChild -> {
-                                                throw new NodeException("Node with that name already exists here");
-                                            });
         }
     }
 
@@ -352,4 +350,9 @@ class NodeItem<T> implements Node<T> {
         }
     }
 
+    @Override
+    public Stream<Node<T>> streamAll() {
+        return Stream.concat(Stream.of(this), getChildren().stream()
+                                                           .flatMap(Node::streamAll));
+    }
 }

@@ -27,6 +27,7 @@ package net.kemitix.node;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * An interface for tree node items.
@@ -221,4 +222,11 @@ public interface Node<T> {
      * Removes the parent from the node. Makes the node into a new root node.
      */
     void removeParent();
+
+    /**
+     * Returns a stream containing the node and all its children and their children.
+     *
+     * @return a stream of all the nodes in the tree below this node
+     */
+    Stream<Node<T>> streamAll();
 }
