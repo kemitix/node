@@ -16,8 +16,8 @@
 
     <properties>
         <lombok.version>1.16.10</lombok.version>
-        <coveralls-maven-plugin.version>4.2.0</coveralls-maven-plugin.version>
         <assertj.version>3.6.2</assertj.version>
+        <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
         <trajano-commons-testing.version>2.1.0</trajano-commons-testing.version>
         <junit.version>4.12</junit.version>
         <hamcrest.version>1.3</hamcrest.version>
