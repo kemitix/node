@@ -143,24 +143,19 @@ class NodeItem<T> implements Node<T> {
     @Override
     public void addChild(@NonNull final Node<T> child) {
         verifyChildIsNotAnAncestor(child);
-        verifyChildWithSameNameDoesNotAlreadyExist(child);
+        //verifyChildWithSameNameDoesNotAlreadyExist
+        if (child.isNamed()) {
+            findChildByName(child.getName()).filter(existingChild -> existingChild != child)
+                                            .ifPresent(existingChild -> {
+                                                throw new NodeException("Node with that name already exists here");
+                                            });
+        }
         children.add(child);
         // update the child's parent if they don't have one or it is not this
         val childParent = child.getParent();
         if (!childParent.isPresent() || !childParent.get()
                                                     .equals(this)) {
             child.setParent(this);
-        }
-    }
-
-    private void verifyChildWithSameNameDoesNotAlreadyExist(
-            final @NonNull Node<T> child
-                                                           ) {
-        if (child.isNamed()) {
-            findChildByName(child.getName()).filter(existingChild -> existingChild != child)
-                                            .ifPresent(existingChild -> {
-                                                throw new NodeException("Node with that name already exists here");
-                                            });
         }
     }
 
