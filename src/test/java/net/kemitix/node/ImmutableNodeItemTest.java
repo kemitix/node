@@ -10,6 +10,7 @@ import org.junit.rules.ExpectedException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,8 +40,8 @@ public class ImmutableNodeItemTest {
         //when
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot(data));
         //then
-        assertThat(immutableNode.getData()).as(
-                "can get the data from a immutableNode").
+        assertThat(immutableNode.getData()).as("can get the data from a immutableNode")
+                                           .
                                                    contains(data);
     }
 
@@ -73,8 +74,7 @@ public class ImmutableNodeItemTest {
         //given
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot("data"));
         //then
-        assertThat(immutableNode.getParent()).as(
-                "immutableNode created without a parent has no parent")
+        assertThat(immutableNode.getParent()).as("immutableNode created without a parent has no parent")
                                              .isEmpty();
     }
 
@@ -101,13 +101,11 @@ public class ImmutableNodeItemTest {
         //then
         // get the immutable node's child's parent
         val immutableChild = immutableNode.getChildByName("child");
-        final Optional<Node<String>> optionalParent
-                = immutableChild.getParent();
+        final Optional<Node<String>> optionalParent = immutableChild.getParent();
         if (optionalParent.isPresent()) {
             val p = optionalParent.get();
             assertThat(p).hasFieldOrPropertyWithValue("name", "root")
-                         .hasFieldOrPropertyWithValue("data",
-                                 Optional.of("parent"));
+                         .hasFieldOrPropertyWithValue("data", Optional.of("parent"));
         }
     }
 
@@ -153,7 +151,8 @@ public class ImmutableNodeItemTest {
         //then
         assertThat(result.isPresent()).isTrue();
         if (result.isPresent()) {
-            assertThat(result.get().getName()).isEqualTo("child");
+            assertThat(result.get()
+                             .getName()).isEqualTo("child");
         }
     }
 
@@ -169,8 +168,7 @@ public class ImmutableNodeItemTest {
         Nodes.unnamedChild("child", Nodes.unnamedChild("parent", root));
         immutableNode = Nodes.asImmutable(root);
         //when
-        val result = immutableNode.findInPath(
-                Arrays.asList("parent", "no child"));
+        val result = immutableNode.findInPath(Arrays.asList("parent", "no child"));
         //then
         assertThat(result.isPresent()).isFalse();
     }
@@ -218,7 +216,8 @@ public class ImmutableNodeItemTest {
         //then
         assertThat(result.isPresent()).isTrue();
         if (result.isPresent()) {
-            assertThat(result.get().getData()).contains("child");
+            assertThat(result.get()
+                             .getData()).contains("child");
         }
     }
 
@@ -324,8 +323,7 @@ public class ImmutableNodeItemTest {
         val bob = Nodes.namedChild("bob data", "bob", root);
         val alice = Nodes.namedChild("alice data", "alice", root);
         Nodes.namedChild("dave data", "dave", alice);
-        Nodes.unnamedChild("bob's child's data",
-                bob); // has no name and no children so no included
+        Nodes.unnamedChild("bob's child's data", bob); // has no name and no children so no included
         val kim = Nodes.unnamedChild("kim data", root); // nameless mother
         Nodes.namedChild("lucy data", "lucy", kim);
         immutableNode = Nodes.asImmutable(root);
@@ -333,11 +331,9 @@ public class ImmutableNodeItemTest {
         val tree = immutableNode.drawTree(0);
         //then
         String[] lines = tree.split("\n");
-        assertThat(lines).contains("[root]", "[ alice]", "[  dave]",
-                "[ (unnamed)]", "[  lucy]", "[ bob]");
+        assertThat(lines).contains("[root]", "[ alice]", "[  dave]", "[ (unnamed)]", "[  lucy]", "[ bob]");
         assertThat(lines).containsSubsequence("[root]", "[ alice]", "[  dave]");
-        assertThat(lines).containsSubsequence("[root]", "[ (unnamed)]",
-                "[  lucy]");
+        assertThat(lines).containsSubsequence("[root]", "[ (unnamed)]", "[  lucy]");
         assertThat(lines).containsSubsequence("[root]", "[ bob]");
     }
 
@@ -406,8 +402,7 @@ public class ImmutableNodeItemTest {
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot(""));
         expectImmutableException();
         //when
-        immutableNode.createDescendantLine(
-                Arrays.asList("child", "grandchild"));
+        immutableNode.createDescendantLine(Arrays.asList("child", "grandchild"));
     }
 
     @Test
@@ -426,5 +421,31 @@ public class ImmutableNodeItemTest {
         exception.expectMessage("source must be the root node");
         //when
         Nodes.asImmutable(Nodes.unnamedChild("child", Nodes.unnamedRoot("root")));
+    }
+
+    @Test
+    public void canStreamAll() throws Exception {
+        //given
+        val node = Nodes.namedRoot("root", "root");
+        val n1 = Nodes.namedChild("one", "one", node);
+        val n2 = Nodes.namedChild("two", "two", node);
+        Nodes.namedChild("three", "three", n1);
+        Nodes.namedChild("four", "four", n2);
+        val n5 = Nodes.namedChild("five", "five", n1);
+        val n6 = Nodes.namedChild("six", "six", n2);
+        Nodes.namedChild("seven", "seven", n5);
+        Nodes.namedChild("eight", "eight", n6);
+        val immutableRoot = Nodes.asImmutable(node);
+        //when
+        val result = immutableRoot.streamAll()
+                                  .collect(Collectors.toList());
+        //then
+        assertThat(result).as("full tree")
+                          .hasSize(9);
+        // and
+        assertThat(immutableRoot.getChild("one")
+                                .streamAll()
+                                .collect(Collectors.toList())).as("sub-tree")
+                                                              .hasSize(4);
     }
 }
