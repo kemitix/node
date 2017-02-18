@@ -59,7 +59,14 @@ public interface Node<T> {
      *
      * @return an Optional containing the node's data, or empty if the node has none
      */
-    Optional<T> getData();
+    Optional<T> findData();
+
+    /**
+     * Fetch the data held within the node.
+     *
+     * @return the node's data, or throws an {@link EmptyNodeException}
+     */
+    T getData();
 
     /**
      * Set the data held within the node.
@@ -80,7 +87,14 @@ public interface Node<T> {
      *
      * @return an Optional contain the parent node, or empty if a root node
      */
-    Optional<Node<T>> getParent();
+    Optional<Node<T>> findParent();
+
+    /**
+     * Fetch the parent node.
+     *
+     * @return the parent node, or throws an {@link OrphanedNodeException}
+     */
+    Node<T> getParent();
 
     /**
      * Make the current node a direct child of the parent.
