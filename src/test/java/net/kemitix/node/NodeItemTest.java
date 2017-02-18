@@ -930,4 +930,19 @@ public class NodeItemTest {
                      .collect(Collectors.toList())).as("sub-tree")
                                                    .containsExactlyInAnyOrder(n1, n3, n5, n7);
     }
+
+    @Test
+    public void isRootWhenRootIsTrue() {
+        assertThat(Nodes.unnamedRoot(null)
+                        .isRoot()).isTrue();
+    }
+
+    @Test
+    public void isRootWhenNotRootIsFalse() {
+        //given
+        val root = Nodes.unnamedRoot(null);
+        //then
+        assertThat(Nodes.unnamedChild(null, root)
+                        .isRoot()).isFalse();
+    }
 }
