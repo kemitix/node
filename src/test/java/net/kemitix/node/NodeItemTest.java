@@ -920,13 +920,13 @@ public class NodeItemTest {
         val n7 = Nodes.namedChild("seven", "seven", n5);
         val n8 = Nodes.namedChild("eight", "eight", n6);
         //when
-        val result = node.streamAll()
+        val result = node.stream()
                          .collect(Collectors.toList());
         //then
         assertThat(result).as("full tree")
                           .contains(node, n1, n2, n3, n4, n5, n6, n7, n8);
         // and
-        assertThat(n1.streamAll()
+        assertThat(n1.stream()
                      .collect(Collectors.toList())).as("sub-tree")
                                                    .containsExactlyInAnyOrder(n1, n3, n5, n7);
     }
@@ -944,5 +944,25 @@ public class NodeItemTest {
         //then
         assertThat(Nodes.unnamedChild(null, root)
                         .isRoot()).isFalse();
+    }
+
+    @Test
+    public void parentStream() {
+        //given
+        val root = Nodes.namedRoot("root data", "root");
+        val child1 = Nodes.namedChild("child 1 data", "child 1", root);
+        val child2 = Nodes.namedChild("child 2 data", "child 2", root);
+        val child3 = Nodes.namedChild("child 3 data", "child 3", child2);
+        //when
+        val resultRoot = root.parentStream()
+                             .collect(Collectors.toSet());
+        val resultChild1 = child1.parentStream()
+                                 .collect(Collectors.toSet());
+        val resultChild3 = child3.parentStream()
+                                 .collect(Collectors.toSet());
+        //then
+        assertThat(resultRoot).isEmpty();
+        assertThat(resultChild1).containsExactlyInAnyOrder(root);
+        assertThat(resultChild3).containsExactlyInAnyOrder(child2, root);
     }
 }

@@ -437,14 +437,14 @@ public class ImmutableNodeItemTest {
         Nodes.namedChild("eight", "eight", n6);
         val immutableRoot = Nodes.asImmutable(node);
         //when
-        val result = immutableRoot.streamAll()
+        val result = immutableRoot.stream()
                                   .collect(Collectors.toList());
         //then
         assertThat(result).as("full tree")
                           .hasSize(9);
         // and
         assertThat(immutableRoot.getChild("one")
-                                .streamAll()
+                                .stream()
                                 .collect(Collectors.toList())).as("sub-tree")
                                                               .hasSize(4);
     }
