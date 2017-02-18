@@ -371,9 +371,9 @@ class NodeItem<T> implements Node<T> {
     }
 
     @Override
-    public Stream<Node<T>> streamAll() {
+    public Stream<Node<T>> stream() {
         return Stream.concat(Stream.of(this), getChildren().stream()
-                                                           .flatMap(Node::streamAll));
+                                                           .flatMap(Node::stream));
     }
 
     @Override

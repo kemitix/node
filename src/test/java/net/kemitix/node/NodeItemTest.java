@@ -920,13 +920,13 @@ public class NodeItemTest {
         val n7 = Nodes.namedChild("seven", "seven", n5);
         val n8 = Nodes.namedChild("eight", "eight", n6);
         //when
-        val result = node.streamAll()
+        val result = node.stream()
                          .collect(Collectors.toList());
         //then
         assertThat(result).as("full tree")
                           .contains(node, n1, n2, n3, n4, n5, n6, n7, n8);
         // and
-        assertThat(n1.streamAll()
+        assertThat(n1.stream()
                      .collect(Collectors.toList())).as("sub-tree")
                                                    .containsExactlyInAnyOrder(n1, n3, n5, n7);
     }

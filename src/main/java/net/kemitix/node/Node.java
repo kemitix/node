@@ -249,7 +249,7 @@ public interface Node<T> {
      *
      * @return a stream of all the nodes in the tree below this node
      */
-    Stream<Node<T>> streamAll();
+    Stream<Node<T>> stream();
 
     /**
      * Returns a stream of all the node's ancestor nodes.
