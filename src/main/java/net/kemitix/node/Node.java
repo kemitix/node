@@ -256,5 +256,5 @@ public interface Node<T> {
      *
      * @return a stream of the node's parents recursively until the root node
      */
-    Stream<Node<T>> streamParents();
+    Stream<Node<T>> parentStream();
 }

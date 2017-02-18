@@ -377,8 +377,8 @@ class NodeItem<T> implements Node<T> {
     }
 
     @Override
-    public Stream<Node<T>> streamParents() {
-        return getParent().map(node -> Stream.concat(Stream.of(node), node.streamParents()))
-                          .orElseGet(Stream::empty);
+    public Stream<Node<T>> parentStream() {
+        return findParent().map(node -> Stream.concat(Stream.of(node), node.parentStream()))
+                           .orElseGet(Stream::empty);
     }
 }
