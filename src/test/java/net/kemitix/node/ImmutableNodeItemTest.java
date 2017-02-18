@@ -74,8 +74,8 @@ public class ImmutableNodeItemTest {
         //given
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot("data"));
         //then
-        assertThat(immutableNode.getParent()).as("immutableNode created without a parent has no parent")
-                                             .isEmpty();
+        assertThat(immutableNode.findParent()).as("immutableNode created without a parent has no parent")
+                                              .isEmpty();
     }
 
     @Test
@@ -101,11 +101,11 @@ public class ImmutableNodeItemTest {
         //then
         // get the immutable node's child's parent
         val immutableChild = immutableNode.getChildByName("child");
-        final Optional<Node<String>> optionalParent = immutableChild.getParent();
+        final Optional<Node<String>> optionalParent = immutableChild.findParent();
         if (optionalParent.isPresent()) {
             val p = optionalParent.get();
             assertThat(p).hasFieldOrPropertyWithValue("name", "root")
-                         .hasFieldOrPropertyWithValue("data", Optional.of("parent"));
+                         .hasFieldOrPropertyWithValue("data", "parent");
         }
     }
 

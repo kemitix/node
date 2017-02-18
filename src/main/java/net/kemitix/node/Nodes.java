@@ -101,12 +101,12 @@ public final class Nodes {
      * @return the immutable copy of the tree
      */
     public static <T> Node<T> asImmutable(final Node<T> root) {
-        if (root.getParent()
+        if (root.findParent()
                 .isPresent()) {
             throw new IllegalArgumentException("source must be the root node");
         }
         final Set<Node<T>> children = getImmutableChildren(root);
-        return ImmutableNodeItem.newRoot(root.getData()
+        return ImmutableNodeItem.newRoot(root.findData()
                                              .orElse(null), root.getName(), children);
     }
 
@@ -120,11 +120,10 @@ public final class Nodes {
     private static <T> Node<T> asImmutableChild(
             final Node<T> source
                                                ) {
-        return ImmutableNodeItem.newChild(source.getData()
-                                                .orElse(null), source.getName(), source.getParent()
+        return ImmutableNodeItem.newChild(source.findData()
+                                                .orElse(null), source.getName(), source.findParent()
                                                                                        .orElse(null),
                                           getImmutableChildren(source)
                                          );
     }
-
 }

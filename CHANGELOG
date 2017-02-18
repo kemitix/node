@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+0.6.0
+------
+
+* Add streamAll() support
+
 0.5.0
 ------
 

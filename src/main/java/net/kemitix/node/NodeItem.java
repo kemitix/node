@@ -42,7 +42,8 @@ import java.util.stream.Stream;
  *
  * @author Paul Campbell (pcampbell@kemitix.net)
  */
-@ToString(exclude = "children")
+@ToString(exclude = {"children", "data", "parent"})
+@SuppressWarnings("methodcount")
 class NodeItem<T> implements Node<T> {
 
     private final Set<Node<T>> children = new HashSet<>();
@@ -61,9 +62,7 @@ class NodeItem<T> implements Node<T> {
      * @param parent   the parent of the node, or null for a root node
      * @param children the children of the node - must not be null
      */
-    NodeItem(
-            final T data, final String name, final Node<T> parent, @NonNull final Set<Node<T>> children
-            ) {
+    NodeItem(final T data, final String name, final Node<T> parent, @NonNull final Set<Node<T>> children) {
         this.data = data;
         this.name = name;
         if (parent != null) {
@@ -92,8 +91,16 @@ class NodeItem<T> implements Node<T> {
     }
 
     @Override
-    public Optional<T> getData() {
+    public Optional<T> findData() {
         return Optional.ofNullable(data);
+    }
+
+    @Override
+    public T getData() {
+        if (isEmpty()) {
+            throw new EmptyNodeException(getName());
+        }
+        return data;
     }
 
     @Override
@@ -107,8 +114,16 @@ class NodeItem<T> implements Node<T> {
     }
 
     @Override
-    public Optional<Node<T>> getParent() {
+    public Optional<Node<T>> findParent() {
         return Optional.ofNullable(parent);
+    }
+
+    @Override
+    public Node<T> getParent() {
+        if (parent == null) {
+            throw new OrphanedNodeException(getName());
+        }
+        return parent;
     }
 
     /**
@@ -155,9 +170,9 @@ class NodeItem<T> implements Node<T> {
         }
         children.add(child);
         // update the child's parent if they don't have one or it is not this
-        val childParent = child.getParent();
-        if (!childParent.isPresent() || !childParent.get()
-                                                    .equals(this)) {
+        if (!child.findParent()
+                  .filter(this::equals)
+                  .isPresent()) {
             child.setParent(this);
         }
     }
@@ -214,8 +229,8 @@ class NodeItem<T> implements Node<T> {
     @Override
     public Optional<Node<T>> findChild(@NonNull final T child) {
         return children.stream()
-                       .filter(node -> child.equals(node.getData()
-                                                        .orElseGet(() -> null)))
+                       .filter(node -> child.equals(node.findData()
+                                                        .orElse(null)))
                        .findFirst();
     }
 
@@ -283,7 +298,7 @@ class NodeItem<T> implements Node<T> {
             val existing = childByName.get();
             if (existing.isEmpty()) {
                 // place any data in the new node into the existing empty node
-                nodeItem.getData()
+                nodeItem.findData()
                         .ifPresent(existing::setData);
             } else {
                 throw new NodeException("A non-empty node named '" + nodeItem.getName() + "' already exists here");
