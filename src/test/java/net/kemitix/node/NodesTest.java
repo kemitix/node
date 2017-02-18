@@ -44,7 +44,7 @@ public class NodesTest {
         SoftAssertions softly = new SoftAssertions();
         softly.assertThat(node.getData()).contains("data");
         softly.assertThat(node.getName()).isEmpty();
-        softly.assertThat(node.getParent()).contains(parent);
+        softly.assertThat(node.findParent()).contains(parent);
         softly.assertAll();
     }
 
@@ -55,7 +55,7 @@ public class NodesTest {
         SoftAssertions softly = new SoftAssertions();
         softly.assertThat(node.getData()).contains("data");
         softly.assertThat(node.getName()).isEqualTo("child");
-        softly.assertThat(node.getParent()).contains(parent);
+        softly.assertThat(node.findParent()).contains(parent);
         softly.assertAll();
     }
 

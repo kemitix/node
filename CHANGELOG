@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+0.7.0
+------
+
+* Rename streamAll() as stream()
+* Add parentStream()
+* Add isRoot()
+* Rename Optional<Node<T>> getParent() as findParent()
+* Rename Optional<Node<T>> getData() as findData()
+* Add Node<T> getParent()
+* Add<Node<T> getData
+
 0.6.0
 ------
 

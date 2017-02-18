@@ -74,8 +74,8 @@ public class ImmutableNodeItemTest {
         //given
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot("data"));
         //then
-        assertThat(immutableNode.getParent()).as("immutableNode created without a parent has no parent")
-                                             .isEmpty();
+        assertThat(immutableNode.findParent()).as("immutableNode created without a parent has no parent")
+                                              .isEmpty();
     }
 
     @Test
@@ -101,11 +101,11 @@ public class ImmutableNodeItemTest {
         //then
         // get the immutable node's child's parent
         val immutableChild = immutableNode.getChildByName("child");
-        final Optional<Node<String>> optionalParent = immutableChild.getParent();
+        final Optional<Node<String>> optionalParent = immutableChild.findParent();
         if (optionalParent.isPresent()) {
             val p = optionalParent.get();
             assertThat(p).hasFieldOrPropertyWithValue("name", "root")
-                         .hasFieldOrPropertyWithValue("data", Optional.of("parent"));
+                         .hasFieldOrPropertyWithValue("data", "parent");
         }
     }
 
@@ -437,14 +437,14 @@ public class ImmutableNodeItemTest {
         Nodes.namedChild("eight", "eight", n6);
         val immutableRoot = Nodes.asImmutable(node);
         //when
-        val result = immutableRoot.streamAll()
+        val result = immutableRoot.stream()
                                   .collect(Collectors.toList());
         //then
         assertThat(result).as("full tree")
                           .hasSize(9);
         // and
         assertThat(immutableRoot.getChild("one")
-                                .streamAll()
+                                .stream()
                                 .collect(Collectors.toList())).as("sub-tree")
                                                               .hasSize(4);
     }

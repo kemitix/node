@@ -59,7 +59,14 @@ public interface Node<T> {
      *
      * @return an Optional containing the node's data, or empty if the node has none
      */
-    Optional<T> getData();
+    Optional<T> findData();
+
+    /**
+     * Fetch the data held within the node.
+     *
+     * @return the node's data, or throws an {@link EmptyNodeException}
+     */
+    T getData();
 
     /**
      * Set the data held within the node.
@@ -76,11 +83,25 @@ public interface Node<T> {
     boolean isEmpty();
 
     /**
+     * Returns true is the node is a root node (has no parent).
+     *
+     * @return true is parent is null
+     */
+    boolean isRoot();
+
+    /**
      * Fetch the parent node.
      *
      * @return an Optional contain the parent node, or empty if a root node
      */
-    Optional<Node<T>> getParent();
+    Optional<Node<T>> findParent();
+
+    /**
+     * Fetch the parent node.
+     *
+     * @return the parent node, or throws an {@link OrphanedNodeException}
+     */
+    Node<T> getParent();
 
     /**
      * Make the current node a direct child of the parent.
@@ -228,5 +249,12 @@ public interface Node<T> {
      *
      * @return a stream of all the nodes in the tree below this node
      */
-    Stream<Node<T>> streamAll();
+    Stream<Node<T>> stream();
+
+    /**
+     * Returns a stream of all the node's ancestor nodes.
+     *
+     * @return a stream of the node's parents recursively until the root node
+     */
+    Stream<Node<T>> parentStream();
 }
