@@ -35,8 +35,79 @@ public class NodeItemTest {
         node = Nodes.unnamedRoot(data);
         //then
         assertThat(node.getData()).as("can get the data from a node")
-                                  .
-                                          contains(data);
+                                  .contains(data);
+    }
+
+    @Test
+    public void getDataWhenEmptyThrowsException() throws Exception {
+        //given
+        node = Nodes.unnamedRoot(null);
+        assertThat(node.isEmpty()).isTrue();
+        exception.expect(EmptyNodeException.class);
+        //when
+        node.getData();
+    }
+
+    @Test
+    public void findDataWhenFullReturnsData() {
+        //given
+        val data = "data";
+        node = Nodes.unnamedRoot(data);
+        //when
+        val result = node.findData();
+        //then
+        assertThat(result).contains(data);
+    }
+
+    @Test
+    public void findDataWhenEmptyReturnsEmptyOptional() {
+        //given
+        node = Nodes.unnamedRoot(null);
+        //when
+        val result = node.findData();
+        //then
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    public void getParentWhenRootThrowsException() {
+        //given
+        node = Nodes.unnamedRoot(null);
+        exception.expect(OrphanedNodeException.class);
+        //when
+        node.getParent();
+    }
+
+    @Test
+    public void getParentWhenChildReturnsRoot() {
+        //given
+        val root = Nodes.unnamedRoot("root");
+        node = Nodes.unnamedChild("child", root);
+        //when
+        val result = node.getParent();
+        //then
+        assertThat(result).isSameAs(root);
+    }
+
+    @Test
+    public void findParentWhenRootReturnsEmptyOptional() {
+        //given
+        node = Nodes.unnamedRoot(null);
+        //when
+        val result = node.findParent();
+        //then
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    public void findParentWhenChildReturnsRoot() {
+        //given
+        val root = Nodes.unnamedRoot("root");
+        node = Nodes.unnamedChild("child", root);
+        //when
+        val result = node.findParent();
+        //then
+        assertThat(result).contains(root);
     }
 
     @Test
