@@ -375,4 +375,10 @@ class NodeItem<T> implements Node<T> {
         return Stream.concat(Stream.of(this), getChildren().stream()
                                                            .flatMap(Node::streamAll));
     }
+
+    @Override
+    public Stream<Node<T>> streamParents() {
+        return getParent().map(node -> Stream.concat(Stream.of(node), node.streamParents()))
+                          .orElseGet(Stream::empty);
+    }
 }
