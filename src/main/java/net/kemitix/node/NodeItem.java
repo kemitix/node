@@ -114,6 +114,11 @@ class NodeItem<T> implements Node<T> {
     }
 
     @Override
+    public boolean isRoot() {
+        return parent == null;
+    }
+
+    @Override
     public Optional<Node<T>> findParent() {
         return Optional.ofNullable(parent);
     }

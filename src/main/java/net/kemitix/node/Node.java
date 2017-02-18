@@ -83,6 +83,13 @@ public interface Node<T> {
     boolean isEmpty();
 
     /**
+     * Returns true is the node is a root node (has no parent).
+     *
+     * @return true is parent is null
+     */
+    boolean isRoot();
+
+    /**
      * Fetch the parent node.
      *
      * @return an Optional contain the parent node, or empty if a root node
