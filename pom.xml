@@ -18,6 +18,7 @@
     <properties>
         <tiles-maven-plugin.version>2.10</tiles-maven-plugin.version>
         <kemitix-tiles.version>0.8.1</kemitix-tiles.version>
+        <kemitix-checkstyle.version>4.0.1</kemitix-checkstyle.version>
         <lombok.version>1.16.20</lombok.version>
         <assertj.version>3.9.1</assertj.version>
         <trajano-commons-testing.version>2.1.0</trajano-commons-testing.version>
@@ -84,6 +85,7 @@
                     <tiles>
                         <tile>net.kemitix.tiles:all:${kemitix-tiles.version}</tile>
                         <!--<tile>net.kemitix.tiles:pmd-strict:${kemitix-tiles.version}</tile>-->
+                        <tile>net.kemitix.checkstyle:tile:${kemitix-checkstyle.version}</tile>
                     </tiles>
                 </configuration>
             </plugin>
