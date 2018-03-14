@@ -25,6 +25,8 @@
         <trajano-commons-testing.version>2.1.0</trajano-commons-testing.version>
         <junit.version>4.12</junit.version>
         <hamcrest.version>1.3</hamcrest.version>
+        <jacoco-class-line-covered-ratio>0</jacoco-class-line-covered-ratio>
+        <jacoco-class-instruction-covered-ratio>0</jacoco-class-instruction-covered-ratio>
     </properties>
 
     <issueManagement>
