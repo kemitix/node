@@ -138,6 +138,7 @@ class NodeItem<T> implements Node<T> {
         doSetParent(parent);
     }
 
+    @SuppressWarnings("npathcomplexity")
     private void doSetParent(@NonNull final Node<T> newParent) {
         if (this.equals(newParent) || newParent.isDescendantOf(this)) {
             throw new NodeException("Parent is a descendant");
@@ -261,6 +262,7 @@ class NodeItem<T> implements Node<T> {
      * @return the child or null
      */
     @Override
+    @SuppressWarnings("npathcomplexity")
     public Optional<Node<T>> findInPath(@NonNull final List<T> path) {
         if (path.isEmpty()) {
             return Optional.empty();
@@ -329,6 +331,7 @@ class NodeItem<T> implements Node<T> {
     }
 
     @Override
+    @SuppressWarnings("movevariableinsideif")
     public String drawTree(final int depth) {
         final StringBuilder sb = new StringBuilder();
         final String unnamed = "(unnamed)";
