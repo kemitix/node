@@ -16,7 +16,7 @@
     </parent>
 
     <properties>
-        <lombok.version>1.16.12</lombok.version>
+        <lombok.version>1.16.20</lombok.version>
         <assertj.version>3.6.2</assertj.version>
         <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
         <trajano-commons-testing.version>2.1.0</trajano-commons-testing.version>
@@ -50,6 +50,12 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <optional>true</optional>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
