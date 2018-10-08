@@ -1,0 +1,104 @@
+* Node
+
+   [[https://oss.sonatype.org/content/repositories/releases/net/kemitix/node][file:https://img.shields.io/nexus/r/https/oss.sonatype.org/net.kemitix/node.svg?style=for-the-badge]
+   [[https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22net.kemitix%22%20AND%20a%3A%22node%22][file:https://img.shields.io/maven-central/v/net.kemitix/node.svg?style=for-the-badge]
+
+   [[https://sonarcloud.io/dashboard?id=net.kemitix%3Anode][file:https://img.shields.io/sonar/https/sonarcloud.io/net.kemitix%3Anode/coverage.svg?style=for-the-badge#.svg]
+   [[https://sonarcloud.io/dashboard?id=net.kemitix%3Anode][file:https://img.shields.io/sonar/https/sonarcloud.io/net.kemitix%3Anode/tech_debt.svg?style=for-the-badge#.svg]
+   [[https://sonarcloud.io/dashboard?id=net.kemitix%3Anode][file:https://sonarcloud.io/api/project_badges/measure?project=net.kemitix%3Anode&metric=sqale_rating#.svg]
+   [[https://sonarcloud.io/dashboard?id=net.kemitix%3Anode][file:https://sonarcloud.io/api/project_badges/measure?project=net.kemitix%3Anode&metric=alert_status#.svg]
+   [[https://sonarcloud.io/dashboard?id=net.kemitix%3Anode][file:https://sonarcloud.io/api/project_badges/measure?project=net.kemitix%3Anode&metric=reliability_rating#.svg]
+   [[https://sonarcloud.io/dashboard?id=net.kemitix%3Anode][file:https://sonarcloud.io/api/project_badges/measure?project=net.kemitix%3Anode&metric=security_rating#.svg]
+   [[https://sonarcloud.io/dashboard?id=net.kemitix%3Anode][file:https://sonarcloud.io/api/project_badges/measure?project=net.kemitix%3Anode&metric=sqale_index#.svg]
+   [[https://sonarcloud.io/dashboard?id=net.kemitix%3Anode][file:https://sonarcloud.io/api/project_badges/measure?project=net.kemitix%3Anode&metric=vulnerabilities#.svg]
+   [[https://sonarcloud.io/dashboard?id=net.kemitix%3Anode][file:https://sonarcloud.io/api/project_badges/measure?project=net.kemitix%3Anode&metric=bugs#.svg]
+   [[https://sonarcloud.io/dashboard?id=net.kemitix%3Anode][file:https://sonarcloud.io/api/project_badges/measure?project=net.kemitix%3Anode&metric=code_smells#.svg]
+   [[https://sonarcloud.io/dashboard?id=net.kemitix%3Anode][file:https://sonarcloud.io/api/project_badges/measure?project=net.kemitix%3Anode&metric=ncloc#.svg]
+
+   [[https://app.codacy.com/project/kemitix/node/dashboard][file:https://img.shields.io/codacy/grade/2b67fc90d79a4402aa29f1a7fcf65d7f.svg?style=for-the-badge]
+   [[http://i.jpeek.org/net.kemitix/node/index.html][file:http://i.jpeek.org/net.kemitix/node/badge.svg]
+
+* A parent/children data structure
+
+* Usage
+
+  Add as a dependency in your =pom.xml=:
+
+  #+BEGIN_SRC xml
+    <dependency>
+      <groupId>net.kemitix</groupId>
+      <artifactId>node</artifactId>
+      <version>${node.version}</version>
+    </dependency>
+  #+END_SRC
+
+  The library consits of an interface =Node= and an implementation =NodeItem=.
+
+** Create a root node
+
+   #+BEGIN_SRC java
+     Node<String> root = new NodeItem<>("[root]");
+   #+END_SRC
+
+** Get the contents of the node
+
+   #+BEGIN_SRC java
+     String rootData = root.getData(); // returns "[root]"
+   #+END_SRC
+
+** Add a child node
+
+   #+BEGIN_SRC java
+     Node<String> child = root.createChild("child");
+   #+END_SRC
+
+   Which is shorthand for:
+
+   #+BEGIN_SRC java
+     Node<String> child = new NodeItem<>("child");
+     root.addChild(child);
+   #+END_SRC
+
+   The tree now looks like:
+
+   #+BEGIN_EXAMPLE
+   "[root]"
+   \-> "child"
+   #+END_EXAMPLE
+
+** Get the child node
+
+   #+BEGIN_SRC java
+     Node<String> childNode = root.getChild("child");
+   #+END_SRC
+
+** Create a chain of nodes
+
+   #+BEGIN_SRC java
+     root.createDescendantLine(Arrays.asList("alpha", "beta", "gamma"));
+   #+END_SRC
+
+   #+BEGIN_EXAMPLE
+   "[root]"
+   \-> "alpha"
+    \-> "beta"
+     \-> "gamma"
+   #+END_EXAMPLE
+
+** Walk the tree to find a node
+
+   #+BEGIN_SRC java
+     Optional<Node<String>> foundNode = root.walkTree(Arrays.asList("alpha", "beta", "gamma"));
+     if (foundNode.isPresent()) {
+         String betaData = foundNode.get().getParent().getData();
+         // returns "beta"
+     }
+   #+END_SRC
+
+** Get all children of a node
+
+   #+BEGIN_SRC java
+     Set<Node<String>> children = root.getChildren();
+     children.size();
+     // returns 2 ("child" and "alpha")
+   #+END_SRC
