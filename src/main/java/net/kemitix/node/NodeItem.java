@@ -71,7 +71,7 @@ class NodeItem<T> implements Node<T> {
      *
      * @param newParent The new parent node
      */
-    protected void forceParent(final Node<T> newParent) {
+    void forceParent(final Node<T> newParent) {
         this.parent = newParent;
     }
 
