@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>node</artifactId>
-    <version>0.7.0</version>
+    <version>DEV-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Node</name>
@@ -11,16 +11,21 @@
     <parent>
         <groupId>net.kemitix</groupId>
         <artifactId>kemitix-parent</artifactId>
-        <version>2.4.0</version>
+        <version>5.2.0</version>
+        <relativePath/>
     </parent>
 
     <properties>
-        <lombok.version>1.16.12</lombok.version>
-        <assertj.version>3.6.2</assertj.version>
-        <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
+        <java.version>1.8</java.version>
+        <tiles-maven-plugin.version>2.12</tiles-maven-plugin.version>
+        <kemitix-maven-tiles.version>1.3.1</kemitix-maven-tiles.version>
+        <kemitix-checkstyle.version>4.0.1</kemitix-checkstyle.version>
+        <lombok.version>1.18.2</lombok.version>
+        <assertj.version>3.11.1</assertj.version>
         <trajano-commons-testing.version>2.1.0</trajano-commons-testing.version>
         <junit.version>4.12</junit.version>
         <hamcrest.version>1.3</hamcrest.version>
+        <jacoco-class-instruction-covered-ratio>97%</jacoco-class-instruction-covered-ratio>
     </properties>
 
     <issueManagement>
@@ -38,17 +43,13 @@
 
     <inceptionYear>2016</inceptionYear>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.eluder.coveralls</groupId>
-                <artifactId>coveralls-maven-plugin</artifactId>
-                <version>${coveralls-maven-plugin.version}</version>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -74,4 +75,22 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.repaint.maven</groupId>
+                <artifactId>tiles-maven-plugin</artifactId>
+                <version>${tiles-maven-plugin.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <tiles>
+                        <tile>net.kemitix.tiles:all:${kemitix-maven-tiles.version}</tile>
+                        <!--<tile>net.kemitix.tiles:pmd-strict:${kemitix-tiles.version}</tile>-->
+                        <tile>net.kemitix.checkstyle:tile:${kemitix-checkstyle.version}</tile>
+                    </tiles>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
