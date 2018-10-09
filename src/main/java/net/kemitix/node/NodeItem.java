@@ -22,7 +22,6 @@
 package net.kemitix.node;
 
 import lombok.NonNull;
-import lombok.ToString;
 import lombok.val;
 
 import java.util.Arrays;
@@ -39,7 +38,6 @@ import java.util.stream.Stream;
  *
  * @author Paul Campbell (pcampbell@kemitix.net)
  */
-@ToString(exclude = {"children", "data", "parent"})
 @SuppressWarnings("methodcount")
 class NodeItem<T> implements Node<T> {
 
