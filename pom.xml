@@ -23,7 +23,7 @@
         <lombok.version>1.18.12</lombok.version>
         <assertj.version>3.13.2</assertj.version>
         <trajano-commons-testing.version>2.1.0</trajano-commons-testing.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13</junit.version>
         <hamcrest.version>2.2</hamcrest.version>
         <jacoco-class-instruction-covered-ratio>97%</jacoco-class-instruction-covered-ratio>
     </properties>
