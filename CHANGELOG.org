@@ -5,42 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-** [0.7.1] - unreleased
-
-Added
-
-- Add kemitix-maven-tiles 0.8.1
-
-Changed
-
-- [checkstyle] suppress npath complexity issues
-- [coverage] lower requirements
-
-Dependencies
-
-- Bump kemitix-parent to 5.2.0
-- Bump assertj from 3.11.1
-- Bump lombok from 1.18.2
-
 * 0.8.0
+
+** Added
+
+- Add kemitix-maven-tiles
 
 ** Changed
 
-   - Replace Jenkins with Github Actions (#57)
+- Replace Jenkins with Github Actions (#57)
+- [checkstyle] suppress npath complexity issues
+- [coverage] lower requirements
 
 ** Dependencies
 
- * Bump hamcrest-core from 2.1 to 2.2 (#50)
- * Bump lombok from 1.18.8 to 1.18.10 (#49)
- * Bump assertj-core from 3.12.2 to 3.13.2 (#48)
- * Bump tiles-maven-plugin from 2.14 to 2.15 (#45)
- * Bump lombok from 1.18.6 to 1.18.8 (#44)
- * Bump tiles-maven-plugin from 2.13 to 2.14 (#43)
- * Bump assertj-core from 3.12.1 to 3.12.2 (#42)
- * Bump lombok from 1.18.4 to 1.18.6 (#41)
- * Bump tiles-maven-plugin from 2.12 to 2.13 (#40)
- * Bump hamcrest-core from 1.3 to 2.1 (#37)
- * Clean up changelog and readme, and remove external build dependencies (#38)
+- Bump hamcrest-core from 2.1 to 2.2 (#50)
+- Bump lombok from 1.18.8 to 1.18.10 (#49)
+- Bump assertj-core from 3.12.2 to 3.13.2 (#48)
+- Bump tiles-maven-plugin from 2.14 to 2.15 (#45)
+- Bump lombok from 1.18.6 to 1.18.8 (#44)
+- Bump tiles-maven-plugin from 2.13 to 2.14 (#43)
+- Bump assertj-core from 3.12.1 to 3.12.2 (#42)
+- Bump lombok from 1.18.4 to 1.18.6 (#41)
+- Bump tiles-maven-plugin from 2.12 to 2.13 (#40)
+- Bump hamcrest-core from 1.3 to 2.1 (#37)
+- Clean up changelog and readme, and remove external build dependencies (#38)
 
 * [0.7.0] - 2017-02-18
 
