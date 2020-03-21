@@ -24,12 +24,12 @@ package net.kemitix.node;
 import lombok.NonNull;
 import lombok.val;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Stream;
+
+import static net.kemitix.node.HeadTail.head;
+import static net.kemitix.node.HeadTail.tail;
 
 /**
  * Represents a tree of nodes.
@@ -230,9 +230,11 @@ class NodeItem<T> implements Node<T> {
     @Override
     public Optional<Node<T>> findChild(@NonNull final T child) {
         return children.stream()
-                       .filter(node -> child.equals(node.findData()
-                                                        .orElse(null)))
-                       .findFirst();
+                .filter(node ->
+                        child.equals(
+                                node.findData()
+                                        .orElse(null)))
+                .findFirst();
     }
 
     @Override
@@ -260,17 +262,19 @@ class NodeItem<T> implements Node<T> {
      * @return the child or null
      */
     @Override
-    @SuppressWarnings("npathcomplexity")
     public Optional<Node<T>> findInPath(@NonNull final List<T> path) {
-        if (path.isEmpty()) {
-            return Optional.empty();
-        }
-        Node<T> current = this;
-        for (int i = 0, pathSize = path.size(); i < pathSize && current != null; i++) {
-            current = current.findChild(path.get(i))
-                             .orElse(null);
-        }
-        return Optional.ofNullable(current);
+        return head(path)
+                .flatMap(this::findChild)
+                .flatMap(findInChildsPath(tail(path)));
+    }
+
+    private Function<Node<T>, Optional<Node<T>>> findInChildsPath(final List<T> path) {
+        return child -> {
+            if (path.isEmpty()) {
+                return Optional.of(child);
+            }
+            return child.findInPath(path);
+        };
     }
 
     @Override

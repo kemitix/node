@@ -405,13 +405,17 @@ public class NodeItemTest {
         val subject = "subject";
         node = Nodes.unnamedChild(subject, parentNode);
         //when
-        val result = grandParentNode.findInPath(Arrays.asList(parent, subject));
+        val result = grandParentNode.findInPath(
+                Arrays.asList(parent, subject));
         //then
-        assertThat(result.isPresent()).as("when we walk the tree to a node it is found")
-                                      .isTrue();
+        assertThat(result.isPresent())
+                .as("when we walk the tree to a node it is found")
+                .isTrue();
         result.ifPresent(
-                stringNode -> assertThat(stringNode).as("when we walk the tree to a node the correct node is found")
-                                                    .isSameAs(node));
+                stringNode ->
+                        assertThat(stringNode)
+                                .as("when we walk the tree to a node we find the correct node")
+                                .isSameAs(node));
     }
 
     /**
@@ -438,7 +442,7 @@ public class NodeItemTest {
      */
     @Test
     @Category(NodeFindInPathTestsCategory.class)
-    public void shouldThrowNEWhenWalkTreeNull() {
+    public void shouldThrowNPEWhenWalkTreeNull() {
         //given
         node = Nodes.unnamedRoot("subject");
         exception.expect(NullPointerException.class);
