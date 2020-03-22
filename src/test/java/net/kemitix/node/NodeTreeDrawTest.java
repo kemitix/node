@@ -18,7 +18,7 @@ public class NodeTreeDrawTest {
         val kim = Nodes.unnamedChild("kim data", node); // nameless mother
         Nodes.namedChild("lucy data", "lucy", kim);
         //when
-        val tree = new NodeTreeDraw().drawTree(node, 0);
+        val tree = Nodes.drawTree(node, 0);
         //then
         String[] lines = tree.split("\n");
         assertThat(lines).contains("[root]", "[ alice]", "[  dave]", "[ (unnamed)]", "[  lucy]", "[ bob]");
