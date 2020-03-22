@@ -107,14 +107,6 @@ class NodeItem<T> implements Node<T> {
         return Optional.ofNullable(parent);
     }
 
-    @Override
-    public Node<T> getParent() {
-        if (parent == null) {
-            throw new OrphanedNodeException(getName());
-        }
-        return parent;
-    }
-
     /**
      * Make the current node a direct child of the parent.
      *

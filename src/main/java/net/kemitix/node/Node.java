@@ -87,13 +87,6 @@ public interface Node<T> {
     Optional<Node<T>> findParent();
 
     /**
-     * Fetch the parent node.
-     *
-     * @return the parent node, or throws an {@link OrphanedNodeException}
-     */
-    Node<T> getParent();
-
-    /**
      * Make the current node a direct child of the parent.
      *
      * @param parent the new parent node

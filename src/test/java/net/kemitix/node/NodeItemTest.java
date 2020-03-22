@@ -14,7 +14,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 
 /**
  * Test for {@link NodeItem}.
@@ -47,26 +46,6 @@ public class NodeItemTest {
         val result = node.findData();
         //then
         assertThat(result).isEmpty();
-    }
-
-    @Test
-    public void getParentWhenRootThrowsException() {
-        //given
-        node = Nodes.unnamedRoot(null);
-        exception.expect(OrphanedNodeException.class);
-        //when
-        node.getParent();
-    }
-
-    @Test
-    public void getParentWhenChildReturnsRoot() {
-        //given
-        val root = Nodes.unnamedRoot("root");
-        node = Nodes.unnamedChild("child", root);
-        //when
-        val result = node.getParent();
-        //then
-        assertThat(result).isSameAs(root);
     }
 
     @Test
@@ -636,19 +615,33 @@ public class NodeItemTest {
         //when
         node.insertInPath(four, "one", "two", "three");
         //then
-        val three = four.getParent();
-        assertThat(four.getParent()).as("add node to a tree")
-                                    .isNotNull();
-        assertThat(three.getName()).isEqualTo("three");
-        val two = three.getParent();
-        assertThat(two.getName()).isEqualTo("two");
-        val one = two.getParent();
-        assertThat(one.getName()).isEqualTo("one");
-        assertThat(one.getParent()).isSameAs(node);
+        assertThat(four.findParent())
+                .as("add node to a tree")
+                .isNotEmpty();
+
+        val three = four.findParent();
+        assertThat(three).isNotEmpty();
+        three.map(threeNode ->
+                assertThat(threeNode.getName())
+                        .isEqualTo("three"));
+
+        val two = three.flatMap(Node::findParent);
+        assertThat(two).isNotEmpty();
+        two.map(twoNode ->
+                assertThat(twoNode.getName())
+                        .isEqualTo("two"));
+
+        val one = two.flatMap(Node::findParent);
+        assertThat(one).isNotEmpty();
+        one.ifPresent(oneNode ->
+                SoftAssertions.assertSoftly(softly -> {
+                    assertThat(oneNode.getName()).isEqualTo("one");
+                    assertThat(oneNode.findParent()).contains(node);
+                }));
         assertThat(node.getChildByName("one")
-                       .getChildByName("two")
-                       .getChildByName("three")
-                       .getChildByName("four")).isSameAs(four);
+                .getChildByName("two")
+                .getChildByName("three")
+                .getChildByName("four")).isSameAs(four);
     }
 
     @Test
