@@ -10,11 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ** Added
 
 - Add kemitix-maven-tiles 2.4.1
+- Tests run against JDK 8, 11 and 13 (#62)
 
 ** Changed
 
 - Moved: Node.drawTree to Nodes (#60)
-- Pinned pitest-junit5-plugin at 0.9 (#59)
 - Replace Jenkins with Github Actions (#57)
 - [checkstyle] suppress npath complexity issues
 - [coverage] lower requirements
