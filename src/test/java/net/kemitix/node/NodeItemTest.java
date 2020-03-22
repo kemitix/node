@@ -833,27 +833,6 @@ public class NodeItemTest {
     }
 
     @Test
-    public void canGetChildWhenFound() {
-        //given
-        node = Nodes.unnamedRoot("data");
-        val child = Nodes.namedChild("child data", "child name", node);
-        //when
-        val found = node.getChild("child data");
-        //then
-        assertThat(found).isSameAs(child);
-    }
-
-    @Test
-    public void canGetChildWhenNotFound() {
-        //given
-        exception.expect(NodeException.class);
-        exception.expectMessage("Child not found");
-        node = Nodes.unnamedRoot("data");
-        //when
-        node.getChild("child data");
-    }
-
-    @Test
     @SuppressWarnings("unchecked")
     public void constructorWithNameSupplierAndParentBeChildOfParent() {
         //given

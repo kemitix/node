@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -322,28 +323,6 @@ public class ImmutableNodeItemTest {
     }
 
     @Test
-    public void canGetChildWhenFound() {
-        //given
-        val root = Nodes.unnamedRoot("data");
-        val child = Nodes.namedChild("child data", "child name", root);
-        immutableNode = Nodes.asImmutable(root);
-        //when
-        val found = immutableNode.getChild("child data");
-        //then
-        assertThat(found.getName()).isEqualTo(child.getName());
-    }
-
-    @Test
-    public void canGetChildWhenNotFound() {
-        //given
-        exception.expect(NodeException.class);
-        exception.expectMessage("Child not found");
-        immutableNode = Nodes.asImmutable(Nodes.unnamedRoot("data"));
-        //when
-        immutableNode.getChild("child data");
-    }
-
-    @Test
     public void canSafelyHandleFindChildWhenAChildHasNoData() {
         //given
         val root = Nodes.unnamedRoot("");
@@ -403,15 +382,16 @@ public class ImmutableNodeItemTest {
         Nodes.namedChild("eight", "eight", n6);
         val immutableRoot = Nodes.asImmutable(node);
         //when
-        val result = immutableRoot.stream()
-                                  .collect(Collectors.toList());
+        val result = immutableRoot.stream().collect(Collectors.toList());
         //then
-        assertThat(result).as("full tree")
-                          .hasSize(9);
+        assertThat(result).as("full tree").hasSize(9);
         // and
-        assertThat(immutableRoot.getChild("one")
-                                .stream()
-                                .collect(Collectors.toList())).as("sub-tree")
-                                                              .hasSize(4);
+        assertThat(immutableRoot
+                .findChild("one")
+                .map(Node::stream)
+                .map(Stream::count)
+        )
+                .as("sub-tree")
+                .contains(4L);
     }
 }

@@ -151,15 +151,6 @@ public interface Node<T> {
     Optional<Node<T>> findChild(T child);
 
     /**
-     * Fetches the node for the child if present.
-     *
-     * @param child the child's data to search for
-     *
-     * @return the child node if found
-     */
-    Node<T> getChild(T child);
-
-    /**
      * Checks if the node is an ancestor.
      *
      * @param node the potential ancestor

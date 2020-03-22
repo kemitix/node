@@ -226,11 +226,6 @@ class NodeItem<T> implements Node<T> {
                 .findFirst();
     }
 
-    @Override
-    public Node<T> getChild(final T child) {
-        return findChild(child).orElseThrow(() -> new NodeException("Child not found"));
-    }
-
     /**
      * Checks if the node is an ancestor.
      *
