@@ -2,7 +2,7 @@ package net.kemitix.node;
 
 import lombok.val;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static net.trajano.commons.testing.UtilityClassTestUtil
         .assertUtilityClassWellDefined;

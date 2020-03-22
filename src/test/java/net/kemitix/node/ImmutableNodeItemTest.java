@@ -2,10 +2,9 @@ package net.kemitix.node;
 
 import lombok.val;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,7 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 /**
  * Test for {@link ImmutableNodeItem}.
@@ -22,17 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class ImmutableNodeItemTest {
 
-    private static final String IMMUTABLE_OBJECT = "Immutable object";
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
     private Node<String> immutableNode;
-
-    private void expectImmutableException() {
-        exception.expect(UnsupportedOperationException.class);
-        exception.expectMessage(IMMUTABLE_OBJECT);
-    }
 
     @Test
     public void canCreateAnEmptyAndUnnamedNode() {
@@ -53,9 +42,11 @@ public class ImmutableNodeItemTest {
     public void shouldThrowExceptionOnSetName() {
         //given
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot(null));
-        expectImmutableException();
         //when
-        immutableNode.setName("named");
+        assertThatExceptionOfType(UnsupportedOperationException.class)
+                .isThrownBy(() ->
+                        immutableNode.setName("named"))
+                .withMessage("Immutable object");
     }
 
     @Test
@@ -104,46 +95,54 @@ public class ImmutableNodeItemTest {
     public void shouldNotBeAbleToAddChildToImmutableTree() {
         //given
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot("root"));
-        expectImmutableException();
         //when
-        Nodes.unnamedChild("child", immutableNode);
+        assertThatExceptionOfType(UnsupportedOperationException.class)
+                .isThrownBy(() ->
+                        Nodes.unnamedChild("child", immutableNode))
+                .withMessage("Immutable object");
     }
 
     @Test
     public void shouldThrowExceptionWhenSetParent() {
         //given
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot("subject"));
-        expectImmutableException();
         //when
-        immutableNode.setParent(Nodes.unnamedRoot("child"));
+        assertThatExceptionOfType(UnsupportedOperationException.class)
+                .isThrownBy(() ->
+                        immutableNode.setParent(Nodes.unnamedRoot("child")))
+                .withMessage("Immutable object");
     }
 
     @Test
     public void shouldThrowExceptionWhenAddingChild() {
         //given
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot("subject"));
-        expectImmutableException();
         //when
-        immutableNode.addChild(Nodes.unnamedRoot("child"));
+        assertThatExceptionOfType(UnsupportedOperationException.class)
+                .isThrownBy(() ->
+                        immutableNode.addChild(Nodes.unnamedRoot("child")))
+                .withMessage("Immutable object");
     }
 
-    /**
-     * Test that we can walk a tree to the target node.
-     */
-    @Test
-    @Category(NodeFindInPathTestsCategory.class)
-    public void shouldWalkTreeToNode() {
-        //given
-        val root = Nodes.unnamedRoot("root");
-        Nodes.namedChild("child", "child", Nodes.unnamedChild("parent", root));
-        immutableNode = Nodes.asImmutable(root);
-        //when
-        val result = immutableNode.findInPath(Arrays.asList("parent", "child"));
-        //then
-        assertThat(result.isPresent()).isTrue();
-        if (result.isPresent()) {
-            assertThat(result.get()
-                             .getName()).isEqualTo("child");
+    @Nested
+    @DisplayName("findInPath")
+    public class FindInPathTests {
+
+        /**
+         * Test that we can walk a tree to the target node.
+         */
+        @Test
+        public void shouldWalkTreeToNode() {
+            //given
+            val root = Nodes.unnamedRoot("root");
+            Nodes.namedChild("child", "child", Nodes.unnamedChild("parent", root));
+            immutableNode = Nodes.asImmutable(root);
+            //when
+            val result = immutableNode.findInPath(Arrays.asList("parent", "child"));
+            //then
+            assertThat(result.isPresent()).isTrue();
+            result.map(value ->
+                    assertThat(value.getName()).isEqualTo("child"));
         }
     }
 
@@ -152,7 +151,6 @@ public class ImmutableNodeItemTest {
      * doesn't exist.
      */
     @Test
-    @Category(NodeFindInPathTestsCategory.class)
     public void shouldNotFindNonExistentChildNode() {
         //given
         val root = Nodes.unnamedRoot("root");
@@ -168,14 +166,14 @@ public class ImmutableNodeItemTest {
      * Test that when we pass null we get an exception.
      */
     @Test
-    @Category(NodeFindInPathTestsCategory.class)
     public void shouldThrowNEWhenWalkTreeNull() {
         //given
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot("subject"));
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("path");
         //when
-        immutableNode.findInPath(null);
+        assertThatNullPointerException()
+                .isThrownBy(() ->
+                        immutableNode.findInPath(null))
+                .withMessageContaining("path");
     }
 
     /**
@@ -183,7 +181,6 @@ public class ImmutableNodeItemTest {
      * a result.
      */
     @Test
-    @Category(NodeFindInPathTestsCategory.class)
     public void shouldReturnEmptyForEmptyWalkTreePath() {
         //given
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot("subject"));
@@ -218,10 +215,11 @@ public class ImmutableNodeItemTest {
     public void getChildShouldThrowNPEWhenThereIsNoChild() {
         //given
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot("data"));
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("child");
         //when
-        immutableNode.findChild(null);
+        assertThatNullPointerException()
+                .isThrownBy(() ->
+                        immutableNode.findChild(null))
+                .withMessageContaining("child");
     }
 
     @Test
@@ -258,19 +256,22 @@ public class ImmutableNodeItemTest {
     public void removingParentThrowsException() {
         //given
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot(null));
-        expectImmutableException();
         //when
-        immutableNode.removeParent();
+        assertThatExceptionOfType(UnsupportedOperationException.class)
+                .isThrownBy(() ->
+                        immutableNode.removeParent())
+                .withMessage("Immutable object");
     }
 
     @Test
     public void findChildNamedShouldThrowNPEWhenNameIsNull() {
         //given
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("name");
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot(null));
         //when
-        immutableNode.findChildByName(null);
+        assertThatNullPointerException()
+                .isThrownBy(() ->
+                        immutableNode.findChildByName(null))
+                .withMessageContaining("name");
     }
 
     @Test
@@ -301,27 +302,33 @@ public class ImmutableNodeItemTest {
     public void removeChildThrowsExceptions() {
         //given
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot(null));
-        expectImmutableException();
         //then
-        immutableNode.removeChild(null);
+        assertThatExceptionOfType(UnsupportedOperationException.class)
+                .isThrownBy(() ->
+                        immutableNode.removeChild(null))
+                .withMessage("Immutable object");
     }
 
     @Test
     public void setDataShouldThrowException() {
         //given
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot("initial"));
-        expectImmutableException();
         //when
-        immutableNode.setData("updated");
+        assertThatExceptionOfType(UnsupportedOperationException.class)
+                .isThrownBy(() ->
+                        immutableNode.setData("updated"))
+                .withMessage("Immutable object");
     }
 
     @Test
     public void createChildThrowsException() {
         //given
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot(null));
-        expectImmutableException();
         //when
-        immutableNode.createChild("child data", "child name");
+        assertThatExceptionOfType(UnsupportedOperationException.class)
+                .isThrownBy(() ->
+                        immutableNode.createChild("child data", "child name"))
+                .withMessage("Immutable object");
     }
 
     @Test
@@ -338,36 +345,43 @@ public class ImmutableNodeItemTest {
     public void createChildShouldThrowException() {
         //given
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot(""));
-        expectImmutableException();
         //when
-        immutableNode.createChild("child");
+        assertThatExceptionOfType(UnsupportedOperationException.class)
+                .isThrownBy(() ->
+                        immutableNode.createChild("child"))
+                .withMessage("Immutable object");
     }
 
     @Test
     public void createDescendantLineShouldThrowException() {
         //given
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot(""));
-        expectImmutableException();
         //when
-        immutableNode.createDescendantLine(Arrays.asList("child", "grandchild"));
+        assertThatExceptionOfType(UnsupportedOperationException.class)
+                .isThrownBy(() ->
+                        immutableNode.createDescendantLine(Arrays.asList("child", "grandchild")))
+                .withMessage("Immutable object");
     }
 
     @Test
     public void insertInPathShouldThrowException() {
         //given
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot(""));
-        expectImmutableException();
         //when
-        immutableNode.insertInPath(null, "");
+        assertThatExceptionOfType(UnsupportedOperationException.class)
+                .isThrownBy(() ->
+                        immutableNode.insertInPath(null, ""))
+                .withMessage("Immutable object");
     }
 
     @Test
     public void AsImmutableShouldThrowIAEWhenNotRoot() {
-        //given
-        exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("source must be the root node");
-        //when
-        Nodes.asImmutable(Nodes.unnamedChild("child", Nodes.unnamedRoot("root")));
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() ->
+                        Nodes.asImmutable(
+                                Nodes.unnamedChild("child",
+                                        Nodes.unnamedRoot("root"))))
+                .withMessage("source must be the root node");
     }
 
     @Test
