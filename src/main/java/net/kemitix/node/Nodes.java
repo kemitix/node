@@ -127,20 +127,20 @@ public final class Nodes {
     /**
      * Draw a representation of the tree.
      *
+     * @param node  the root node to draw
      * @param depth current depth for recursion
+     * @param <T>   the type of the node's content
      * @return a representation of the tree
      */
-    @SuppressWarnings("movevariableinsideif")
     public static <T> String drawTree(
             final Node<T> node,
             final int depth
     ) {
         final StringBuilder sb = new StringBuilder();
-        final String unnamed = "(unnamed)";
         if (node.isNamed()) {
             sb.append(formatByDepth(node.getName(), depth));
         } else if (!node.getChildren().isEmpty()) {
-            sb.append(formatByDepth(unnamed, depth));
+            sb.append(formatByDepth("(unnamed)", depth));
         }
         node.getChildren().forEach(c -> sb.append(drawTree(c, depth + 1)));
         return sb.toString();
