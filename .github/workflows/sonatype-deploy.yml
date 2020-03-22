@@ -16,7 +16,21 @@ jobs:
       - name: Build with Maven
         run: mvn -B install
       - name: Nexus Repo Publish
-        run: sh .github/deploy.sh
+        run: |
+          gpg --quiet \
+            --batch \
+            --yes \
+            --decrypt \
+            --passphrase="${{ secrets.GPG_PASSPHRASE }}" \
+            --output codesigning.asc \
+            .github/codesigning.asc.gpg
+          gpg --batch \
+            --fast-import codesigning.asc
+          mvn --settings .github/settings.xml \
+            -Dskip-Tests=true \
+            -P release \
+            -B \
+            deploy
         env:
           NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
           NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
