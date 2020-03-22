@@ -21,7 +21,9 @@
 
 package net.kemitix.node;
 
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.val;
 
 import java.util.*;
@@ -43,10 +45,13 @@ class NodeItem<T> implements Node<T> {
 
     private final Set<Node<T>> children = new HashSet<>();
 
+    @Setter
     private T data;
 
     private Node<T> parent;
 
+    @Setter
+    @Getter
     private String name;
 
     /**
@@ -83,16 +88,6 @@ class NodeItem<T> implements Node<T> {
     }
 
     @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    @Override
     public Optional<T> findData() {
         return Optional.ofNullable(data);
     }
@@ -103,11 +98,6 @@ class NodeItem<T> implements Node<T> {
             throw new EmptyNodeException(getName());
         }
         return data;
-    }
-
-    @Override
-    public void setData(final T data) {
-        this.data = data;
     }
 
     @Override
