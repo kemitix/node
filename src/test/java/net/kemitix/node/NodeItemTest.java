@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 /**
  * Test for {@link NodeItem}.
@@ -789,14 +790,16 @@ public class NodeItemTest {
     }
 
     @Test
+    @Category(IsNamedCategory.class)
     public void isNamedNull() {
         //given
-        node = Nodes.unnamedRoot(null);
+        node = Nodes.namedRoot(null, null);
         //then
         assertThat(node.isNamed()).isFalse();
     }
 
     @Test
+    @Category(IsNamedCategory.class)
     public void isNamedEmpty() {
         //given
         node = Nodes.namedRoot(null, "");
@@ -805,6 +808,7 @@ public class NodeItemTest {
     }
 
     @Test
+    @Category(IsNamedCategory.class)
     public void isNamedNamed() {
         //given
         node = Nodes.namedRoot(null, "named");
@@ -968,5 +972,18 @@ public class NodeItemTest {
         assertThat(resultRoot).isEmpty();
         assertThat(resultChild1).containsExactlyInAnyOrder(root);
         assertThat(resultChild3).containsExactlyInAnyOrder(child2, root);
+    }
+
+    @Test
+    public void whenNodeItemChildrenAreNullThenAsNoChildren() {
+        //when
+        NodeItem<String> nodeItem = new NodeItem<>(
+                "data",
+                "name",
+                null,
+                null);
+        //then
+        assertThat(nodeItem.getChildren())
+                .isEmpty();
     }
 }

@@ -57,13 +57,20 @@ class NodeItem<T> implements Node<T> {
      * @param parent   the parent of the node, or null for a root node
      * @param children the children of the node - must not be null
      */
-    NodeItem(final T data, final String name, final Node<T> parent, @NonNull final Set<Node<T>> children) {
+    NodeItem(
+            final T data,
+            final String name,
+            final Node<T> parent,
+            final Set<Node<T>> children
+    ) {
         this.data = data;
         this.name = name;
         if (parent != null) {
             doSetParent(parent);
         }
-        this.children.addAll(children);
+        if (children != null) {
+            this.children.addAll(children);
+        }
     }
 
     /**
@@ -178,7 +185,7 @@ class NodeItem<T> implements Node<T> {
         }
     }
 
-    private void verifyChildIsNotAnAncestor(final @NonNull Node<T> child) {
+    private void verifyChildIsNotAnAncestor(final Node<T> child) {
         if (this.equals(child) || isDescendantOf(child)) {
             throw new NodeException("Child is an ancestor");
         }
@@ -316,7 +323,7 @@ class NodeItem<T> implements Node<T> {
     }
 
     @Override
-    public Optional<Node<T>> findChildByName(final String named) {
+    public Optional<Node<T>> findChildByName(@NonNull final String named) {
         return children.stream()
                        .filter((Node<T> t) -> t.getName()
                                                .equals(named))
