@@ -85,7 +85,7 @@ public final class Nodes {
      */
     public static <T> Node<T> namedChild(
             final T data, final String name, final Node<T> parent
-                                        ) {
+    ) {
         return new NodeItem<>(data, name, parent, new HashSet<>());
     }
 
@@ -104,23 +104,49 @@ public final class Nodes {
         }
         final Set<Node<T>> children = getImmutableChildren(root);
         return ImmutableNodeItem.newRoot(root.findData()
-                                             .orElse(null), root.getName(), children);
+                .orElse(null), root.getName(), children);
     }
 
     private static <T> Set<Node<T>> getImmutableChildren(final Node<T> source) {
         return source.getChildren()
-                     .stream()
-                     .map(Nodes::asImmutableChild)
-                     .collect(Collectors.toSet());
+                .stream()
+                .map(Nodes::asImmutableChild)
+                .collect(Collectors.toSet());
     }
 
     private static <T> Node<T> asImmutableChild(
             final Node<T> source
-                                               ) {
+    ) {
         return ImmutableNodeItem.newChild(source.findData()
-                                                .orElse(null), source.getName(), source.findParent()
-                                                                                       .orElse(null),
-                                          getImmutableChildren(source)
-                                         );
+                        .orElse(null), source.getName(), source.findParent()
+                        .orElse(null),
+                getImmutableChildren(source)
+        );
+    }
+
+    /**
+     * Draw a representation of the tree.
+     *
+     * @param depth current depth for recursion
+     * @return a representation of the tree
+     */
+    @SuppressWarnings("movevariableinsideif")
+    public static <T> String drawTree(
+            final Node<T> node,
+            final int depth
+    ) {
+        final StringBuilder sb = new StringBuilder();
+        final String unnamed = "(unnamed)";
+        if (node.isNamed()) {
+            sb.append(formatByDepth(node.getName(), depth));
+        } else if (!node.getChildren().isEmpty()) {
+            sb.append(formatByDepth(unnamed, depth));
+        }
+        node.getChildren().forEach(c -> sb.append(drawTree(c, depth + 1)));
+        return sb.toString();
+    }
+
+    private static String formatByDepth(final String value, final int depth) {
+        return String.format("[%1$" + (depth + value.length()) + "s]\n", value);
     }
 }

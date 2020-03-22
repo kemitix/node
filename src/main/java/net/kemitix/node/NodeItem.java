@@ -21,7 +21,9 @@
 
 package net.kemitix.node;
 
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.val;
 
 import java.util.*;
@@ -38,15 +40,17 @@ import static net.kemitix.node.HeadTail.tail;
  *
  * @author Paul Campbell (pcampbell@kemitix.net)
  */
-@SuppressWarnings("methodcount")
 class NodeItem<T> implements Node<T> {
 
     private final Set<Node<T>> children = new HashSet<>();
 
+    @Setter
     private T data;
 
     private Node<T> parent;
 
+    @Setter
+    @Getter
     private String name;
 
     /**
@@ -57,13 +61,20 @@ class NodeItem<T> implements Node<T> {
      * @param parent   the parent of the node, or null for a root node
      * @param children the children of the node - must not be null
      */
-    NodeItem(final T data, final String name, final Node<T> parent, @NonNull final Set<Node<T>> children) {
+    NodeItem(
+            final T data,
+            final String name,
+            final Node<T> parent,
+            final Set<Node<T>> children
+    ) {
         this.data = data;
         this.name = name;
         if (parent != null) {
             doSetParent(parent);
         }
-        this.children.addAll(children);
+        if (children != null) {
+            this.children.addAll(children);
+        }
     }
 
     /**
@@ -76,31 +87,8 @@ class NodeItem<T> implements Node<T> {
     }
 
     @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    @Override
     public Optional<T> findData() {
         return Optional.ofNullable(data);
-    }
-
-    @Override
-    public T getData() {
-        if (isEmpty()) {
-            throw new EmptyNodeException(getName());
-        }
-        return data;
-    }
-
-    @Override
-    public void setData(final T data) {
-        this.data = data;
     }
 
     @Override
@@ -118,14 +106,6 @@ class NodeItem<T> implements Node<T> {
         return Optional.ofNullable(parent);
     }
 
-    @Override
-    public Node<T> getParent() {
-        if (parent == null) {
-            throw new OrphanedNodeException(getName());
-        }
-        return parent;
-    }
-
     /**
      * Make the current node a direct child of the parent.
      *
@@ -137,7 +117,7 @@ class NodeItem<T> implements Node<T> {
     }
 
     @SuppressWarnings("npathcomplexity")
-    private void doSetParent(@NonNull final Node<T> newParent) {
+    private void doSetParent(final Node<T> newParent) {
         if (this.equals(newParent) || newParent.isDescendantOf(this)) {
             throw new NodeException("Parent is a descendant");
         }
@@ -178,7 +158,7 @@ class NodeItem<T> implements Node<T> {
         }
     }
 
-    private void verifyChildIsNotAnAncestor(final @NonNull Node<T> child) {
+    private void verifyChildIsNotAnAncestor(final Node<T> child) {
         if (this.equals(child) || isDescendantOf(child)) {
             throw new NodeException("Child is an ancestor");
         }
@@ -235,11 +215,6 @@ class NodeItem<T> implements Node<T> {
                                 node.findData()
                                         .orElse(null)))
                 .findFirst();
-    }
-
-    @Override
-    public Node<T> getChild(final T child) {
-        return findChild(child).orElseThrow(() -> new NodeException("Child not found"));
     }
 
     /**
@@ -321,33 +296,6 @@ class NodeItem<T> implements Node<T> {
                        .filter((Node<T> t) -> t.getName()
                                                .equals(named))
                        .findAny();
-    }
-
-    @Override
-    public Node<T> getChildByName(final String named) {
-        final Optional<Node<T>> optional = findChildByName(named);
-        if (optional.isPresent()) {
-            return optional.get();
-        }
-        throw new NodeException("Named child not found");
-    }
-
-    @Override
-    @SuppressWarnings("movevariableinsideif")
-    public String drawTree(final int depth) {
-        final StringBuilder sb = new StringBuilder();
-        final String unnamed = "(unnamed)";
-        if (isNamed()) {
-            sb.append(formatByDepth(name, depth));
-        } else if (!children.isEmpty()) {
-            sb.append(formatByDepth(unnamed, depth));
-        }
-        getChildren().forEach(c -> sb.append(c.drawTree(depth + 1)));
-        return sb.toString();
-    }
-
-    private String formatByDepth(final String value, final int depth) {
-        return String.format("[%1$" + (depth + value.length()) + "s]\n", value);
     }
 
     @Override

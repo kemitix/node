@@ -59,13 +59,6 @@ public interface Node<T> {
     Optional<T> findData();
 
     /**
-     * Fetch the data held within the node.
-     *
-     * @return the node's data, or throws an {@link EmptyNodeException}
-     */
-    T getData();
-
-    /**
      * Set the data held within the node.
      *
      * @param data the node's data
@@ -92,13 +85,6 @@ public interface Node<T> {
      * @return an Optional contain the parent node, or empty if a root node
      */
     Optional<Node<T>> findParent();
-
-    /**
-     * Fetch the parent node.
-     *
-     * @return the parent node, or throws an {@link OrphanedNodeException}
-     */
-    Node<T> getParent();
 
     /**
      * Make the current node a direct child of the parent.
@@ -158,15 +144,6 @@ public interface Node<T> {
     Optional<Node<T>> findChild(T child);
 
     /**
-     * Fetches the node for the child if present.
-     *
-     * @param child the child's data to search for
-     *
-     * @return the child node if found
-     */
-    Node<T> getChild(T child);
-
-    /**
      * Checks if the node is an ancestor.
      *
      * @param node the potential ancestor
@@ -201,25 +178,6 @@ public interface Node<T> {
      * @return an Optional containing the child found or empty
      */
     Optional<Node<T>> findChildByName(String name);
-
-    /**
-     * Returns the child with the given name. If one can't be found a
-     * NodeException is thrown.
-     *
-     * @param name the name of the child
-     *
-     * @return the node
-     */
-    Node<T> getChildByName(String name);
-
-    /**
-     * Draw a representation of the tree.
-     *
-     * @param depth current depth for recursion
-     *
-     * @return a representation of the tree
-     */
-    String drawTree(int depth);
 
     /**
      * Returns true if the Node has a name. Where a name supplier is used, the
