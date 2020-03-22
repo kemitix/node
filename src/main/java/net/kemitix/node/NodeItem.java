@@ -137,7 +137,7 @@ class NodeItem<T> implements Node<T> {
     }
 
     @SuppressWarnings("npathcomplexity")
-    private void doSetParent(@NonNull final Node<T> newParent) {
+    private void doSetParent(final Node<T> newParent) {
         if (this.equals(newParent) || newParent.isDescendantOf(this)) {
             throw new NodeException("Parent is a descendant");
         }
@@ -316,7 +316,7 @@ class NodeItem<T> implements Node<T> {
     }
 
     @Override
-    public Optional<Node<T>> findChildByName(@NonNull final String named) {
+    public Optional<Node<T>> findChildByName(final String named) {
         return children.stream()
                        .filter((Node<T> t) -> t.getName()
                                                .equals(named))
