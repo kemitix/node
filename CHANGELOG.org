@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ** Added
 
 - Add kemitix-maven-tiles 2.4.1
+- Tests run against JDK 8, 11 and 13 (#62)
 
 ** Changed
 
