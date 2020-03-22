@@ -93,14 +93,6 @@ class NodeItem<T> implements Node<T> {
     }
 
     @Override
-    public T getData() {
-        if (isEmpty()) {
-            throw new EmptyNodeException(getName());
-        }
-        return data;
-    }
-
-    @Override
     public boolean isEmpty() {
         return data == null;
     }

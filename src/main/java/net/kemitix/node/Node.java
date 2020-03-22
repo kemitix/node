@@ -59,13 +59,6 @@ public interface Node<T> {
     Optional<T> findData();
 
     /**
-     * Fetch the data held within the node.
-     *
-     * @return the node's data, or throws an {@link EmptyNodeException}
-     */
-    T getData();
-
-    /**
      * Set the data held within the node.
      *
      * @param data the node's data

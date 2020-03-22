@@ -34,18 +34,6 @@ public class ImmutableNodeItemTest {
     }
 
     @Test
-    public void getDataReturnsData() {
-        //given
-        val data = "this immutableNode data";
-        //when
-        immutableNode = Nodes.asImmutable(Nodes.unnamedRoot(data));
-        //then
-        assertThat(immutableNode.getData()).as("can get the data from a immutableNode")
-                                           .
-                                                   contains(data);
-    }
-
-    @Test
     public void canCreateAnEmptyAndUnnamedNode() {
         //when
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot(null));
@@ -215,10 +203,9 @@ public class ImmutableNodeItemTest {
         val result = immutableNode.findChild("child");
         //then
         assertThat(result.isPresent()).isTrue();
-        if (result.isPresent()) {
-            assertThat(result.get()
-                             .getData()).contains("child");
-        }
+        result.map(resultNode ->
+                assertThat(resultNode.findData())
+                        .contains("child"));
     }
 
     /**

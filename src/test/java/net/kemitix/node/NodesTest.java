@@ -23,7 +23,7 @@ public class NodesTest {
     public void shouldCreateUnnamedRoot() throws Exception {
         val node = Nodes.unnamedRoot("data");
         SoftAssertions softly = new SoftAssertions();
-        softly.assertThat(node.getData()).contains("data");
+        softly.assertThat(node.findData()).contains("data");
         softly.assertThat(node.getName()).isEmpty();
         softly.assertAll();
     }
@@ -32,7 +32,7 @@ public class NodesTest {
     public void shouldCreateNamedRoot() throws Exception {
         val node = Nodes.namedRoot("data", "name");
         SoftAssertions softly = new SoftAssertions();
-        softly.assertThat(node.getData()).contains("data");
+        softly.assertThat(node.findData()).contains("data");
         softly.assertThat(node.getName()).isEqualTo("name");
         softly.assertAll();
     }
@@ -42,7 +42,7 @@ public class NodesTest {
         val parent = Nodes.unnamedRoot("root");
         val node = Nodes.unnamedChild("data", parent);
         SoftAssertions softly = new SoftAssertions();
-        softly.assertThat(node.getData()).contains("data");
+        softly.assertThat(node.findData()).contains("data");
         softly.assertThat(node.getName()).isEmpty();
         softly.assertThat(node.findParent()).contains(parent);
         softly.assertAll();
@@ -53,7 +53,7 @@ public class NodesTest {
         val parent = Nodes.unnamedRoot("root");
         val node = Nodes.namedChild("data", "child", parent);
         SoftAssertions softly = new SoftAssertions();
-        softly.assertThat(node.getData()).contains("data");
+        softly.assertThat(node.findData()).contains("data");
         softly.assertThat(node.getName()).isEqualTo("child");
         softly.assertThat(node.findParent()).contains(parent);
         softly.assertAll();

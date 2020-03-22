@@ -29,27 +29,6 @@ public class NodeItemTest {
     private Node<String> node;
 
     @Test
-    public void getDataReturnsData() {
-        //given
-        val data = "this node data";
-        //when
-        node = Nodes.unnamedRoot(data);
-        //then
-        assertThat(node.getData()).as("can get the data from a node")
-                                  .contains(data);
-    }
-
-    @Test
-    public void getDataWhenEmptyThrowsException() throws Exception {
-        //given
-        node = Nodes.unnamedRoot(null);
-        assertThat(node.isEmpty()).isTrue();
-        exception.expect(EmptyNodeException.class);
-        //when
-        node.getData();
-    }
-
-    @Test
     public void findDataWhenFullReturnsData() {
         //given
         val data = "data";
@@ -701,12 +680,12 @@ public class NodeItemTest {
         node.insertInPath(grandchild, "child");
         node.insertInPath(child);
         //then
-        assertThat(node.getChildByName("child")
-                       .getData()).as("data in tree")
-                                  .contains("child data");
-        assertThat(node.getChildByName("child")
-                       .getChildByName("grandchild")).as("grandchild")
-                                                     .isSameAs(grandchild);
+        assertThat(node.getChildByName("child").findData())
+                .as("data in tree")
+                .contains("child data");
+        assertThat(node.getChildByName("child").getChildByName("grandchild"))
+                .as("grandchild")
+                .isSameAs(grandchild);
     }
 
     @Test
@@ -767,16 +746,16 @@ public class NodeItemTest {
         child.addChild(target);
         val addMe = Nodes.namedRoot("I'm new", "target");
         assertThat(addMe.findParent()).isEmpty();
-        assertThat(child.getChildByName("target")
-                        .isEmpty()).as("target starts empty")
-                                   .isTrue();
+        assertThat(child.getChildByName("target").isEmpty())
+                .as("target starts empty")
+                .isTrue();
         //when
         // addMe should replace target as the sole descendant of child
         node.insertInPath(addMe, "child");
         //then
-        assertThat(child.getChildByName("target")
-                        .getData()).as("target now contains data")
-                                   .contains("I'm new");
+        assertThat(child.getChildByName("target").findData())
+                .as("target now contains data")
+                .contains("I'm new");
     }
 
     @Test
@@ -837,7 +816,7 @@ public class NodeItemTest {
         //when
         node.setData("updated");
         //then
-        assertThat(node.getData()).contains("updated");
+        assertThat(node.findData()).contains("updated");
     }
 
     @Test
