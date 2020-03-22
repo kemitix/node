@@ -1,10 +1,9 @@
 package net.kemitix.node;
 
 import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for {@link NodeException}.
@@ -23,7 +22,8 @@ public class NodeExceptionTest {
         //when
         val nodeException = new NodeException(message);
         //then
-        assertThat(nodeException.getMessage(), is(message));
+        assertThat(nodeException.getMessage())
+                .isEqualTo(message);
     }
 
 }

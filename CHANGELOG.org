@@ -13,12 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ** Changed
 
+- Moved: Node.drawTree to Nodes (#60)
+- Pinned pitest-junit5-plugin at 0.9 (#59)
 - Replace Jenkins with Github Actions (#57)
 - [checkstyle] suppress npath complexity issues
 - [coverage] lower requirements
 - Clean up changelog and readme, and remove external build dependencies (#38)
-- Pinned pitest-junit5-plugin at 0.9 (#59)
-- Moved: Node.drawTree to Nodes (#60)
 
 ** Removed
 
@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ** Dependencies
 
+- Upgraded JUnit from 4.13 to Junit Jupiter 5.6.1
 - Bump kemitix-checkstyle-ruleset from 4.0.1 to 5.4.0 (#59)
 - Bump kemitix-parent from 5.2.0 to 5.3.0 (#56)
 - Bump lombok from 1.18.10 to 1.18.12 (#55)

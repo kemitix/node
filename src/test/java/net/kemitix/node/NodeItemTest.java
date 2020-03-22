@@ -2,10 +2,9 @@ package net.kemitix.node;
 
 import lombok.val;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,7 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 /**
  * Test for {@link NodeItem}.
@@ -21,9 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author pcampbell
  */
 public class NodeItemTest {
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     private Node<String> node;
 
@@ -140,10 +136,11 @@ public class NodeItemTest {
         //given
         node = Nodes.unnamedRoot("subject");
         val child = Nodes.unnamedChild("child", node);
-        exception.expect(NodeException.class);
-        exception.expectMessage("Parent is a descendant");
         //when
-        node.setParent(child);
+        assertThatExceptionOfType(NodeException.class)
+                .isThrownBy(() ->
+                        node.setParent(child))
+                .withMessage("Parent is a descendant");
     }
 
     /**
@@ -185,10 +182,11 @@ public class NodeItemTest {
     public void shouldThrowNPEWhenSetParentNull() {
         //given
         node = Nodes.unnamedRoot("subject");
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("parent");
         //when
-        node.setParent(null);
+        assertThatNullPointerException()
+                .isThrownBy(() ->
+                        node.setParent(null))
+                .withMessageContaining("parent");
     }
 
     /**
@@ -199,10 +197,11 @@ public class NodeItemTest {
     public void setParentShouldThrowNodeExceptionWhenParentIsSelf() {
         //given
         node = Nodes.unnamedRoot("subject");
-        exception.expect(NodeException.class);
-        exception.expectMessage("Parent is a descendant");
         //when
-        node.setParent(node);
+        assertThatExceptionOfType(NodeException.class)
+                .isThrownBy(() ->
+                        node.setParent(node))
+                .withMessage("Parent is a descendant");
     }
 
     /**
@@ -256,10 +255,11 @@ public class NodeItemTest {
     public void shouldThrowNPEWhenAddingNullAsChild() {
         //given
         node = Nodes.unnamedRoot("subject");
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("child");
         //when
-        node.addChild(null);
+        assertThatNullPointerException()
+                .isThrownBy(() ->
+                        node.addChild(null))
+                .withMessageContaining("child");
     }
 
     /**
@@ -285,10 +285,11 @@ public class NodeItemTest {
     public void addChildShouldThrowNodeExceptionWhenAddingANodeAsOwnChild() {
         //given
         node = Nodes.unnamedRoot("subject");
-        exception.expect(NodeException.class);
-        exception.expectMessage("Child is an ancestor");
         //then
-        node.addChild(node);
+        assertThatExceptionOfType(NodeException.class)
+                .isThrownBy(() ->
+                        node.addChild(node))
+                .withMessage("Child is an ancestor");
     }
 
     /**
@@ -298,10 +299,11 @@ public class NodeItemTest {
     public void addChildShouldThrowNodeExceptionWhenAddingSelfAsChild() {
         //given
         node = Nodes.unnamedRoot("subject");
-        exception.expect(NodeException.class);
-        exception.expectMessage("Child is an ancestor");
         //when
-        node.addChild(node);
+        assertThatExceptionOfType(NodeException.class)
+                .isThrownBy(() ->
+                        node.addChild(node))
+                .withMessage("Child is an ancestor");
     }
 
     /**
@@ -313,10 +315,11 @@ public class NodeItemTest {
         //given
         val parent = Nodes.unnamedRoot("parent");
         node = Nodes.unnamedChild("subject", parent);
-        exception.expect(NodeException.class);
-        exception.expectMessage("Child is an ancestor");
         //when
-        node.addChild(parent);
+        assertThatExceptionOfType(NodeException.class)
+                .isThrownBy(() ->
+                        node.addChild(parent))
+                .withMessage("Child is an ancestor");
     }
 
     /**
@@ -329,10 +332,11 @@ public class NodeItemTest {
         val grandParent = Nodes.unnamedRoot("grandparent");
         val parent = Nodes.unnamedChild("parent", grandParent);
         node = Nodes.unnamedChild("subject", parent);
-        exception.expect(NodeException.class);
-        exception.expectMessage("Child is an ancestor");
         //when
-        node.addChild(grandParent);
+        assertThatExceptionOfType(NodeException.class)
+                .isThrownBy(() ->
+                        node.addChild(grandParent))
+                .withMessage("Child is an ancestor");
     }
 
     /**
@@ -347,82 +351,84 @@ public class NodeItemTest {
         node.addChild(child);
         //then
         assertThat(child.findParent()).as("when a node is added as a child, the child has the node as " + "its parent")
-                                      .contains(node);
+                .contains(node);
     }
 
-    /**
-     * Test that we can walk a tree to the target node.
-     */
-    @Test
-    @Category(NodeFindInPathTestsCategory.class)
-    public void shouldWalkTreeToNode() {
-        //given
-        val grandparent = "grandparent";
-        val grandParentNode = Nodes.unnamedRoot(grandparent);
-        val parent = "parent";
-        val parentNode = Nodes.unnamedChild(parent, grandParentNode);
-        val subject = "subject";
-        node = Nodes.unnamedChild(subject, parentNode);
-        //when
-        val result = grandParentNode.findInPath(
-                Arrays.asList(parent, subject));
-        //then
-        assertThat(result.isPresent())
-                .as("when we walk the tree to a node it is found")
-                .isTrue();
-        result.ifPresent(
-                stringNode ->
-                        assertThat(stringNode)
-                                .as("when we walk the tree to a node we find the correct node")
-                                .isSameAs(node));
-    }
+    @Nested
+    @DisplayName("findInPath")
+    public class FindInPathTests {
 
-    /**
-     * Test that we get an empty {@link Optional} when walking a path that
-     * doesn't exist.
-     */
-    @Test
-    @Category(NodeFindInPathTestsCategory.class)
-    public void shouldNotFindNonExistentChildNode() {
-        //given
-        val parent = "parent";
-        val parentNode = Nodes.unnamedRoot(parent);
-        val subject = "subject";
-        node = Nodes.unnamedChild(subject, parentNode);
-        //when
-        val result = parentNode.findInPath(Arrays.asList(subject, "no child"));
-        //then
-        assertThat(result.isPresent()).as("when we walk the tree to a node that doesn't exists, nothing" + " is found")
-                                      .isFalse();
-    }
+        /**
+         * Test that we can walk a tree to the target node.
+         */
+        @Test
+        public void shouldWalkTreeToNode() {
+            //given
+            val grandparent = "grandparent";
+            val grandParentNode = Nodes.unnamedRoot(grandparent);
+            val parent = "parent";
+            val parentNode = Nodes.unnamedChild(parent, grandParentNode);
+            val subject = "subject";
+            node = Nodes.unnamedChild(subject, parentNode);
+            //when
+            val result = grandParentNode.findInPath(
+                    Arrays.asList(parent, subject));
+            //then
+            assertThat(result.isPresent())
+                    .as("when we walk the tree to a node it is found")
+                    .isTrue();
+            result.ifPresent(
+                    stringNode ->
+                            assertThat(stringNode)
+                                    .as("when we walk the tree to a node we find the correct node")
+                                    .isSameAs(node));
+        }
 
-    /**
-     * Test that when we pass null we get an exception.
-     */
-    @Test
-    @Category(NodeFindInPathTestsCategory.class)
-    public void shouldThrowNPEWhenWalkTreeNull() {
-        //given
-        node = Nodes.unnamedRoot("subject");
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("path");
-        //when
-        node.findInPath(null);
-    }
+        /**
+         * Test that we get an empty {@link Optional} when walking a path that
+         * doesn't exist.
+         */
+        @Test
+        public void shouldNotFindNonExistentChildNode() {
+            //given
+            val parent = "parent";
+            val parentNode = Nodes.unnamedRoot(parent);
+            val subject = "subject";
+            node = Nodes.unnamedChild(subject, parentNode);
+            //when
+            val result = parentNode.findInPath(Arrays.asList(subject, "no child"));
+            //then
+            assertThat(result.isPresent()).as("when we walk the tree to a node that doesn't exists, nothing" + " is found")
+                    .isFalse();
+        }
 
-    /**
-     * Test that when we pass an empty path we get and empty {@link Optional} as
-     * a result.
-     */
-    @Test
-    @Category(NodeFindInPathTestsCategory.class)
-    public void shouldReturnEmptyForEmptyWalkTreePath() {
-        //given
-        node = Nodes.unnamedRoot("subject");
-        //when
-        val result = node.findInPath(Collections.emptyList());
-        //then
-        assertThat(result).isEmpty();
+        /**
+         * Test that when we pass null we get an exception.
+         */
+        @Test
+        public void shouldThrowNPEWhenWalkTreeNull() {
+            //given
+            node = Nodes.unnamedRoot("subject");
+            //when
+            assertThatNullPointerException()
+                    .isThrownBy(() ->
+                            node.findInPath(null))
+                    .withMessageContaining("path");
+        }
+
+        /**
+         * Test that when we pass an empty path we get and empty {@link Optional} as
+         * a result.
+         */
+        @Test
+        public void shouldReturnEmptyForEmptyWalkTreePath() {
+            //given
+            node = Nodes.unnamedRoot("subject");
+            //when
+            val result = node.findInPath(Collections.emptyList());
+            //then
+            assertThat(result).isEmpty();
+        }
     }
 
     /**
@@ -472,10 +478,11 @@ public class NodeItemTest {
     public void createDescendantLineShouldThrowNPEWhenDescendantsAreNull() {
         //given
         node = Nodes.unnamedRoot("subject");
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("descendants");
         //when
-        node.createDescendantLine(null);
+        assertThatNullPointerException()
+                .isThrownBy(() ->
+                        node.createDescendantLine(null))
+                .withMessageContaining("descendants");
     }
 
     /**
@@ -519,10 +526,11 @@ public class NodeItemTest {
     public void getChildShouldThrowNPEWhenThereIsNoChild() {
         //given
         node = Nodes.unnamedRoot("data");
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("child");
         //when
-        node.findChild(null);
+        assertThatNullPointerException()
+                .isThrownBy(() ->
+                        node.findChild(null))
+                .withMessageContaining("child");
     }
 
     /**
@@ -554,10 +562,11 @@ public class NodeItemTest {
     public void createChildShouldThrowNPEWhenChildIsNull() {
         //given
         node = Nodes.unnamedRoot("subject");
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("child");
         //when
-        node.createChild(null);
+        assertThatNullPointerException()
+                .isThrownBy(() ->
+                        node.createChild(null))
+                .withMessageContaining("child");
     }
 
     @Test
@@ -573,10 +582,11 @@ public class NodeItemTest {
         val alpha = Nodes.namedRoot("alpha data", "alpha");
         node.addChild(alpha);
         val beta = Nodes.namedRoot("beta data", "alpha");
-        exception.expect(NodeException.class);
-        exception.expectMessage("Node with that name already exists here");
         //when
-        node.addChild(beta);
+        assertThatExceptionOfType(NodeException.class)
+                .isThrownBy(() ->
+                        node.addChild(beta))
+                .withMessage("Node with that name already exists here");
     }
 
     @Test
@@ -681,8 +691,6 @@ public class NodeItemTest {
     @Test
     public void placeNodeInTreeWhereNonEmptyNodeWithSameNameExists() {
         //given
-        exception.expect(NodeException.class);
-        exception.expectMessage("A non-empty node named 'grandchild' already exists here");
         node = Nodes.unnamedRoot(null);
         val child = Nodes.namedChild("child data", "child", node);
         Nodes.namedChild("data", "grandchild", child);
@@ -690,7 +698,14 @@ public class NodeItemTest {
         // only grandchild has data
         //when
         // attempt to add another node called 'grandchild' to 'child'
-        node.insertInPath(Nodes.namedRoot("cuckoo", "grandchild"), "child");
+        assertThatExceptionOfType(NodeException.class)
+                .isThrownBy(() ->
+                        node.insertInPath(
+                                Nodes.namedRoot(
+                                        "cuckoo",
+                                        "grandchild"),
+                                "child"))
+                .withMessage("A non-empty node named 'grandchild' already exists here");
     }
 
     @Test
@@ -730,38 +745,41 @@ public class NodeItemTest {
     @Test
     public void findChildNamedShouldThrowNPEWhenNameIsNull() {
         //given
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("name");
         node = Nodes.unnamedRoot(null);
         //when
-        node.findChildByName(null);
+        assertThatNullPointerException()
+                .isThrownBy(() ->
+                        node.findChildByName(null))
+                .withMessageContaining("name");
     }
 
-    @Test
-    @Category(IsNamedCategory.class)
-    public void isNamedNull() {
-        //given
-        node = Nodes.namedRoot(null, null);
-        //then
-        assertThat(node.isNamed()).isFalse();
-    }
+    @Nested
+    @DisplayName("isNamed")
+    public class IsNamedTests {
 
-    @Test
-    @Category(IsNamedCategory.class)
-    public void isNamedEmpty() {
-        //given
-        node = Nodes.namedRoot(null, "");
-        //then
-        assertThat(node.isNamed()).isFalse();
-    }
+        @Test
+        public void isNamedNull() {
+            //given
+            node = Nodes.namedRoot(null, null);
+            //then
+            assertThat(node.isNamed()).isFalse();
+        }
 
-    @Test
-    @Category(IsNamedCategory.class)
-    public void isNamedNamed() {
-        //given
-        node = Nodes.namedRoot(null, "named");
-        //then
-        assertThat(node.isNamed()).isTrue();
+        @Test
+        public void isNamedEmpty() {
+            //given
+            node = Nodes.namedRoot(null, "");
+            //then
+            assertThat(node.isNamed()).isFalse();
+        }
+
+        @Test
+        public void isNamedNamed() {
+            //given
+            node = Nodes.namedRoot(null, "named");
+            //then
+            assertThat(node.isNamed()).isTrue();
+        }
     }
 
     @Test
