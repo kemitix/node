@@ -70,14 +70,15 @@ public class ImmutableNodeItemTest {
     @Test
     public void shouldContainImmutableCopyOfChild() {
         //given
-        val parent = Nodes.unnamedRoot("root");
-        val child = Nodes.namedChild("child", "child", parent);
+        Node<String> parent = Nodes.unnamedRoot("root");
+        Node<String> child = Nodes.namedChild("child", "child", parent);
         //when
         immutableNode = Nodes.asImmutable(parent);
         //then
-        val immutableChild = immutableNode.getChildByName("child");
-        assertThat(immutableChild).isNotSameAs(child);
-        assertThat(immutableChild.getName()).isEqualTo("child");
+        Optional<Node<String>> immutableChild =
+                immutableNode.findChildByName("child");
+        assertThat(immutableChild).isNotEqualTo(Optional.of(child));
+        assertThat(immutableChild.map(Node::getName)).contains("child");
     }
 
     @Test
@@ -89,13 +90,14 @@ public class ImmutableNodeItemTest {
         immutableNode = Nodes.asImmutable(parent);
         //then
         // get the immutable node's child's parent
-        val immutableChild = immutableNode.getChildByName("child");
-        final Optional<Node<String>> optionalParent = immutableChild.findParent();
-        if (optionalParent.isPresent()) {
-            val p = optionalParent.get();
-            assertThat(p).hasFieldOrPropertyWithValue("name", "root")
-                         .hasFieldOrPropertyWithValue("data", "parent");
-        }
+        Optional<Node<String>> foundParent =
+                immutableNode.findChildByName("child")
+                        .flatMap(Node::findParent);
+        assertThat(foundParent).isNotEmpty();
+        foundParent.ifPresent(p ->
+                assertThat(p)
+                        .hasFieldOrPropertyWithValue("name", "root")
+                        .hasFieldOrPropertyWithValue("data", "parent"));
     }
 
     @Test
@@ -232,9 +234,10 @@ public class ImmutableNodeItemTest {
         root.addChild(beta);
         immutableNode = Nodes.asImmutable(root);
         //when
-        val result = immutableNode.getChildByName("alpha");
+        Optional<Node<String>> result = immutableNode.findChildByName("alpha");
         //then
-        assertThat(result.getName()).isEqualTo(alpha.getName());
+        assertThat(result.map(Node::getName))
+                .contains(alpha.getName());
     }
 
     @Test
@@ -245,11 +248,10 @@ public class ImmutableNodeItemTest {
         val beta = Nodes.namedRoot("beta data", "beta");
         root.addChild(alpha);
         root.addChild(beta);
-        exception.expect(NodeException.class);
-        exception.expectMessage("Named child not found");
         immutableNode = Nodes.asImmutable(root);
-        //when
-        immutableNode.getChildByName("gamma");
+        //then
+        assertThat(immutableNode.findChildByName("gamma"))
+                .isEmpty();
     }
 
     @Test

@@ -300,15 +300,6 @@ class NodeItem<T> implements Node<T> {
     }
 
     @Override
-    public Node<T> getChildByName(final String named) {
-        final Optional<Node<T>> optional = findChildByName(named);
-        if (optional.isPresent()) {
-            return optional.get();
-        }
-        throw new NodeException("Named child not found");
-    }
-
-    @Override
     public boolean isNamed() {
         String currentName = getName();
         return currentName != null && currentName.length() > 0;

@@ -567,34 +567,6 @@ public class NodeItemTest {
     }
 
     @Test
-    public void getChildNamedFindsChild() {
-        //given
-        node = Nodes.namedRoot("root data", "root");
-        val alpha = Nodes.namedRoot("alpha data", "alpha");
-        val beta = Nodes.namedRoot("beta data", "beta");
-        node.addChild(alpha);
-        node.addChild(beta);
-        //when
-        val result = node.getChildByName("alpha");
-        //then
-        assertThat(result).isSameAs(alpha);
-    }
-
-    @Test
-    public void getChildNamedFindsNothing() {
-        //given
-        node = Nodes.namedRoot("root data", "root");
-        val alpha = Nodes.namedRoot("alpha data", "alpha");
-        val beta = Nodes.namedRoot("beta data", "beta");
-        node.addChild(alpha);
-        node.addChild(beta);
-        exception.expect(NodeException.class);
-        exception.expectMessage("Named child not found");
-        //when
-        node.getChildByName("gamma");
-    }
-
-    @Test
     public void nodeNamesAreUniqueWithinAParent() {
         //given
         node = Nodes.namedRoot("root data", "root");
@@ -638,14 +610,15 @@ public class NodeItemTest {
                     assertThat(oneNode.getName()).isEqualTo("one");
                     assertThat(oneNode.findParent()).contains(node);
                 }));
-        assertThat(node.getChildByName("one")
-                .getChildByName("two")
-                .getChildByName("three")
-                .getChildByName("four")).isSameAs(four);
+        Optional<Node<String>> fourNode = node.findChildByName("one")
+                .flatMap(oneChild -> oneChild.findChildByName("two"))
+                .flatMap(twoChild -> twoChild.findChildByName("three"))
+                .flatMap(threeChild -> threeChild.findChildByName("four"));
+        assertThat(fourNode).isNotEmpty();
+        assertThat(fourNode).contains(four);
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void canPlaceInTreeUnderExistingNode() {
         //given
         node = Nodes.namedRoot(null, "root");
@@ -655,15 +628,17 @@ public class NodeItemTest {
         node.insertInPath(child); // as root/child
         node.insertInPath(grandchild, "child"); // as root/child/grandchild
         //then
-        assertThat(node.getChildByName("child")).as("child")
-                                                .isSameAs(child);
-        assertThat(node.getChildByName("child")
-                       .getChildByName("grandchild")).as("grandchild")
-                                                     .isSameAs(grandchild);
+        assertThat(node.findChildByName("child"))
+                .as("child")
+                .contains(child);
+        Optional<Node<String>> grandNode = node.findChildByName("child")
+                .flatMap(childNode -> childNode.findChildByName("grandchild"));
+        assertThat(grandNode)
+                .as("grandchild")
+                .contains(grandchild);
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void canPlaceInTreeAboveExistingNode() {
         //given
         node = Nodes.namedRoot(null, "root");
@@ -673,12 +648,14 @@ public class NodeItemTest {
         node.insertInPath(grandchild, "child");
         node.insertInPath(child);
         //then
-        assertThat(node.getChildByName("child").findData())
+        assertThat(node.findChildByName("child").flatMap(Node::findData))
                 .as("data in tree")
                 .contains("child data");
-        assertThat(node.getChildByName("child").getChildByName("grandchild"))
+        assertThat(
+                node.findChildByName("child").flatMap(childNode ->
+                        childNode.findChildByName("grandchild")))
                 .as("grandchild")
-                .isSameAs(grandchild);
+                .contains(grandchild);
     }
 
     @Test
@@ -729,7 +706,6 @@ public class NodeItemTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void placeNodeInTreeWhenEmptyChildWithTargetNameExists() {
         //given
         node = Nodes.unnamedRoot(null);
@@ -737,16 +713,16 @@ public class NodeItemTest {
         final Node<String> target = Nodes.namedRoot(null, "target");
         node.addChild(child);
         child.addChild(target);
-        val addMe = Nodes.namedRoot("I'm new", "target");
+        Node<String> addMe = Nodes.namedRoot("I'm new", "target");
         assertThat(addMe.findParent()).isEmpty();
-        assertThat(child.getChildByName("target").isEmpty())
+        assertThat(child.findChildByName("target").flatMap(Node::findData))
                 .as("target starts empty")
-                .isTrue();
+                .isEmpty();
         //when
         // addMe should replace target as the sole descendant of child
         node.insertInPath(addMe, "child");
         //then
-        assertThat(child.getChildByName("target").findData())
+        assertThat(child.findChildByName("target").flatMap(Node::findData))
                 .as("target now contains data")
                 .contains("I'm new");
     }

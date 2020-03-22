@@ -180,16 +180,6 @@ public interface Node<T> {
     Optional<Node<T>> findChildByName(String name);
 
     /**
-     * Returns the child with the given name. If one can't be found a
-     * NodeException is thrown.
-     *
-     * @param name the name of the child
-     *
-     * @return the node
-     */
-    Node<T> getChildByName(String name);
-
-    /**
      * Returns true if the Node has a name. Where a name supplier is used, the
      * generated name is used.
      *
