@@ -40,7 +40,6 @@ import static net.kemitix.node.HeadTail.tail;
  *
  * @author Paul Campbell (pcampbell@kemitix.net)
  */
-@SuppressWarnings("methodcount")
 class NodeItem<T> implements Node<T> {
 
     private final Set<Node<T>> children = new HashSet<>();
