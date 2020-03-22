@@ -330,24 +330,6 @@ class NodeItem<T> implements Node<T> {
     }
 
     @Override
-    @SuppressWarnings("movevariableinsideif")
-    public String drawTree(final int depth) {
-        final StringBuilder sb = new StringBuilder();
-        final String unnamed = "(unnamed)";
-        if (isNamed()) {
-            sb.append(formatByDepth(name, depth));
-        } else if (!children.isEmpty()) {
-            sb.append(formatByDepth(unnamed, depth));
-        }
-        getChildren().forEach(c -> sb.append(c.drawTree(depth + 1)));
-        return sb.toString();
-    }
-
-    private String formatByDepth(final String value, final int depth) {
-        return String.format("[%1$" + (depth + value.length()) + "s]\n", value);
-    }
-
-    @Override
     public boolean isNamed() {
         String currentName = getName();
         return currentName != null && currentName.length() > 0;

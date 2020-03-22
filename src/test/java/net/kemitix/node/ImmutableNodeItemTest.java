@@ -317,27 +317,6 @@ public class ImmutableNodeItemTest {
     }
 
     @Test
-    public void drawTreeIsCorrect() {
-        //given
-        val root = Nodes.namedRoot("root data", "root");
-        val bob = Nodes.namedChild("bob data", "bob", root);
-        val alice = Nodes.namedChild("alice data", "alice", root);
-        Nodes.namedChild("dave data", "dave", alice);
-        Nodes.unnamedChild("bob's child's data", bob); // has no name and no children so no included
-        val kim = Nodes.unnamedChild("kim data", root); // nameless mother
-        Nodes.namedChild("lucy data", "lucy", kim);
-        immutableNode = Nodes.asImmutable(root);
-        //when
-        val tree = immutableNode.drawTree(0);
-        //then
-        String[] lines = tree.split("\n");
-        assertThat(lines).contains("[root]", "[ alice]", "[  dave]", "[ (unnamed)]", "[  lucy]", "[ bob]");
-        assertThat(lines).containsSubsequence("[root]", "[ alice]", "[  dave]");
-        assertThat(lines).containsSubsequence("[root]", "[ (unnamed)]", "[  lucy]");
-        assertThat(lines).containsSubsequence("[root]", "[ bob]");
-    }
-
-    @Test
     public void setDataShouldThrowException() {
         //given
         immutableNode = Nodes.asImmutable(Nodes.unnamedRoot("initial"));

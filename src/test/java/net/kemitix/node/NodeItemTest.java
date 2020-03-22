@@ -831,26 +831,6 @@ public class NodeItemTest {
     }
 
     @Test
-    public void drawTreeIsCorrect() {
-        //given
-        node = Nodes.namedRoot(null, "root");
-        val bob = Nodes.namedChild("bob data", "bob", node);
-        val alice = Nodes.namedChild("alice data", "alice", node);
-        Nodes.namedChild("dave data", "dave", alice);
-        Nodes.unnamedChild("bob's child's data", bob); // has no name and no children so no included
-        val kim = Nodes.unnamedChild("kim data", node); // nameless mother
-        Nodes.namedChild("lucy data", "lucy", kim);
-        //when
-        val tree = node.drawTree(0);
-        //then
-        String[] lines = tree.split("\n");
-        assertThat(lines).contains("[root]", "[ alice]", "[  dave]", "[ (unnamed)]", "[  lucy]", "[ bob]");
-        assertThat(lines).containsSubsequence("[root]", "[ alice]", "[  dave]");
-        assertThat(lines).containsSubsequence("[root]", "[ (unnamed)]", "[  lucy]");
-        assertThat(lines).containsSubsequence("[root]", "[ bob]");
-    }
-
-    @Test
     public void canChangeNodeData() {
         //given
         node = Nodes.unnamedRoot("initial");
