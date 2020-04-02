@@ -30,8 +30,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static net.kemitix.node.HeadTail.head;
-import static net.kemitix.node.HeadTail.tail;
+import static net.kemitix.list.HeadTail.head;
+import static net.kemitix.list.HeadTail.tail;
 
 /**
  * Represents a tree of nodes.

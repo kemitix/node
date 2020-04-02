@@ -22,6 +22,7 @@
         <tiles-maven-plugin.version>2.16</tiles-maven-plugin.version>
         <kemitix-maven-tiles.version>2.4.1</kemitix-maven-tiles.version>
         <kemitix-checkstyle.version>5.4.0</kemitix-checkstyle.version>
+        <list-head-tail.version>1.0.0</list-head-tail.version>
         <lombok.version>1.18.12</lombok.version>
         <assertj.version>3.15.0</assertj.version>
         <trajano-commons-testing.version>2.1.0</trajano-commons-testing.version>
@@ -46,6 +47,11 @@
     <inceptionYear>2016</inceptionYear>
 
     <dependencies>
+        <dependency>
+            <groupId>net.kemitix</groupId>
+            <artifactId>list-head-tail</artifactId>
+            <version>${list-head-tail.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
