@@ -23,7 +23,7 @@
         <kemitix-maven-tiles.version>2.4.1</kemitix-maven-tiles.version>
         <kemitix-checkstyle.version>5.4.0</kemitix-checkstyle.version>
         <list-head-tail.version>1.0.0</list-head-tail.version>
-        <lombok.version>1.18.20</lombok.version>
+        <lombok.version>1.18.24</lombok.version>
         <assertj.version>3.19.0</assertj.version>
         <trajano-commons-testing.version>2.1.0</trajano-commons-testing.version>
         <junit.version>5.7.2</junit.version>
